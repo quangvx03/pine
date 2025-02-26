@@ -1,0 +1,113 @@
+name: pine
+description: "A new Flutter project."
+
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.1
+
+
+#--------------- PACKAGES ---------------
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Utility packages
+  http: ^1.1.0
+  intl: ^0.18.1
+  logger: ^2.0.1
+  url_launcher: ^6.1.12
+  flutter_native_splash: ^2.4.4
+  smooth_page_indicator: ^1.2.0+3
+
+  # Icons
+  iconsax: ^0.0.8
+  cupertino_icons: ^1.0.8
+
+  # State management
+  get: ^4.6.6
+  get_storage: ^2.1.1
+
+  # Product specific
+  readmore: ^3.0.0
+  carousel_slider: ^5.0.0
+  flutter_rating_bar: ^4.0.1
+
+  # Firebase
+  firebase_core: ^3.12.0
+
+#--------------- PACKAGES END ---------------
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+
+flutter:
+  uses-material-design: true
+
+  #--------------- LOCAL ASSETS ---------------
+  assets:
+    - assets/logos/
+    - assets/icons/brands/
+    - assets/icons/categories/
+    - assets/icons/payment_method/
+    - assets/images/banners/
+    - assets/images/on_boarding_images/
+    - assets/images/animations/
+    - assets/images/products/
+    - assets/images/user/
+    - assets/images/reviews/
+
+  #--------------- LOCAL FONTS ---------------
+  fonts:
+    - family: Cabin
+      fonts:
+        - asset: assets/fonts/Cabin-Regular.ttf
+          weight: 300
+        - asset: assets/fonts/Cabin-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Cabin-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Cabin-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Cabin-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Cabin-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Cabin-Bold.ttf
+          weight: 800
+  
+  
+  
+  
+
+  
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
