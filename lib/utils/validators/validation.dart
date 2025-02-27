@@ -1,5 +1,14 @@
 
 class PValidator {
+
+  static String? validateEmptyText(String? fieldName, String? value){
+    if(value == null || value.isEmpty){
+      return '$fieldName là bắt buộc.';
+    }
+
+    return null;
+  }
+
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email là bắt buộc.';
@@ -17,7 +26,7 @@ class PValidator {
 
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Mật khẩu là bắt buộc".';
+      return 'Mật khẩu là bắt buộc.';
     }
 
     // check for minimum password length

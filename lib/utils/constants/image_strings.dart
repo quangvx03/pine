@@ -21,6 +21,8 @@ class PImages{
   static const String deliveredInPlaneIllustration = "assets/images/animations/pine-come-back-later.gif";
   static const String deliveredEmailIllustration = "assets/images/animations/pine-receives-a-mail.gif";
   static const String verifyIllustration = "assets/images/animations/pine-verify.gif";
+  static const String verify = "assets/images/animations/141594-animation-of-docer.json";
+
 
   // Category Icons
   static const String sportIcon = "assets/icons/categories/icons8-bowling-64.png";
