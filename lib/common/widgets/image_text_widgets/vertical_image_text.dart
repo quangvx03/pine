@@ -11,7 +11,6 @@ class PVerticalImageText extends StatelessWidget {
     required this.title,
     this.textColor = PColors.white,
     this.backgroundColor = PColors.white,
-    // this.backgroundColor,
     this.onTap,
   });
 
@@ -26,45 +25,38 @@ class PVerticalImageText extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.only(right: PSizes.spaceBtwItems),
-        child: Column(
-          children: [
-            /// Circular Icon
-            Container(
-              width: 56,
-              height: 56,
-              padding: const EdgeInsets.all(PSizes.sm),
-              decoration: BoxDecoration(
-                  // color:
-                  // backgroundColor ?? (dark ? PColors.black : PColors.white),
-                color: backgroundColor,
-                  borderRadius: BorderRadius.circular(100)),
-              child: Center(
-                child: Image(
-                    image: AssetImage(image),
-                    fit: BoxFit.cover,
-                    color: PColors.dark),
+      child: Column(
+        children: [
+          /// Circular Icon
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: backgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image(
+                image: AssetImage(image),
+                fit: BoxFit.contain,
+                color: PColors.dark,
               ),
             ),
+          ),
 
-            /// Text
-            const SizedBox(height: PSizes.spaceBtwItems / 2),
-            SizedBox(
-                width: 55,
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelMedium!
-                  .apply(color: textColor),
-                      // .apply(color: dark ? PColors.light : PColors.dark),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ))
-          ],
-        ),
+          /// Text
+          const SizedBox(height: PSizes.spaceBtwItems / 2),
+          SizedBox(
+              width: 65,
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: dark ? PColors.light : PColors.dark,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ))
+        ],
       ),
     );
   }

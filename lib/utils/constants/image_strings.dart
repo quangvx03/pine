@@ -4,6 +4,7 @@ class PImages{
   // App logos
   static const String darkAppLogo = "assets/logos/pine-logo-dark.png";
   static const String lightAppLogo = "assets/logos/pine-logo-white.png";
+  static const String logoWithSpacing = "assets/logos/pinews.png";
 
   // Social logos
   static const String google = "assets/logos/google-icon.png";
@@ -22,6 +23,7 @@ class PImages{
   static const String deliveredEmailIllustration = "assets/images/animations/pine-receives-a-mail.gif";
   static const String verifyIllustration = "assets/images/animations/pine-verify.gif";
   static const String verify = "assets/images/animations/141594-animation-of-docer.json";
+  static const String successfullyRegAnimation = "assets/images/animations/72462-check-register.json";
 
 
   // Category Icons

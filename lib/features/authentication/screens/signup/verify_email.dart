@@ -2,23 +2,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/common/widgets/success_screen/success_screen.dart';
+import 'package:pine/data/repositories/authentication/authentication_repository.dart';
 import 'package:pine/features/authentication/screens/login/login.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/constants/text_strings.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 import '../../../../utils/constants/image_strings.dart';
+import '../../controllers/signup/verify_email_controller.dart';
 
 class VerifyEmailScreen extends StatelessWidget {
-  const VerifyEmailScreen({super.key});
+  const VerifyEmailScreen({super.key, this.email});
+
+  final String? email;
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(VerifyEmailController());
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              onPressed: () => Get.offAll(() => const LoginScreen()),
+              onPressed: () => AuthenticationRepository.instance.logout(),
               icon: const Icon(CupertinoIcons.clear))
         ],
       ),
@@ -39,7 +45,7 @@ class VerifyEmailScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center),
               const SizedBox(height: PSizes.spaceBtwItems),
-              Text('support@pine.com',
+              Text(email ?? '',
                   style: Theme.of(context).textTheme.labelLarge,
                   textAlign: TextAlign.center),
               const SizedBox(height: PSizes.spaceBtwItems),
@@ -52,18 +58,13 @@ class VerifyEmailScreen extends StatelessWidget {
               SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                      onPressed: () => Get.to(() => SuccessScreen(
-                            image: PImages.staticSuccessIllustration,
-                            title: PTexts.yourAccountCreatedTitle,
-                            subTitle: PTexts.yourAccountCreatedSubTitle,
-                            onPressed: () => Get.to(() => const LoginScreen()),
-                          )),
+                      onPressed: () => controller.checkEmailVerificationStatus(),
                       child: const Text(PTexts.pContinue))),
               const SizedBox(height: PSizes.spaceBtwItems),
               SizedBox(
                   width: double.infinity,
                   child: TextButton(
-                      onPressed: () {},
+                      onPressed: () => controller.sendEmailVerification(),
                       style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 17),
                           shape: RoundedRectangleBorder(

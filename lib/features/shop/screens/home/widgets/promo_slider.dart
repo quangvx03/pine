@@ -24,10 +24,26 @@ class PPromoSlider extends StatelessWidget {
       children: [
         CarouselSlider(
             options: CarouselOptions(
-                viewportFraction: 1,
-                onPageChanged: (index, _) =>
-                    controller.updatePageIndicator(index)),
-            items: banners.map((url) => PRoundedImage(imageUrl: url)).toList()),
+              viewportFraction: 1,
+              onPageChanged: (index, _) =>
+                  controller.updatePageIndicator(index),
+              aspectRatio: 3 / 1,
+              autoPlay: true,
+              autoPlayInterval: Duration(seconds: 5),
+              autoPlayAnimationDuration: Duration(milliseconds: 1200),
+              autoPlayCurve: Curves.easeInOut,
+            ),
+            items: banners
+                .map((url) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: AspectRatio(
+                          aspectRatio: 3 / 1,
+                          child: PRoundedImage(
+                            imageUrl: url,
+                            fit: BoxFit.cover,
+                          )),
+                    ))
+                .toList()),
         const SizedBox(height: PSizes.spaceBtwItems),
         Center(
           child: Obx(

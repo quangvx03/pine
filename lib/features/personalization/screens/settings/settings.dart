@@ -8,6 +8,7 @@ import 'package:pine/common/widgets/custom_shapes/containers/primary_header_cont
 import 'package:pine/common/widgets/images/circular_image.dart';
 import 'package:pine/common/widgets/list_tiles/settings_menu_tile.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
+import 'package:pine/data/repositories/authentication/authentication_repository.dart';
 import 'package:pine/features/personalization/screens/address/address.dart';
 import 'package:pine/features/shop/screens/cart/cart.dart';
 import 'package:pine/features/shop/screens/order/order.dart';
@@ -107,42 +108,45 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () {},
                   ),
 
-                  /// App Settings
-                  SizedBox(height: PSizes.spaceBtwSections),
-                  PSectionHeading(
-                      title: 'Cài đặt ứng dụng', showActionButton: false),
-                  SizedBox(height: PSizes.spaceBtwItems),
-                  PSettingMenuTile(
-                    icon: Iconsax.document_upload,
-                    title: 'Tải dữ liệu',
-                    subTitle: 'Tải dữ liệu của bạn lên Cloud Firebase',
-                    onTap: () {},
-                  ),
-                  PSettingMenuTile(
-                    icon: Iconsax.location,
-                    title: 'Định vị địa lý',
-                    subTitle: 'Cài đặt gợi ý dựa trên vị trí',
-                    trailing: Switch(value: true, onChanged: (value) {}),
-                  ),
-                  PSettingMenuTile(
-                    icon: Iconsax.security_user,
-                    title: 'Chế độ an toàn',
-                    subTitle: 'Kết quả tìm kiếm an toàn cho mọi lứa tuổi',
-                    trailing: Switch(value: false, onChanged: (value) {}),
-                  ),
-                  PSettingMenuTile(
-                    icon: Iconsax.image,
-                    title: 'Chất lượng hình ảnh HD',
-                    subTitle: 'Cài đặt chất lượng hình ảnh hiển thị',
-                    trailing: Switch(value: false, onChanged: (value) {}),
-                  ),
+                  // /// App Settings
+                  // SizedBox(height: PSizes.spaceBtwSections),
+                  // PSectionHeading(
+                  //     title: 'Cài đặt ứng dụng', showActionButton: false),
+                  // SizedBox(height: PSizes.spaceBtwItems),
+                  // PSettingMenuTile(
+                  //   icon: Iconsax.document_upload,
+                  //   title: 'Tải dữ liệu',
+                  //   subTitle: 'Tải dữ liệu của bạn lên Cloud Firebase',
+                  //   onTap: () {},
+                  // ),
+                  // PSettingMenuTile(
+                  //   icon: Iconsax.location,
+                  //   title: 'Định vị địa lý',
+                  //   subTitle: 'Cài đặt gợi ý dựa trên vị trí',
+                  //   trailing: Switch(value: true, onChanged: (value) {}),
+                  // ),
+                  // PSettingMenuTile(
+                  //   icon: Iconsax.security_user,
+                  //   title: 'Chế độ an toàn',
+                  //   subTitle: 'Kết quả tìm kiếm an toàn cho mọi lứa tuổi',
+                  //   trailing: Switch(value: false, onChanged: (value) {}),
+                  // ),
+                  // PSettingMenuTile(
+                  //   icon: Iconsax.image,
+                  //   title: 'Chất lượng hình ảnh HD',
+                  //   subTitle: 'Cài đặt chất lượng hình ảnh hiển thị',
+                  //   trailing: Switch(value: false, onChanged: (value) {}),
+                  // ),
 
                   /// Logout Button
                   const SizedBox(height: PSizes.spaceBtwSections),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                        onPressed: () {}, child: const Text('Đăng xuất')),
+                        onPressed: () async {
+                          await AuthenticationRepository.instance.logout();
+                        },
+                        child: const Text('Đăng xuất')),
                   ),
                   const SizedBox(
                     height: PSizes.spaceBtwSections,

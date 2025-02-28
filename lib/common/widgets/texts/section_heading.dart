@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pine/utils/constants/colors.dart';
 
 class PSectionHeading extends StatelessWidget {
   const PSectionHeading({
@@ -28,7 +29,15 @@ class PSectionHeading extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis),
         if (showActionButton)
-          TextButton(onPressed: onPressed, child: Text(buttonTitle))
+          TextButton(
+              onPressed: onPressed,
+              child: Text(
+                buttonTitle,
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge!
+                    .apply(color: PColors.primary),
+              ))
       ],
     );
   }

@@ -46,7 +46,7 @@ class PTexts{
   static const String confirmEmailSubTitle = "Chúc mừng! Tài khoản của bạn đang chờ đợi: Xác minh email của bạn để bắt đầu mua sắm và trải nghiệm những ưu đãi không gì sánh bằng và các ưu đãi cá nhân hóa.";
   static const String emailNotReceivedMessage = "Không nhận được email? Kiểm tra thư rác hoặc gửi lại.";
   static const String yourAccountCreatedTitle = "Tài khoản của bạn đã được tạo thành công!";
-  static const String yourAccountCreatedSubTitle = "Chào mừng đến với Điểm đến mua sắm tối ưu của bạn: Tài khoản của bạn đã được tạo, hãy tận hưởng niềm vui mua sắm trực tuyến liền mạch!";
+  static const String yourAccountCreatedSubTitle = "Chào mừng đến với diểm đến mua sắm tối ưu của bạn: Tài khoản của bạn đã được tạo, hãy tận hưởng niềm vui mua sắm trực tuyến liền mạch!";
   static const String submit = "Gửi";
   static const String done = "Hoàn tất";
 
@@ -55,6 +55,6 @@ class PTexts{
 
 
   // Home
-  static const String homeAppbarTitle = "Ngày tuyệt vời để mua sắm";
+  static const String homeAppbarTitle = "Pine";
   static const String homeAppbarSubTitle = "Người dùng Pine";
 }

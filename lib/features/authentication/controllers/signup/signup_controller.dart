@@ -20,7 +20,7 @@ class SignupController extends GetxController {
   final hidePassword = true.obs;
   final firstName = TextEditingController();
   final phoneNumber = TextEditingController();
-  final privacyPolicy = true.obs;
+  final privacyPolicy = false.obs;
   GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
 
   void signup() async {
@@ -83,7 +83,7 @@ class SignupController extends GetxController {
               'Tài khoản của bạn đã được tạo! Xác minh email để tiếp tục.');
 
       // Move to verify Email Screen
-      Get.to(() => const VerifyEmailScreen());
+      Get.to(() =>  VerifyEmailScreen(email: email.text.trim()));
     } catch (e) {
       // Remove Loader
       PFullScreenLoader.stopLoading();

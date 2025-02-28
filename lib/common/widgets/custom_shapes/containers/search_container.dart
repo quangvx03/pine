@@ -15,6 +15,7 @@ class PSearchContainer extends StatelessWidget {
     this.showBorder = true,
     this.onTap,
     this.padding = const EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
+    this.height = 50, // Thêm thuộc tính chiều cao
   });
 
   final String text;
@@ -22,6 +23,7 @@ class PSearchContainer extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showBackground, showBorder;
   final EdgeInsetsGeometry padding;
+  final double height; // Thêm thuộc tính chiều cao
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +35,19 @@ class PSearchContainer extends StatelessWidget {
         padding: padding,
         child: Container(
           width: PDeviceUtils.getScreenWidth(context),
-          padding: const EdgeInsets.all(PSizes.md),
+          height: height, // Sử dụng thuộc tính chiều cao
+          padding: const EdgeInsets.symmetric(horizontal: PSizes.md, vertical: PSizes.sm), // Giảm padding dọc
           decoration: BoxDecoration(
               color: showBackground
                   ? dark
-                      ? PColors.dark
-                      : PColors.light
+                  ? PColors.dark
+                  : PColors.light
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
               border: showBorder ? Border.all(color: PColors.grey) : null),
           child: Row(
             children: [
-              Icon(icon, color: dark ?  PColors.darkerGrey : PColors.grey),
+              Icon(icon, color: dark ?  PColors.darkerGrey : PColors.grey, size: 20,), // Giảm kích thước icon
               const SizedBox(width: PSizes.spaceBtwItems),
               Text(text, style: Theme.of(context).textTheme.bodySmall),
             ],

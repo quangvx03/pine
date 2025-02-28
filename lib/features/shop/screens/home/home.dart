@@ -22,61 +22,61 @@ class HomeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const PPrimaryHeaderContainer(
-                child: Column(
+            Column(
               children: [
                 /// Appbar
                 PHomeAppBar(),
-                SizedBox(height: PSizes.spaceBtwSections),
+                SizedBox(height: PSizes.spaceBtwItems),
 
                 /// Searchbar
                 PSearchContainer(text: 'Tìm kiếm'),
-                SizedBox(height: PSizes.spaceBtwSections),
+                SizedBox(height: PSizes.defaultSpace),
+
+                /// Promo Slider
+                Padding(
+                  padding: EdgeInsets.only(left: PSizes.spaceBtwItems, right: PSizes.spaceBtwItems),
+                  child: PPromoSlider(
+                    banners: [
+                      PImages.promoBanner1,
+                      PImages.promoBanner2,
+                      PImages.promoBanner3,
+                    ],
+                  ),
+                ),
+                SizedBox(height: PSizes.spaceBtwItems),
 
                 /// Categories
                 Padding(
-                  padding: EdgeInsets.only(left: PSizes.defaultSpace),
+                  padding: EdgeInsets.only(left: PSizes.defaultSpace, right: PSizes.defaultSpace),
                   child: Column(
                     children: [
                       /// Heading
                       PSectionHeading(
                         title: 'Danh mục phổ biến',
-                        showActionButton: false,
-                        textColor: PColors.white,
+                        showActionButton: true,
                       ),
-                      SizedBox(height: PSizes.spaceBtwItems),
-
                       /// Categories
                       PHomeCategories()
                     ],
                   ),
                 ),
-                 SizedBox(height: PSizes.spaceBtwSections * 1.5),
               ],
-            )),
+            ),
 
             /// Body
             Padding(
               padding: const EdgeInsets.all(PSizes.defaultSpace),
               child: Column(
                 children: [
-                  /// Promo Slider
-                  const PPromoSlider(
-                    banners: [
-                      PImages.promoBanner1,
-                      PImages.promoBanner2,
-                      PImages.promoBanner3
-                    ],
-                  ),
-                  const SizedBox(height: PSizes.spaceBtwSections),
-
                   /// Heading
-                  PSectionHeading(title: 'Sản phẩm phổ biến', onPressed: () => Get.to(() => const AllProductsScreen())),
+                  PSectionHeading(
+                      title: 'Sản phẩm phổ biến',
+                      onPressed: () => Get.to(() => const AllProductsScreen())),
                   const SizedBox(height: PSizes.spaceBtwItems),
 
                   /// Popular Products
                   PGridLayout(
-                      itemCount: 4,
+                      itemCount: 6,
                       itemBuilder: (_, index) => const PProductCardVertical()),
                 ],
               ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pine/features/authentication/controllers/login/login_controller.dart';
 import 'package:pine/features/authentication/screens/password_configuration/forgot_password.dart';
 import 'package:pine/features/authentication/screens/signup/signup.dart';
 import 'package:pine/navigation_menu.dart';
+import 'package:pine/utils/validators/validation.dart';
 
 import '../../../../../utils/constants/sizes.dart';
 import '../../../../../utils/constants/text_strings.dart';
@@ -15,7 +17,10 @@ class PLoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LoginController());
+
     return Form(
+        key: controller.loginFormKey,
         child: Padding(
             padding:
                 const EdgeInsets.symmetric(vertical: PSizes.spaceBtwSections),
@@ -23,6 +28,8 @@ class PLoginForm extends StatelessWidget {
               children: [
                 /// Email
                 TextFormField(
+                  controller: controller.email,
+                  validator: (value) => PValidator.validateEmail(value),
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Iconsax.direct_right),
                     labelText: PTexts.email,
@@ -30,13 +37,22 @@ class PLoginForm extends StatelessWidget {
                 ),
                 const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                /// Password
-                TextFormField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Iconsax.password_check),
-                    labelText: PTexts.password,
-                    suffixIcon: Icon(Iconsax.eye_slash),
-                  ),
+                // Password
+                Obx(
+                  () => TextFormField(
+                      validator: (value) => PValidator.validatePassword(value),
+                      controller: controller.password,
+                      obscureText: controller.hidePassword.value,
+                      decoration: InputDecoration(
+                          labelText: PTexts.password,
+                          prefixIcon: const Icon(Iconsax.password_check),
+                          suffixIcon: IconButton(
+                            onPressed: () => controller.hidePassword.value =
+                                !controller.hidePassword.value,
+                            icon: Icon(controller.hidePassword.value
+                                ? Iconsax.eye_slash
+                                : Iconsax.eye),
+                          ))),
                 ),
                 const SizedBox(height: PSizes.spaceBtwInputFields / 2),
 
@@ -47,7 +63,10 @@ class PLoginForm extends StatelessWidget {
                     /// Remember Me
                     Row(
                       children: [
-                        Checkbox(value: true, onChanged: (value) {}),
+                        Obx(() => Checkbox(
+                            value: controller.rememberMe.value,
+                            onChanged: (value) => controller.rememberMe.value =
+                                !controller.rememberMe.value)),
                         const Text(PTexts.rememberMe),
                       ],
                     ),
@@ -64,7 +83,8 @@ class PLoginForm extends StatelessWidget {
                 SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                        onPressed: () => Get.to(() => const NavigationMenu()), child: const Text(PTexts.signIn))),
+                        onPressed: () => controller.emailAndPasswordSignIn(),
+                        child: const Text(PTexts.signIn))),
                 const SizedBox(height: PSizes.spaceBtwItems),
 
                 /// Create Account Button

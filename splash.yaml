@@ -1,13 +1,13 @@
 flutter_native_splash:
   color: "#FFFFFF"
   color_dark: "#272727"
-  image: assets/logos/pine-logo-white.png
-  image_dark: assets/logos/pine-logo-dark.png
+  image: assets/logos/pinews.png
+  image_dark: assets/logos/pinews.png
 
   android_12:
     color: "#FFFFFF"
     color_dark: "#272727"
-    image: assets/logos/pine-logo-white.png
-    image_dark: assets/logos/pine-logo-dark.png
+    image: assets/logos/pinews.png
+    image_dark: assets/logos/pinews.png
 
   web: false
