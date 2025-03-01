@@ -86,7 +86,7 @@ class SettingsScreen extends StatelessWidget {
                   PSettingMenuTile(
                     icon: Iconsax.bank,
                     title: 'Tài khoản ngân hàng',
-                    subTitle: 'Rút tiền vào tài khoản ngân hàng đã đăng ký',
+                    subTitle: 'Quản lý tài khoản ngân hàng',
                     onTap: () {},
                   ),
                   PSettingMenuTile(

@@ -37,6 +37,7 @@ class HomeScreen extends StatelessWidget {
                   padding: EdgeInsets.only(left: PSizes.spaceBtwItems, right: PSizes.spaceBtwItems),
                   child: PPromoSlider(
                     banners: [
+                      PImages.bannerbf,
                       PImages.promoBanner1,
                       PImages.promoBanner2,
                       PImages.promoBanner3,

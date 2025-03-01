@@ -29,14 +29,13 @@ class PVerticalImageText extends StatelessWidget {
         children: [
           /// Circular Icon
           CircleAvatar(
-            radius: 22,
+            radius: 25,
             backgroundColor: backgroundColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Image(
                 image: AssetImage(image),
                 fit: BoxFit.contain,
-                color: PColors.dark,
               ),
             ),
           ),

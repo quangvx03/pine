@@ -27,7 +27,7 @@ class NavigationMenu extends StatelessWidget {
             backgroundColor: darkMode ? PColors.black : PColors.white,
             indicatorColor: darkMode
                 ? PColors.white.withValues(alpha: 0.1)
-                : PColors.black.withValues(alpha: 0.1),
+                : PColors.primary.withValues(alpha: 0.1),
             destinations: const [
               NavigationDestination(
                   icon: Icon(

@@ -25,7 +25,6 @@ class PProductCardVertical extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.to(() => const ProductDetailScreen()),
       child: Container(
-        width: 180,
         padding: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           boxShadow: [PShadowStyle.verticalProductShadow],
@@ -36,15 +35,21 @@ class PProductCardVertical extends StatelessWidget {
           children: [
             /// Thumbnail, WishList Button, Sale Tag
             PRoundedContainer(
-                height: 180,
+                height: 150,
                 padding: const EdgeInsets.all(PSizes.sm),
                 backgroundColor: dark ? PColors.dark : PColors.light,
                 child: Stack(
                   children: [
                     /// Thumbnail Image
-                    const PRoundedImage(
-                        imageUrl: PImages.productImage1,
-                        applyImageRadius: true),
+                    Positioned.fill(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: PRoundedImage(
+                          imageUrl: PImages.productImage1,
+                          applyImageRadius: true,
+                        ),
+                      ),
+                    ),
 
                     /// Sale Tag
                     Positioned(
@@ -64,7 +69,7 @@ class PProductCardVertical extends StatelessWidget {
                     ),
 
                     /// Favorite Icon Button
-                    const Positioned(
+                    Positioned(
                         top: 0,
                         right: 0,
                         child: PCircularIcon(
@@ -80,18 +85,18 @@ class PProductCardVertical extends StatelessWidget {
 
             /// Details
             const Padding(
-              padding:  EdgeInsets.symmetric(horizontal: PSizes.sm),
+              padding: EdgeInsets.symmetric(horizontal: PSizes.sm),
               child: SizedBox(
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                     PProductTitleText(
-                      title: 'Giày Nike Air',
+                    PProductTitleText(
+                      title: 'Sữa TH True Milk',
                       smallSize: true,
                     ),
-                     SizedBox(height: PSizes.spaceBtwItems / 2),
-                     PBrandTitleWithVerifiedIcon(title: 'Nike'),
+                    SizedBox(height: PSizes.spaceBtwItems / 2),
+                    PBrandTitleWithVerifiedIcon(title: 'TH'),
                   ],
                 ),
               ),
@@ -105,7 +110,7 @@ class PProductCardVertical extends StatelessWidget {
                 /// Price
                 Padding(
                   padding: const EdgeInsets.only(left: PSizes.sm),
-                  child: const PProductPriceText(price: '1,250,000'),
+                  child: const PProductPriceText(price: '12,000'),
                 ),
 
                 /// Add to Cart Button

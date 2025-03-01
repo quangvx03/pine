@@ -20,13 +20,13 @@ class PHomeCategories extends StatelessWidget {
         crossAxisCount: 4,
         mainAxisSpacing: PSizes.spaceBtwItems,
         crossAxisSpacing: PSizes.spaceBtwItems / 2,
-        childAspectRatio: 0.9,
+        childAspectRatio: 0.835,
       ),
       itemBuilder: (_, index) {
         return PVerticalImageText(
           backgroundColor: PColors.primary.withValues(alpha: 0.125),
-          image: PImages.shoeIcon,
-          title: 'Mã giảm giá ádajfkhyaskdanjskhduiahsjdkasndkjah',
+          image: PImages.fruits,
+          title: 'Trái cây kahjsdkjasgdjkasgjdgasyugdjkabsjkdguiasg',
           textColor: PColors.textPrimary,
           onTap: () => Get.to(() => const SubCategoriesScreen()),
         );
