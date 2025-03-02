@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pine/features/personalization/controllers/user_controller.dart';
 
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/image_strings.dart';
@@ -14,6 +15,7 @@ class PUserProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = UserController.instance;
     return ListTile(
       leading: PCircularImage(
         image: PImages.user,
@@ -21,13 +23,13 @@ class PUserProfileTile extends StatelessWidget {
         height: 50,
         padding: 0,
       ),
-      title: Text('Người dùng Pine',
+      title: Text(controller.user.value.fullName,
           style: Theme.of(context)
               .textTheme
               .headlineSmall!
               .apply(color: PColors.white)),
       subtitle: Text(
-        'userpine@gmail.com',
+        controller.user.value.email,
         style:
             Theme.of(context).textTheme.bodyMedium!.apply(color: PColors.white),
       ),

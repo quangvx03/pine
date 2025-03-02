@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:pine/data/repositories/user/user_repository.dart';
 import 'package:pine/features/authentication/screens/login/login.dart';
 import 'package:pine/features/authentication/screens/onboarding/onboarding.dart';
 import 'package:pine/features/authentication/screens/signup/verify_email.dart';
@@ -20,6 +21,8 @@ class AuthenticationRepository extends GetxController {
   final deviceStorage = GetStorage();
   final _auth = FirebaseAuth.instance;
 
+  User? get authUser => _auth.currentUser;
+
   @override
   void onReady() {
     FlutterNativeSplash.remove();
@@ -28,6 +31,7 @@ class AuthenticationRepository extends GetxController {
 
   screenRedirect() async {
     final user = _auth.currentUser;
+
     if (user != null) {
       if (user.emailVerified) {
         Get.offAll(() => const NavigationMenu());
@@ -62,7 +66,7 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-  /// SignUp
+  /// Register
   Future<UserCredential> registerWithEmailAndPassword(
       String email, String password) async {
     try {
@@ -81,7 +85,43 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-  /// Mail verification
+  /// Forgot password
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw PFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const PFormatException();
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
+  /// Re Auth User
+  Future<void> reAuthWithEmailAndPassword(String email, String password) async {
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
+
+      await _auth.currentUser!.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw PFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const PFormatException();
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
+  /// Email verification
   Future<void> sendEmailVerification() async {
     try {
       await _auth.currentUser?.sendEmailVerification();
@@ -97,6 +137,7 @@ class AuthenticationRepository extends GetxController {
       throw 'Có lỗi xảy ra, vui lòng thử lại';
     }
   }
+
 
   /// Google
   Future<UserCredential?> signInWithGoogle() async {
@@ -131,6 +172,24 @@ class AuthenticationRepository extends GetxController {
       await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();
       Get.offAll(() => const LoginScreen());
+    } on FirebaseAuthException catch (e) {
+      throw PFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const PFormatException();
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
+  /// Delete account
+  Future<void> deleteAccount() async {
+    try {
+      await UserRepository.instance.removeUserRecord(_auth.currentUser!.uid);
+      await _auth.currentUser?.delete();
     } on FirebaseAuthException catch (e) {
       throw PFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {

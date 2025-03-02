@@ -20,7 +20,7 @@ class UserModel {
     required this.profilePicture,
   });
 
-  String get fullName => '$firstName $lastName';
+  String get fullName => '$lastName $firstName';
 
   String get formattedPhoneNo => PFormatter.formatPhoneNumber(phoneNumber);
 

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:pine/data/repositories/authentication/authentication_repository.dart';
-import 'package:pine/data/repositories/user_repository.dart';
+import 'package:pine/data/repositories/user/user_repository.dart';
 import 'package:pine/features/authentication/screens/signup/verify_email.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/popups/full_screen_loader.dart';
