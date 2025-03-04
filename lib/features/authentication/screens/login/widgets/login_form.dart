@@ -73,7 +73,7 @@ class PLoginForm extends StatelessWidget {
 
                     /// Forgot Password
                     TextButton(
-                        onPressed: () => Get.to(() => const ForgotPassword()),
+                        onPressed: () => Get.to(() => const ForgotPasswordScreen()),
                         child: const Text(PTexts.forgotPassword)),
                   ],
                 ),

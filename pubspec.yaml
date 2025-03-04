@@ -19,6 +19,7 @@ dependencies:
   logger: ^2.0.1
   lottie: ^2.7.0
   shimmer: ^3.0.0
+  image_picker: ^1.0.4
   url_launcher: ^6.1.12
   connectivity_plus: ^5.0.1
   flutter_native_splash: ^2.4.4
@@ -42,6 +43,8 @@ dependencies:
   firebase_auth: ^5.5.1
   cloud_firestore: ^5.6.5
   google_sign_in: ^6.2.2
+  firebase_storage: ^12.4.4
+  cached_network_image: ^3.4.1
 
 #--------------- PACKAGES END ---------------
 
@@ -50,6 +53,22 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: "^0.14.3"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logos/pine-logo-white.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/logos/pine-logo-white.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/logos/pine-logo-white.png"
+    icon_size: 48 # min:48, max:256, default: 48
 
 
 flutter:
@@ -87,6 +106,11 @@ flutter:
           weight: 600
         - asset: assets/fonts/Cabin-Bold.ttf
           weight: 800
+
+    - family: Agbalumo
+      fonts:
+        - asset: assets/fonts/Agbalumo-Regular.ttf
+          weight: 400
   
   
   

@@ -5,12 +5,9 @@ import 'package:pine/features/shop/screens/all_product/all_products.dart';
 import 'package:pine/features/shop/screens/home/widgets/home_appbar.dart';
 import 'package:pine/features/shop/screens/home/widgets/home_categories.dart';
 import 'package:pine/features/shop/screens/home/widgets/promo_slider.dart';
-import 'package:pine/utils/constants/colors.dart';
-import '../../../../common/widgets/custom_shapes/containers/primary_header_container.dart';
 import '../../../../common/widgets/custom_shapes/containers/search_container.dart';
 import '../../../../common/widgets/layouts/grid_layout.dart';
 import '../../../../common/widgets/texts/section_heading.dart';
-import '../../../../utils/constants/image_strings.dart';
 import '../../../../utils/constants/sizes.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,32 +27,29 @@ class HomeScreen extends StatelessWidget {
 
                 /// Searchbar
                 PSearchContainer(text: 'Tìm kiếm'),
-                SizedBox(height: PSizes.defaultSpace),
+                SizedBox(height: PSizes.defaultSpace * 1.25),
 
                 /// Promo Slider
                 Padding(
-                  padding: EdgeInsets.only(left: PSizes.spaceBtwItems, right: PSizes.spaceBtwItems),
-                  child: PPromoSlider(
-                    banners: [
-                      PImages.bannerbf,
-                      PImages.promoBanner1,
-                      PImages.promoBanner2,
-                      PImages.promoBanner3,
-                    ],
-                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
+                  child: PPromoSlider(),
                 ),
-                SizedBox(height: PSizes.spaceBtwItems),
+                SizedBox(height: PSizes.spaceBtwSections),
 
                 /// Categories
                 Padding(
-                  padding: EdgeInsets.only(left: PSizes.defaultSpace, right: PSizes.defaultSpace),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
                   child: Column(
                     children: [
                       /// Heading
                       PSectionHeading(
                         title: 'Danh mục phổ biến',
-                        showActionButton: true,
+                        showActionButton: false,
                       ),
+                      SizedBox(height: PSizes.defaultSpace),
+
                       /// Categories
                       PHomeCategories()
                     ],
@@ -63,10 +57,12 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: PSizes.spaceBtwItems / 1.5),
 
             /// Body
             Padding(
-              padding: const EdgeInsets.all(PSizes.defaultSpace),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
               child: Column(
                 children: [
                   /// Heading

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/bindings/general_bindings.dart';
-import 'package:pine/features/authentication/screens/onboarding/onboarding.dart';
+import 'package:pine/routes/app_routes.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/theme/theme.dart';
 
@@ -15,6 +15,7 @@ class App extends StatelessWidget {
       theme: PAppTheme.lightTheme,
       darkTheme: PAppTheme.darkTheme,
       initialBinding: GeneralBindings(),
+      getPages: AppRoutes.pages,
       home: const Scaffold(
         backgroundColor: PColors.primary,
         body: Center(

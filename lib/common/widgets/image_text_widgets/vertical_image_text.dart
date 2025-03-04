@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pine/common/widgets/images/circular_image.dart';
 
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
@@ -11,12 +12,14 @@ class PVerticalImageText extends StatelessWidget {
     required this.title,
     this.textColor = PColors.white,
     this.backgroundColor = PColors.white,
+    this.isNetworkImage = true,
     this.onTap,
   });
 
   final String image, title;
   final Color textColor;
   final Color? backgroundColor;
+  final bool isNetworkImage;
   final void Function()? onTap;
 
   @override
@@ -28,17 +31,12 @@ class PVerticalImageText extends StatelessWidget {
       child: Column(
         children: [
           /// Circular Icon
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: backgroundColor,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image(
-                image: AssetImage(image),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+          PCircularImage(
+              image: image,
+              padding: 7,
+              fit: BoxFit.fitWidth,
+              isNetworkImage: isNetworkImage,
+              backgroundColor: backgroundColor),
 
           /// Text
           const SizedBox(height: PSizes.spaceBtwItems / 2),

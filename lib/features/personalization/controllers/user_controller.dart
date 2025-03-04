@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pine/data/repositories/authentication/authentication_repository.dart';
 import 'package:pine/data/repositories/user/user_repository.dart';
 import 'package:pine/features/authentication/screens/login/login.dart';
@@ -21,6 +22,7 @@ class UserController extends GetxController {
   Rx<UserModel> user = UserModel.empty().obs;
 
   final hidePassword = false.obs;
+  final imageUploading = false.obs;
   final verifyEmail = TextEditingController();
   final verifyPassword = TextEditingController();
   final userRepository = Get.put(UserRepository());
@@ -48,26 +50,32 @@ class UserController extends GetxController {
   /// Save user record from any registration provider
   Future<void> saveUserRecord(UserCredential? userCredentials) async {
     try {
-      if (userCredentials != null) {
-        // Convert Name to First and Last Name
-        final nameParts =
-            UserModel.nameParts(userCredentials.user!.displayName ?? '');
-        final username =
-            UserModel.generateUsername(userCredentials.user!.displayName ?? '');
+      // Update Rx User and then check if user data is already stored. If not store new data
+      await fetchUserRecord();
 
-        // Map Data
-        final user = UserModel(
-            id: userCredentials.user!.uid,
-            firstName: nameParts[0],
-            lastName:
-                nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '',
-            username: username,
-            email: userCredentials.user!.email ?? '',
-            phoneNumber: userCredentials.user!.phoneNumber ?? '',
-            profilePicture: userCredentials.user!.photoURL ?? '');
+      // If no record already stored
+      if (user.value.id.isEmpty) {
+        if (userCredentials != null) {
+          // Convert Name to First and Last Name
+          final nameParts =
+              UserModel.nameParts(userCredentials.user!.displayName ?? '');
+          final username = UserModel.generateUsername(
+              userCredentials.user!.displayName ?? '');
 
-        //   Save user data
-        await userRepository.saveUserRecord(user);
+          // Map Data
+          final user = UserModel(
+              id: userCredentials.user!.uid,
+              firstName: nameParts[0],
+              lastName:
+                  nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '',
+              username: username,
+              email: userCredentials.user!.email ?? '',
+              phoneNumber: userCredentials.user!.phoneNumber ?? '',
+              profilePicture: userCredentials.user!.photoURL ?? '');
+
+          //   Save user data
+          await userRepository.saveUserRecord(user);
+        }
       }
     } catch (e) {
       PLoaders.warningSnackBar(
@@ -99,54 +107,87 @@ class UserController extends GetxController {
   }
 
   /// Delete User Account
-  void deleteUserAccount()async{
-    try{
+  void deleteUserAccount() async {
+    try {
       PFullScreenLoader.openLoadingDiaLog('Đang xử lý...', PImages.verify);
 
       final auth = AuthenticationRepository.instance;
-      final provider = auth.authUser!.providerData.map((e) => e.providerId).first;
-      if(provider.isNotEmpty){
+      final provider =
+          auth.authUser!.providerData.map((e) => e.providerId).first;
+      if (provider.isNotEmpty) {
         // Re verify auth email
-        if(provider == 'google.com'){
+        if (provider == 'google.com') {
           await auth.signInWithGoogle();
           await auth.deleteAccount();
           PFullScreenLoader.stopLoading();
           Get.offAll(() => const LoginScreen());
-        } else if (provider == 'password'){
+        } else if (provider == 'password') {
           PFullScreenLoader.stopLoading();
           Get.to(() => const ReAuthUserLoginForm());
         }
       }
-    } catch(e){
+    } catch (e) {
       PFullScreenLoader.stopLoading();
       PLoaders.warningSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
     }
   }
 
   /// Re Auth
-  Future<void> reAuthEmailAndPasswordUser() async{
-    try{
+  Future<void> reAuthEmailAndPasswordUser() async {
+    try {
       PFullScreenLoader.openLoadingDiaLog('Đang xử lý', PImages.verify);
 
       // Check Internet
       final isConnected = await NetworkManager.instance.isConnected();
-      if(!isConnected){
+      if (!isConnected) {
         PFullScreenLoader.stopLoading();
         return;
       }
 
-      if(!reAuthFormKey.currentState!.validate()){
+      if (!reAuthFormKey.currentState!.validate()) {
         PFullScreenLoader.stopLoading();
         return;
       }
 
-      await AuthenticationRepository.instance.reAuthWithEmailAndPassword(verifyEmail.text.trim(), verifyPassword.text.trim());
+      await AuthenticationRepository.instance.reAuthWithEmailAndPassword(
+          verifyEmail.text.trim(), verifyPassword.text.trim());
       await AuthenticationRepository.instance.deleteAccount();
       PFullScreenLoader.stopLoading();
       Get.offAll(() => const LoginScreen());
-    } catch(e){
+    } catch (e) {
       PFullScreenLoader.stopLoading();
       PLoaders.warningSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
+    }
+  }
+
+  /// Upload Profile Image
+  uploadUserProfilePicture() async {
+    try {
+      final image = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 70,
+          maxHeight: 512,
+          maxWidth: 512);
+      if (image != null) {
+        imageUploading.value = true;
+        // Upload Image
+        final imageUrl =
+            await userRepository.uploadImage('Users/Images/Profile/', image);
+
+        // Update User Image Record
+        Map<String, dynamic> json = {'ProfilePicture': imageUrl};
+        await userRepository.updateSingleField(json);
+
+        user.value.profilePicture = imageUrl;
+        user.refresh();
+
+        PLoaders.successSnackBar(
+            title: 'Chúc mừng', message: 'Ảnh đại diện đã được tải lên!');
+      }
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra', message: e.toString());
+    } finally{
+      imageUploading.value = false;
     }
   }
 }

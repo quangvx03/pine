@@ -76,7 +76,7 @@ class CheckoutScreen extends StatelessWidget {
         padding: const EdgeInsets.all(PSizes.defaultSpace),
         child: ElevatedButton(
             onPressed: () => Get.to(() => SuccessScreen(
-                image: PImages.staticSuccessIllustration,
+                image: PImages.success,
                 title: 'Thanh toán thành công!',
                 subTitle: 'Đơn hàng sẽ sớm được giao tới bạn!',
                 onPressed: () => Get.offAll(() => const NavigationMenu()))),

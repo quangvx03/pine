@@ -8,6 +8,7 @@ import 'package:pine/common/widgets/custom_shapes/containers/search_container.da
 import 'package:pine/common/widgets/layouts/grid_layout.dart';
 import 'package:pine/common/widgets/products/cart/cart_menu_icon.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
+import 'package:pine/features/shop/controllers/category_controller.dart';
 import 'package:pine/features/shop/screens/brand/all_brands.dart';
 import 'package:pine/features/shop/screens/store/widgets/category_tab.dart';
 import 'package:pine/utils/constants/colors.dart';
@@ -25,11 +26,13 @@ class StoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final categories = CategoryController.instance.featuredCategories;
+
     return DefaultTabController(
-        length: 5,
+        length: categories.length,
         child: Scaffold(
           appBar: PAppBar(
-            title: Text('Store',
+            title: Text('Cửa hàng',
                 style: Theme.of(context).textTheme.headlineMedium),
             actions: [
               PCartCounterIcon(
@@ -48,13 +51,13 @@ class StoreScreen extends StatelessWidget {
                   SliverAppBar(
                     pinned: true,
                     floating: true,
-                    expandedHeight: 440,
+                    expandedHeight: 390,
                     automaticallyImplyLeading: false,
                     backgroundColor: PHelperFunctions.isDarkMode(context)
                         ? PColors.black
                         : PColors.white,
                     flexibleSpace: Padding(
-                      padding: const EdgeInsets.all(PSizes.defaultSpace),
+                      padding: const EdgeInsets.symmetric(horizontal:  PSizes.defaultSpace),
                       child: ListView(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -66,7 +69,7 @@ class StoreScreen extends StatelessWidget {
                               showBorder: true,
                               showBackground: false,
                               padding: EdgeInsets.zero),
-                          const SizedBox(height: PSizes.spaceBtwSections),
+                          const SizedBox(height: PSizes.spaceBtwItems),
 
                           /// Featured Brands
                           PSectionHeading(
@@ -85,14 +88,8 @@ class StoreScreen extends StatelessWidget {
                     ),
 
                     /// Tabs
-                    bottom: const PTabBar(
-                      tabs: [
-                        Tab(child: Text('Thể thao')),
-                        Tab(child: Text('Nội thất')),
-                        Tab(child: Text('Điện tử')),
-                        Tab(child: Text('Quần áo')),
-                        Tab(child: Text('Mỹ phẩm')),
-                      ],
+                    bottom:  PTabBar(
+                      tabs: categories.map((category) => Tab(child: Text(category.name))).toList(),
                     ),
                   )
                 ];
@@ -100,13 +97,7 @@ class StoreScreen extends StatelessWidget {
 
               /// Body
               body: TabBarView(
-                children: [
-                  PCategoryTab(),
-                  PCategoryTab(),
-                  PCategoryTab(),
-                  PCategoryTab(),
-                  PCategoryTab(),
-                ],
+                children: categories.map((category) => PCategoryTab(category: category)).toList()
               )),
         ));
   }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/images/circular_image.dart';
+import 'package:pine/common/widgets/shimmers/shimmer.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/features/personalization/controllers/user_controller.dart';
 import 'package:pine/features/personalization/screens/profile/widgets/change_name.dart';
@@ -35,9 +36,24 @@ class ProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 child: Column(
                   children: [
-                    PCircularImage(image: PImages.user, width: 80, height: 80),
+                    Obx(() {
+                      final networkImage = controller.user.value.profilePicture;
+                      final image =
+                          networkImage.isNotEmpty ? networkImage : PImages.user;
+                      return controller.imageUploading.value
+                          ? const PShimmerEffect(
+                              width: 80,
+                              height: 80,
+                              radius: 100,
+                            )
+                          : PCircularImage(
+                              image: image,
+                              width: 100,
+                              height: 100,
+                              isNetworkImage: networkImage.isNotEmpty);
+                    }),
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () => controller.uploadUserProfilePicture(),
                         child: const Text('Thay đổi ảnh đại diện'))
                   ],
                 ),

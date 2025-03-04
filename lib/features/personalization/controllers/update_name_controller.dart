@@ -23,14 +23,11 @@ class UpdateNameController extends GetxController {
     super.onInit();
   }
 
-
-
   /// Fetch user record
-  Future<void> initializeNames() async{
+  Future<void> initializeNames() async {
     firstName.text = userController.user.value.firstName;
     lastName.text = userController.user.value.lastName;
   }
-
 
   Future<void> updateUserName() async {
     try {

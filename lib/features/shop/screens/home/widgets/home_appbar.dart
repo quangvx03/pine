@@ -5,7 +5,7 @@ import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 
 import '../../../../../common/widgets/appbar/appbar.dart';
-import '../../../../../common/widgets/loaders/shimmer.dart';
+import '../../../../../common/widgets/shimmers/shimmer.dart';
 import '../../../../../common/widgets/products/cart/cart_menu_icon.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
@@ -35,7 +35,7 @@ class PHomeAppBar extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .headlineSmall!
-                      .apply(color: PColors.primary)),
+                      .apply(color: PColors.primary, fontFamily: 'Agbalumo')),
               Obx(() {
                 if (controller.profileLoading.value) {
                   return const PShimmerEffect(width: 80, height: 15);
