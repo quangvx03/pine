@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:pine/data/repositories/authentication/authentication_repository.dart';
+import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/features/authentication/screens/password_configuration/reset_password.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/helpers/network_manager.dart';

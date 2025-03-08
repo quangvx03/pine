@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/common/widgets/products/product_cards/product_card_vertical.dart';
+import 'package:pine/common/widgets/shimmers/vertical_product_shimmer.dart';
 import 'package:pine/features/shop/screens/all_product/all_products.dart';
 import 'package:pine/features/shop/screens/home/widgets/home_appbar.dart';
 import 'package:pine/features/shop/screens/home/widgets/home_categories.dart';
@@ -9,12 +11,15 @@ import '../../../../common/widgets/custom_shapes/containers/search_container.dar
 import '../../../../common/widgets/layouts/grid_layout.dart';
 import '../../../../common/widgets/texts/section_heading.dart';
 import '../../../../utils/constants/sizes.dart';
+import '../../controllers/product/product_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(ProductController());
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -68,13 +73,29 @@ class HomeScreen extends StatelessWidget {
                   /// Heading
                   PSectionHeading(
                       title: 'Sản phẩm phổ biến',
-                      onPressed: () => Get.to(() => const AllProductsScreen())),
+                      onPressed: () => Get.to(() => AllProductsScreen(
+                            title: 'Sản phẩm phổ biến',
+                            futureMethod: controller.fetchAllFeaturedProducts(),
+                          ))),
                   const SizedBox(height: PSizes.spaceBtwItems),
 
                   /// Popular Products
-                  PGridLayout(
-                      itemCount: 6,
-                      itemBuilder: (_, index) => const PProductCardVertical()),
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return const PVerticalProductShimmer();
+                    }
+
+                    if (controller.featuredProducts.isEmpty) {
+                      return Center(
+                          child: Text('Không có dữ liệu!',
+                              style: Theme.of(context).textTheme.bodyMedium));
+                    }
+                    return PGridLayout(
+                        itemCount: controller.featuredProducts.length,
+                        itemBuilder: (_, index) => PProductCardVertical(
+                            product: controller.featuredProducts[index]));
+                  }),
+                  const SizedBox(height: PSizes.spaceBtwSections),
                 ],
               ),
             )

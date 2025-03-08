@@ -22,30 +22,35 @@ class PUserProfileTile extends StatelessWidget {
     return ListTile(
       leading: Obx(() {
         final networkImage = controller.user.value.profilePicture;
-        final image =
-        networkImage.isNotEmpty ? networkImage : PImages.user;
+        final image = networkImage.isNotEmpty ? networkImage : PImages.user;
         return controller.imageUploading.value
             ? const PShimmerEffect(
-          width: 50,
-          height: 50,
-          radius: 100,
-        )
+                width: 50,
+                height: 50,
+                radius: 100,
+              )
             : PCircularImage(
-            image: image,
-            width: 50,
-            height: 50,
-            padding: 0,
-            isNetworkImage: networkImage.isNotEmpty);
+                image: image,
+                width: 50,
+                height: 50,
+                padding: 0,
+                isNetworkImage: networkImage.isNotEmpty);
       }),
-      title: Text(controller.user.value.fullName,
+      title: Obx(
+        () => Text(controller.user.value.fullName,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .apply(color: PColors.white)),
+      ),
+      subtitle: Obx(
+        () => Text(
+          controller.user.value.email,
           style: Theme.of(context)
               .textTheme
-              .headlineSmall!
-              .apply(color: PColors.white)),
-      subtitle: Text(
-        controller.user.value.email,
-        style:
-            Theme.of(context).textTheme.bodyMedium!.apply(color: PColors.white),
+              .bodyMedium!
+              .apply(color: PColors.white),
+        ),
       ),
       trailing: IconButton(
           onPressed: onPressed,

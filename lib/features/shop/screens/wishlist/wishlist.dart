@@ -5,9 +5,12 @@ import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/icons/circular_icon.dart';
 import 'package:pine/common/widgets/layouts/grid_layout.dart';
 import 'package:pine/common/widgets/products/product_cards/product_card_vertical.dart';
+import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/features/shop/screens/home/home.dart';
 import 'package:pine/navigation_menu.dart';
 import 'package:pine/utils/constants/sizes.dart';
+
+import '../../controllers/product/product_controller.dart';
 
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
@@ -15,6 +18,7 @@ class FavoriteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<NavigationController>();
+    final product = Get.put(ProductController());
 
     return Scaffold(
       appBar: PAppBar(
@@ -36,8 +40,8 @@ class FavoriteScreen extends StatelessWidget {
           child: Column(
             children: [
               PGridLayout(
-                  itemCount: 6,
-                  itemBuilder: (_, index) => const PProductCardVertical())
+                  itemCount: product.featuredProducts.length,
+                  itemBuilder: (_, index) =>  PProductCardVertical(product: product.featuredProducts[index]))
             ],
           ),
         ),

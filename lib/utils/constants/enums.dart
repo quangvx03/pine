@@ -8,5 +8,7 @@ enum OrderStatus {
 }
 
 enum PaymentMethods {
-  paypal, googlePay, applePay, visa, masterCard, creditCard, paystack, razorPay, paytm
+  paypal, googlePay, visa, masterCard
 }
+
+enum ProductType { single, variable}

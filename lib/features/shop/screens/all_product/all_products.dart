@@ -1,23 +1,47 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:get/get.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
-import 'package:pine/common/widgets/layouts/grid_layout.dart';
-import 'package:pine/common/widgets/products/product_cards/product_card_vertical.dart';
+import 'package:pine/common/widgets/shimmers/vertical_product_shimmer.dart';
 import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 
 import '../../../../common/widgets/products/sortable/sortable_products.dart';
+import '../../controllers/product/all_products_controller.dart';
+import '../../models/product_model.dart';
 
 class AllProductsScreen extends StatelessWidget {
-  const AllProductsScreen({super.key});
+  const AllProductsScreen(
+      {super.key, required this.title, this.query, this.futureMethod});
+
+  final String title;
+  final Query? query;
+  final Future<List<ProductModel>>? futureMethod;
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: PAppBar(title: Text('Sản phẩm phổ biến'), showBackArrow: true),
+    final controller = Get.put(AllProductsController());
+
+    return Scaffold(
+      appBar: PAppBar(title: Text(title), showBackArrow: true),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(PSizes.defaultSpace),
-          child: PSortableProducts(),
+          padding: const EdgeInsets.all(PSizes.defaultSpace),
+          child: FutureBuilder(
+              future: futureMethod ?? controller.fetchProductsByQuery(query),
+              builder: (context, snapshot) {
+                // Check the state of the FutureBuilder snapshot
+                const loader = PVerticalProductShimmer();
+                final widget = PCloudHelperFunctions.checkMultiRecordState(snapshot: snapshot, loader: loader);
+
+                // Return appropriate widget based on snapshot state
+                if(widget != null) return widget;
+
+                // Products found!
+                final products = snapshot.data!;
+
+                return  PSortableProducts(products: products,);
+              }),
         ),
       ),
     );

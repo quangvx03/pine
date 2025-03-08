@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:pine/data/repositories/banner/banner_repository.dart';
-import 'package:pine/features/personalization/models/banner_model.dart';
+import 'package:pine/data/repositories/banner_repository.dart';
+import 'package:pine/features/shop/models/banner_model.dart';
 
 import '../../../utils/popups/loaders.dart';
 

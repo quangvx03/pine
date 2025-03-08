@@ -5,14 +5,20 @@ import 'package:pine/common/widgets/brands/brand_card.dart';
 import 'package:pine/common/widgets/layouts/grid_layout.dart';
 import 'package:pine/common/widgets/products/sortable/sortable_products.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
+import 'package:pine/features/shop/controllers/brand_controller.dart';
 import 'package:pine/features/shop/screens/brand/brand_products.dart';
 import 'package:pine/utils/constants/sizes.dart';
+
+import '../../../../common/widgets/shimmers/brands_shimmer.dart';
+import '../../models/brand_model.dart';
 
 class AllBrandsScreen extends StatelessWidget {
   const AllBrandsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final brandController = BrandController.instance;
+
     return Scaffold(
       appBar: PAppBar(title: Text('Thương hiệu'), showBackArrow: true),
       body: SingleChildScrollView(
@@ -30,13 +36,38 @@ class AllBrandsScreen extends StatelessWidget {
               ),
 
               /// Brands
-              PGridLayout(
-                  itemCount: 10,
-                  mainAxisExtent: 80,
-                  itemBuilder: (context, index) => PBrandCard(
+              Obx(
+                () {
+                  if (brandController.isLoading.value) {
+                    return const PBrandsShimmer();
+                  }
+
+                  if (brandController.allBrands.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Không tìm thấy dữ liệu!',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .apply(color: Colors.white),
+                      ),
+                    );
+                  }
+
+                  return PGridLayout(
+                    itemCount: brandController.allBrands.length,
+                    mainAxisExtent: 80,
+                    itemBuilder: (_, index) {
+                      final brand = brandController.allBrands[index];
+                      return PBrandCard(
                         showBorder: true,
-                        onTap: () => Get.to(() => const BrandProducts()),
-                      ))
+                        brand: brand,
+                        onTap: () => Get.to(() =>  BrandProducts(brand: brand,)),
+                      );
+                    },
+                  );
+                },
+              ),
             ],
           ),
         ),

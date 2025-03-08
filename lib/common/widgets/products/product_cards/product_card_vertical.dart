@@ -5,9 +5,11 @@ import 'package:pine/common/styles/shadows.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
 import 'package:pine/common/widgets/texts/product_title_text.dart';
+import 'package:pine/features/shop/controllers/product/product_controller.dart';
+import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/features/shop/screens/product_details/product_detail.dart';
 import 'package:pine/utils/constants/colors.dart';
-import 'package:pine/utils/constants/image_strings.dart';
+import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
@@ -16,14 +18,19 @@ import '../../texts/brand_title_text_with_verified_icon.dart';
 import '../../texts/product_price_text.dart';
 
 class PProductCardVertical extends StatelessWidget {
-  const PProductCardVertical({super.key});
+  const PProductCardVertical({super.key, required this.product});
+
+  final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
+    final controller = ProductController.instance;
+    final salePercentage =
+        controller.calculateSalePercentage(product.price, product.salePrice);
     final dark = PHelperFunctions.isDarkMode(context);
 
     return GestureDetector(
-      onTap: () => Get.to(() => const ProductDetailScreen()),
+      onTap: () => Get.to(() => ProductDetailScreen(product: product)),
       child: Container(
         padding: const EdgeInsets.all(1),
         decoration: BoxDecoration(
@@ -36,22 +43,41 @@ class PProductCardVertical extends StatelessWidget {
             /// Thumbnail, WishList Button, Sale Tag
             PRoundedContainer(
                 height: 150,
+                width: 180,
                 padding: const EdgeInsets.all(PSizes.sm),
                 backgroundColor: dark ? PColors.dark : PColors.light,
                 child: Stack(
                   children: [
                     /// Thumbnail Image
-                    Positioned.fill(
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: PRoundedImage(
-                          imageUrl: PImages.productImage1,
-                          applyImageRadius: true,
+                    Center(
+                      child: SizedBox(
+                        child: Center(
+                          child: PRoundedImage(
+                            imageUrl: product.thumbnail,
+                            applyImageRadius: true,
+                            isNetworkImage: true,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
 
+                    /// Thumbnail Image - before bug
+                    // Positioned.fill(
+                    //   child: FittedBox(
+                    //     fit: BoxFit.contain,
+                    //     child: Center(
+                    //       child: PRoundedImage(
+                    //         imageUrl: product.thumbnail,
+                    //         applyImageRadius: true,
+                    //         isNetworkImage: true,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+
                     /// Sale Tag
+                    if(salePercentage != null)
                     Positioned(
                       top: 0,
                       child: PRoundedContainer(
@@ -60,7 +86,7 @@ class PProductCardVertical extends StatelessWidget {
                             PColors.secondary.withValues(alpha: 0.8),
                         padding: const EdgeInsets.symmetric(
                             horizontal: PSizes.sm, vertical: PSizes.xs),
-                        child: Text('25%',
+                        child: Text('$salePercentage%',
                             style: Theme.of(context)
                                 .textTheme
                                 .labelLarge!
@@ -84,7 +110,7 @@ class PProductCardVertical extends StatelessWidget {
             const SizedBox(height: PSizes.spaceBtwItems / 2),
 
             /// Details
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: PSizes.sm),
               child: SizedBox(
                 width: double.infinity,
@@ -92,11 +118,12 @@ class PProductCardVertical extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PProductTitleText(
-                      title: 'Sữa TH True Milk',
+                      title: product.title,
                       smallSize: true,
                     ),
                     SizedBox(height: PSizes.spaceBtwItems / 2),
-                    PBrandTitleWithVerifiedIcon(title: 'TH'),
+                    PBrandTitleWithVerifiedIcon(
+                        title: product.brand?.name ?? 'Không có thương hiệu'),
                   ],
                 ),
               ),
@@ -108,9 +135,32 @@ class PProductCardVertical extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 /// Price
-                Padding(
-                  padding: const EdgeInsets.only(left: PSizes.sm),
-                  child: const PProductPriceText(price: '12,000'),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (product.productType ==
+                              ProductType.single.toString() &&
+                          product.salePrice > 0)
+                        Padding(
+                            padding: const EdgeInsets.only(left: PSizes.sm),
+                            child: Text(
+                              PHelperFunctions.formatCurrency(product.price),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .apply(
+                                      decoration: TextDecoration.lineThrough),
+                            )),
+                      Padding(
+                        padding: const EdgeInsets.only(left: PSizes.sm),
+                        child: PProductPriceText(
+                            price: (product.salePrice > 0
+                                    ? product.salePrice
+                                    : product.price).toString(),
+                      ),)
+                    ],
+                  ),
                 ),
 
                 /// Add to Cart Button

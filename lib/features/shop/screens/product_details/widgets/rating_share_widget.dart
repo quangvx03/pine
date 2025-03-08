@@ -21,18 +21,18 @@ class PRatingAndShare extends StatelessWidget {
             Text.rich(TextSpan(children: [
               TextSpan(
                   text: '4.7 ', style: Theme.of(context).textTheme.bodyLarge),
-              const TextSpan(text: '(178)'),
+              const TextSpan(text: '(22)'),
             ]))
           ],
         ),
 
         /// Share Button
-        IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.share,
-              size: PSizes.iconMd,
-            ))
+        // IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(
+        //       Icons.share,
+        //       size: PSizes.iconMd,
+        //     ))
       ],
     );
   }

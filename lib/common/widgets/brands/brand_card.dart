@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pine/features/shop/models/brand_model.dart';
 
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/enums.dart';
@@ -14,8 +15,10 @@ class PBrandCard extends StatelessWidget {
     super.key,
     this.onTap,
     required this.showBorder,
+    required this.brand,
   });
 
+  final BrandModel brand;
   final bool showBorder;
   final void Function()? onTap;
 
@@ -25,6 +28,7 @@ class PBrandCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
+
       /// Container
       child: PRoundedContainer(
         showBorder: showBorder,
@@ -36,10 +40,9 @@ class PBrandCard extends StatelessWidget {
             /// Icon
             Flexible(
               child: PCircularImage(
-                isNetworkImage: false,
-                image: PImages.clothIcon,
+                isNetworkImage: true,
+                image: brand.image,
                 backgroundColor: Colors.transparent,
-                overlayColor: dark ? PColors.white : PColors.black,
               ),
             ),
             const SizedBox(width: PSizes.spaceBtwItems / 2),
@@ -50,9 +53,10 @@ class PBrandCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PBrandTitleWithVerifiedIcon(title: 'Nike', brandTextSize: TextSizes.large),
+                  PBrandTitleWithVerifiedIcon(
+                      title: brand.name, brandTextSize: TextSizes.medium),
                   Text(
-                    '25 sản phẩm',
+                    '${brand.productsCount ?? 0} sản phẩm',
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelMedium,
                   ),

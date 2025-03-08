@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:pine/data/repositories/user/user_repository.dart';
+import 'package:pine/data/repositories/user_repository.dart';
 import 'package:pine/features/personalization/controllers/user_controller.dart';
 import 'package:pine/features/personalization/screens/profile/profile.dart';
 import 'package:pine/utils/constants/image_strings.dart';
@@ -57,6 +57,8 @@ class UpdateNameController extends GetxController {
       // Update the Rx User value
       userController.user.value.firstName = firstName.text.trim();
       userController.user.value.lastName = lastName.text.trim();
+
+      userController.user.refresh();
 
       // Remove Loader
       PFullScreenLoader.stopLoading();

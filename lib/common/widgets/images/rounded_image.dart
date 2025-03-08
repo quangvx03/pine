@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:pine/common/widgets/shimmers/shimmer.dart';
 
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
@@ -46,11 +48,18 @@ class PRoundedImage extends StatelessWidget {
             borderRadius: applyImageRadius
                 ? BorderRadius.circular(borderRadius)
                 : BorderRadius.zero,
-            child: Image(
-                fit: fit,
-                image: isNetworkImage
-                    ? NetworkImage(imageUrl)
-                    : AssetImage(imageUrl) as ImageProvider)),
+            child: isNetworkImage
+                ? CachedNetworkImage(
+                    fit: fit,
+                    imageUrl: imageUrl,
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) => PShimmerEffect(
+                            width: width ?? double.infinity,
+                            height: height ?? 100),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  )
+                : Image(fit: fit, image: AssetImage(imageUrl))),
       ),
     );
   }

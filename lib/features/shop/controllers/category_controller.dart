@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
-import 'package:pine/data/repositories/categories/category_repository.dart';
+import 'package:pine/data/repositories/category_repository.dart';
+import 'package:pine/data/repositories/product_repository.dart';
 import 'package:pine/features/shop/models/category_model.dart';
+import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/utils/popups/loaders.dart';
 
 class CategoryController extends GetxController {
@@ -43,5 +45,10 @@ class CategoryController extends GetxController {
 
   /// Load selected category data
 
+
   /// Get Category or Sub-Category Products
+  Future<List<ProductModel>> getCategoryProducts({required String categoryId, int limit = 4}) async{
+    final products = await ProductRepository.instance.getProductsForCategory(categoryId: categoryId, limit: limit);
+    return products;
+  }
 }

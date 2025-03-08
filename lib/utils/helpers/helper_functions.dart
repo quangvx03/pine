@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 class PHelperFunctions {
   static Color? getColor(String value) {
-
     if (value == 'Green') {
       return Colors.green;
     } else if (value == 'Green') {
@@ -46,19 +45,19 @@ class PHelperFunctions {
 
   static void showAlert(String title, String message) {
     showDialog(
-      context: Get.context!, 
-      builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          )
-        ],
-      );
-    });
+        context: Get.context!,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              )
+            ],
+          );
+        });
   }
 
   static void navigateToScreen(BuildContext context, Widget screen) {
@@ -92,7 +91,8 @@ class PHelperFunctions {
     return MediaQuery.of(Get.context!).size.width;
   }
 
-  static String getFormattedDate(DateTime date, {String format = 'dd MMM yyyyy'}) {
+  static String getFormattedDate(DateTime date,
+      {String format = 'dd MMM yyyyy'}) {
     return DateFormat(format).format(date);
   }
 
@@ -102,10 +102,32 @@ class PHelperFunctions {
 
   static List<Widget> wrapWidgets(List<Widget> widgets, int rowSize) {
     final wrappedList = <Widget>[];
-    for (var i =0; i < widgets.length; i += rowSize) {
-      final rowChildren = widgets.sublist(i, i + rowSize > widgets.length ? widgets.length : i + rowSize);
+    for (var i = 0; i < widgets.length; i += rowSize) {
+      final rowChildren = widgets.sublist(
+          i, i + rowSize > widgets.length ? widgets.length : i + rowSize);
       wrappedList.add(Row(children: rowChildren));
     }
     return wrappedList;
+  }
+
+  static String formatCurrency(dynamic amount) {
+    if (amount == null) return '0₫';
+
+    int intAmount;
+    if (amount is String) {
+      double? doubleAmount = double.tryParse(amount);
+      intAmount = doubleAmount?.toInt() ?? 0;
+    } else if (amount is double) {
+      intAmount = amount.toInt();
+    } else if (amount is int) {
+      intAmount = amount;
+    } else {
+      intAmount = 0;
+    }
+
+    final formattedWithSeparators = intAmount.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+
+    return '$formattedWithSeparators₫';
   }
 }

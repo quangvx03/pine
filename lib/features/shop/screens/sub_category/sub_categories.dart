@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
 import 'package:pine/common/widgets/products/product_cards/product_card_horizontal.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
+import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
+
+import '../../controllers/product/product_controller.dart';
 
 class SubCategoriesScreen extends StatelessWidget {
   const SubCategoriesScreen({super.key});
@@ -43,8 +47,8 @@ class SubCategoriesScreen extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         separatorBuilder: (context, index) =>
                             const SizedBox(width: PSizes.spaceBtwItems),
-                        itemBuilder: (context, index) =>
-                            const PProductCardHorizontal()),
+                        itemBuilder: (context, index) => PProductCardHorizontal(
+                            product: ProductModel.empty())),
                   ),
                 ],
               ),
@@ -64,9 +68,9 @@ class SubCategoriesScreen extends StatelessWidget {
                         itemCount: 4,
                         scrollDirection: Axis.horizontal,
                         separatorBuilder: (context, index) =>
-                        const SizedBox(width: PSizes.spaceBtwItems),
-                        itemBuilder: (context, index) =>
-                        const PProductCardHorizontal()),
+                            const SizedBox(width: PSizes.spaceBtwItems),
+                        itemBuilder: (context, index) => PProductCardHorizontal(
+                            product: ProductModel.empty())),
                   ),
                 ],
               )

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:pine/common/widgets/success_screen/success_screen.dart';
-import 'package:pine/data/repositories/authentication/authentication_repository.dart';
+import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/text_strings.dart';
 import 'package:pine/utils/popups/loaders.dart';

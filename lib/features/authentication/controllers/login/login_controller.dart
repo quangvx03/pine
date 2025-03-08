@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:pine/data/repositories/authentication/authentication_repository.dart';
+import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/features/personalization/controllers/user_controller.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/helpers/network_manager.dart';

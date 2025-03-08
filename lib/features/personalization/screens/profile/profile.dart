@@ -74,7 +74,7 @@ class ProfileScreen extends StatelessWidget {
               PProfileMenu(
                 title: 'Tên',
                 value: controller.user.value.fullName,
-                onPressed: () => Get.to(() => const ChangeNameScreen()),
+                onPressed: () => Get.off(() => const ChangeNameScreen()),
               ),
               PProfileMenu(
                 title: 'Tài khoản',

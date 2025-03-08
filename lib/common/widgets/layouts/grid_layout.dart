@@ -7,7 +7,7 @@ class PGridLayout extends StatelessWidget {
     super.key,
     required this.itemCount,
     required this.itemBuilder,
-    this.mainAxisExtent = 265,
+    this.mainAxisExtent = 270,
   });
 
   final int itemCount;

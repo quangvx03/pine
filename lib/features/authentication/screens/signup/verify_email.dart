@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/common/widgets/success_screen/success_screen.dart';
-import 'package:pine/data/repositories/authentication/authentication_repository.dart';
+import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/features/authentication/screens/login/login.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/constants/text_strings.dart';

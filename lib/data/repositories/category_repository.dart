@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pine/features/shop/models/category_model.dart';
 
-import '../../../utils/exceptions/firebase_exceptions.dart';
-import '../../../utils/exceptions/platform_exceptions.dart';
-import '../../services/firebase_storage_service.dart';
+import '../../utils/exceptions/firebase_exceptions.dart';
+import '../../utils/exceptions/platform_exceptions.dart';
+import '../services/firebase_storage_service.dart';
 
 class CategoryRepository extends GetxController {
   static CategoryRepository get instance => Get.find();

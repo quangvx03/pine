@@ -12,18 +12,21 @@ import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
+import '../../../../features/shop/models/product_model.dart';
 import '../../../../features/shop/screens/product_details/product_detail.dart';
 import '../../icons/circular_icon.dart';
 
 class PProductCardHorizontal extends StatelessWidget {
-  const PProductCardHorizontal({super.key});
+  const PProductCardHorizontal({super.key, required this.product});
+
+  final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
     final dark = PHelperFunctions.isDarkMode(context);
 
     return GestureDetector(
-      onTap: () => Get.to(() => const ProductDetailScreen()),
+      onTap: () => Get.to(() =>  ProductDetailScreen(product: product)),
       child: Container(
         width: 275,
         // width: 310,

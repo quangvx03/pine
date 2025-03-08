@@ -8,7 +8,7 @@ import 'package:pine/common/widgets/custom_shapes/containers/primary_header_cont
 import 'package:pine/common/widgets/images/circular_image.dart';
 import 'package:pine/common/widgets/list_tiles/settings_menu_tile.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
-import 'package:pine/data/repositories/authentication/authentication_repository.dart';
+import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/features/personalization/screens/address/address.dart';
 import 'package:pine/features/shop/screens/cart/cart.dart';
 import 'package:pine/features/shop/screens/order/order.dart';

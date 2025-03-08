@@ -5,7 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pine/data/repositories/user/user_repository.dart';
+import 'package:pine/data/repositories/user_repository.dart';
 import 'package:pine/features/authentication/screens/login/login.dart';
 import 'package:pine/features/authentication/screens/onboarding/onboarding.dart';
 import 'package:pine/features/authentication/screens/signup/verify_email.dart';
