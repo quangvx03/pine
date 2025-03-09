@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/styles/shadows.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
+import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
 import 'package:pine/common/widgets/texts/product_title_text.dart';
 import 'package:pine/features/shop/controllers/product/product_controller.dart';
 import 'package:pine/features/shop/models/product_model.dart';
@@ -50,15 +51,10 @@ class PProductCardVertical extends StatelessWidget {
                   children: [
                     /// Thumbnail Image
                     Center(
-                      child: SizedBox(
-                        child: Center(
-                          child: PRoundedImage(
-                            imageUrl: product.thumbnail,
-                            applyImageRadius: true,
-                            isNetworkImage: true,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
+                      child: PRoundedImage(
+                        imageUrl: product.thumbnail,
+                        applyImageRadius: true,
+                        isNetworkImage: true,
                       ),
                     ),
 
@@ -77,34 +73,28 @@ class PProductCardVertical extends StatelessWidget {
                     // ),
 
                     /// Sale Tag
-                    if(salePercentage != null)
-                    Positioned(
-                      top: 0,
-                      child: PRoundedContainer(
-                        radius: PSizes.sm,
-                        backgroundColor:
-                            PColors.secondary.withValues(alpha: 0.8),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: PSizes.sm, vertical: PSizes.xs),
-                        child: Text('$salePercentage%',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge!
-                                .apply(color: PColors.black)),
+                    if (salePercentage != null)
+                      Positioned(
+                        top: 0,
+                        child: PRoundedContainer(
+                          radius: PSizes.sm,
+                          backgroundColor:
+                              PColors.secondary.withValues(alpha: 0.8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: PSizes.sm, vertical: PSizes.xs),
+                          child: Text('$salePercentage%',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge!
+                                  .apply(color: PColors.black)),
+                        ),
                       ),
-                    ),
 
                     /// Favorite Icon Button
                     Positioned(
                         top: 0,
                         right: 0,
-                        child: PCircularIcon(
-                          width: 35,
-                          height: 35,
-                          size: 20,
-                          icon: Iconsax.heart5,
-                          color: PColors.favorite,
-                        ))
+                        child: PFavoriteIcon(productId: product.id))
                   ],
                 )),
             const SizedBox(height: PSizes.spaceBtwItems / 2),
@@ -155,10 +145,12 @@ class PProductCardVertical extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: PSizes.sm),
                         child: PProductPriceText(
-                            price: (product.salePrice > 0
-                                    ? product.salePrice
-                                    : product.price).toString(),
-                      ),)
+                          price: (product.salePrice > 0
+                                  ? product.salePrice
+                                  : product.price)
+                              .toString(),
+                        ),
+                      )
                     ],
                   ),
                 ),

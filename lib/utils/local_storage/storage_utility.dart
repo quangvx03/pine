@@ -1,15 +1,24 @@
 import 'package:get_storage/get_storage.dart';
 
 class PLocalStorage {
-  static final PLocalStorage _instance = PLocalStorage._internal();
 
-  factory PLocalStorage() {
-    return _instance;
-  }
+  late final GetStorage _storage;
+
+  static PLocalStorage? _instance;
 
   PLocalStorage._internal();
 
-  final _storage = GetStorage();
+  factory PLocalStorage.instance() {
+    _instance ??= PLocalStorage._internal();
+    return _instance!;
+  }
+
+  static Future<void> init(String bucketName) async{
+    await GetStorage.init(bucketName);
+    _instance = PLocalStorage._internal();
+    _instance!._storage = GetStorage(bucketName);
+  }
+
 
   // generic method to save data
   Future<void> saveData<P>(String key, P value) async {
@@ -31,20 +40,3 @@ class PLocalStorage {
     await _storage.erase();
   }
 }
-
-/// *** *** *** *** *** Example *** *** *** *** *** ///
-
-// LocalStorage localStorage = LocalStorage();
-//
-// // Save data
-// localStorage.saveData('username', 'JohnDoe');
-//
-// // Read data
-// String? username = localStorage.readData<String>('username');
-// print('Username: $username'); // Output: Username: JohnDoe
-//
-// // Remove data
-// localStorage.removeData('username');
-//
-// // Clear all data
-// localStorage.clearAll();

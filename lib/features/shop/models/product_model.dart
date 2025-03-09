@@ -86,13 +86,6 @@ class ProductModel {
       DocumentSnapshot<Map<String, dynamic>> document) {
     if (document.data() == null) return ProductModel.empty();
     final data = document.data()!;
-    // final brandData =
-    //     data['Brand'] != null ? data['Brand'] as Map<String, dynamic> : {};
-    // final brand = BrandModel(
-    //   id: brandData['Id'] ?? '',
-    //   name: brandData['Name'] ?? 'Không có thương hiệu',
-    //   image: brandData['Image'] ?? '',
-    // );
     return ProductModel(
       id: document.id,
       sku: data['SKU'],

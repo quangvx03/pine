@@ -7,7 +7,7 @@ import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 
 import '../../../../common/widgets/products/sortable/sortable_products.dart';
-import '../../controllers/product/all_products_controller.dart';
+import '../../controllers/all_products_controller.dart';
 import '../../models/product_model.dart';
 
 class AllProductsScreen extends StatelessWidget {
@@ -32,15 +32,18 @@ class AllProductsScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 // Check the state of the FutureBuilder snapshot
                 const loader = PVerticalProductShimmer();
-                final widget = PCloudHelperFunctions.checkMultiRecordState(snapshot: snapshot, loader: loader);
+                final widget = PCloudHelperFunctions.checkMultiRecordState(
+                    snapshot: snapshot, loader: loader);
 
                 // Return appropriate widget based on snapshot state
-                if(widget != null) return widget;
+                if (widget != null) return widget;
 
                 // Products found!
                 final products = snapshot.data!;
 
-                return  PSortableProducts(products: products,);
+                return PSortableProducts(
+                  products: products,
+                );
               }),
         ),
       ),

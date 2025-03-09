@@ -28,7 +28,7 @@ class ProductRepository extends GetxController {
     }
   }
 
-  /// Get limited featured products
+  /// Get All featured products
   Future<List<ProductModel>> getAllFeaturedProducts() async {
     try {
       final snapshot = await _db
@@ -45,7 +45,7 @@ class ProductRepository extends GetxController {
     }
   }
 
-  /// Get products based on the brand
+  /// Get products based on the query
   Future<List<ProductModel>> fetchProductsByQuery(Query query) async {
     try {
       final querySnapshot = await query.get();
@@ -53,6 +53,20 @@ class ProductRepository extends GetxController {
           .map((doc) => ProductModel.fromQuerySnapshot(doc))
           .toList();
       return productList;
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
+  /// Get products based on the query
+  Future<List<ProductModel>> getFavoriteProducts(List<String> productIds) async {
+    try {
+      final snapshot = await _db.collection('Products').where(FieldPath.documentId, whereIn: productIds).get();
+      return snapshot.docs.map((querySnapshot) => ProductModel.fromSnapshot(querySnapshot)).toList();
     } on FirebaseException catch (e) {
       throw PFirebaseException(e.code).message;
     } on PlatformException catch (e) {

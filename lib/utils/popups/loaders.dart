@@ -11,7 +11,7 @@ class PLoaders{
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       SnackBar(
         elevation: 0,
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.transparent,
         content: Container(
           padding: const EdgeInsets.all(12.0),
@@ -26,7 +26,7 @@ class PLoaders{
     );
   }
 
-  static successSnackBar({required title, message = '', duration = 3}) {
+  static successSnackBar({required title, message = '', duration = 1.5}) {
     Get.snackbar(
       title,
       message,
@@ -35,7 +35,8 @@ class PLoaders{
       colorText: PColors.white,
       backgroundColor: PColors.primary,
       snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: duration),
+      duration: Duration(milliseconds: (duration * 1000).toInt()),
+      // duration: Duration(seconds: duration),
       margin: const EdgeInsets.all(10),
       icon: const Icon(Iconsax.check, color: PColors.white),
     );
@@ -50,7 +51,7 @@ class PLoaders{
       colorText: PColors.white,
       backgroundColor: Colors.orange,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 1500),
       margin: const EdgeInsets.all(20),
       icon: const Icon(Iconsax.warning_2, color: PColors.white),
     );
@@ -65,7 +66,7 @@ class PLoaders{
       colorText: PColors.white,
       backgroundColor: Colors.red.shade600,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 1500),
       margin: const EdgeInsets.all(20),
       icon: const Icon(Iconsax.warning_2, color: PColors.white),
     );

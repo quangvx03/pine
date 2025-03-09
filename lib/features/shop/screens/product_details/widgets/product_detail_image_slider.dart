@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
 import 'package:pine/features/shop/controllers/product/images_controller.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
@@ -88,14 +89,9 @@ class PProductImageSlider extends StatelessWidget {
             ),
           ),
 
-          const PAppBar(
+          PAppBar(
             showBackArrow: true,
-            actions: [
-              PCircularIcon(
-                icon: Iconsax.heart5,
-                color: PColors.favorite,
-              )
-            ],
+            actions: [PFavoriteIcon(productId: product.id)],
           )
         ],
       ),

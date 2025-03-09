@@ -14,6 +14,7 @@ import 'package:pine/utils/exceptions/firebase_auth_exceptions.dart';
 import 'package:pine/utils/exceptions/firebase_exceptions.dart';
 import 'package:pine/utils/exceptions/format_exceptions.dart';
 import 'package:pine/utils/exceptions/platform_exceptions.dart';
+import 'package:pine/utils/local_storage/storage_utility.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
@@ -34,6 +35,10 @@ class AuthenticationRepository extends GetxController {
 
     if (user != null) {
       if (user.emailVerified) {
+
+        // Initialize user specific storage
+        await PLocalStorage.init(user.uid);
+
         Get.offAll(() => const NavigationMenu());
       } else {
         Get.offAll(() => VerifyEmailScreen(email: _auth.currentUser?.email));
@@ -41,6 +46,7 @@ class AuthenticationRepository extends GetxController {
     } else {
       // Local Storage
       deviceStorage.writeIfNull('IsFirstTime', true);
+
       deviceStorage.read('IsFirstTime') != true
           ? Get.offAll(() => const LoginScreen())
           : Get.offAll(const OnBoardingScreen());
