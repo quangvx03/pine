@@ -9,7 +9,13 @@ import '../../icons/circular_icon.dart';
 class PProductQuantityWithAddRemoveButton extends StatelessWidget {
   const PProductQuantityWithAddRemoveButton({
     super.key,
+    required this.quantity,
+    this.add,
+    this.remove,
   });
+
+  final int quantity;
+  final VoidCallback? add, remove;
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +33,20 @@ class PProductQuantityWithAddRemoveButton extends StatelessWidget {
           backgroundColor: PHelperFunctions.isDarkMode(context)
               ? PColors.darkerGrey
               : PColors.light,
+          onPressed: remove,
         ),
         const SizedBox(width: PSizes.spaceBtwItems),
-        Text('2',
+        Text(quantity.toString(),
             style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(width: PSizes.spaceBtwItems),
-        const PCircularIcon(
+        PCircularIcon(
           icon: Iconsax.add,
           width: 32,
           height: 32,
           size: PSizes.md,
           color: PColors.white,
           backgroundColor: PColors.primary,
+          onPressed: add,
         )
       ],
     );

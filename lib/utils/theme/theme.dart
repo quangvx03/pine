@@ -14,7 +14,7 @@ class PAppTheme {
 
   static ThemeData lightTheme = ThemeData(
       useMaterial3: true,
-      fontFamily: 'Poppins',
+      fontFamily: 'Cabin',
       disabledColor: PColors.grey,
       brightness: Brightness.light,
       primaryColor: PColors.primary,
@@ -29,7 +29,6 @@ class PAppTheme {
       inputDecorationTheme: PTextFormFieldTheme.lightInputDecorationTheme,
       colorScheme: ColorScheme.light(
         primary: PColors.primary,
-        secondary: PColors.secondary,
         surface: PColors.white,
         error: PColors.error,
         onPrimary: PColors.textWhite,
@@ -40,7 +39,7 @@ class PAppTheme {
 
   static ThemeData darkTheme = ThemeData(
       useMaterial3: true,
-      fontFamily: 'Poppins',
+      fontFamily: 'Cabin',
       disabledColor: PColors.grey,
       brightness: Brightness.dark,
       primaryColor: PColors.primary,
@@ -55,7 +54,6 @@ class PAppTheme {
       inputDecorationTheme: PTextFormFieldTheme.darkInputDecorationTheme,
       colorScheme: ColorScheme.dark(
         primary: PColors.primary,
-        secondary: PColors.secondary,
         surface: PColors.darkerGrey,
         error: PColors.error,
         onPrimary: PColors.textWhite,

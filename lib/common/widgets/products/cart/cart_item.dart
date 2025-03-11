@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pine/features/shop/models/cart_item_model.dart';
 
 import '../../../../utils/constants/colors.dart';
 import '../../../../utils/constants/image_strings.dart';
@@ -11,7 +12,10 @@ import '../../texts/product_title_text.dart';
 class PCartItem extends StatelessWidget {
   const PCartItem({
     super.key,
+    required this.cartItem,
   });
+
+  final CartItemModel cartItem;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +23,10 @@ class PCartItem extends StatelessWidget {
       children: [
         /// Image
         PRoundedImage(
-          imageUrl: PImages.productImage1,
+          imageUrl: cartItem.image ?? '',
           width: 65,
           height: 65,
+          isNetworkImage: true,
           padding: const EdgeInsets.all(PSizes.sm),
           backgroundColor: PHelperFunctions.isDarkMode(context)
               ? PColors.darkerGrey
@@ -36,29 +41,48 @@ class PCartItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Flexible(
+              Flexible(
                   child: PProductTitleText(
-                title: 'Giày thể thao',
+                title: cartItem.title,
                 maxLines: 1,
               )),
-              const PBrandTitleWithVerifiedIcon(title: 'Nike'),
+              PBrandTitleWithVerifiedIcon(title: cartItem.brandName ?? ''),
 
               /// Attributes
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                    text: 'Màu sắc: ',
-                    style: Theme.of(context).textTheme.bodySmall),
-                TextSpan(
-                    text: 'Xanh ngọc ',
-                    style: Theme.of(context).textTheme.bodyLarge),
-              ])),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                    text: 'Kích cỡ: ',
-                    style: Theme.of(context).textTheme.bodySmall),
-                TextSpan(
-                    text: '40', style: Theme.of(context).textTheme.bodyLarge),
-              ])),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: (cartItem.selectedVariation ?? {})
+                    .entries
+                    .map((e) => Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${e.key}: ',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              TextSpan(
+                                text: e.value,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+              ),
+
+              // /// Attributes
+              // Text.rich(TextSpan(
+              //     children: (cartItem.selectedVariation ?? {})
+              //         .entries
+              //         .map((e) => TextSpan(children: [
+              //               TextSpan(
+              //                   text: '${e.key}:',
+              //                   style: Theme.of(context).textTheme.bodySmall),
+              //               TextSpan(
+              //                   text: ' ${e.value} ',
+              //                   style: Theme.of(context).textTheme.bodyLarge),
+              //             ]))
+              //         .toList())),
             ],
           ),
         )

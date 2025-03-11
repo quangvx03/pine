@@ -7,7 +7,7 @@ class PChipTheme{
 
   static ChipThemeData lightChipTheme = ChipThemeData(
     disabledColor: PColors.grey.withValues(alpha: 0.4),
-    labelStyle: const TextStyle(color: PColors.black),
+    labelStyle: const TextStyle(color: PColors.black, fontFamily: 'Cabin'),
     selectedColor: PColors.primary,
     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12),
     checkmarkColor: PColors.white,
@@ -15,7 +15,7 @@ class PChipTheme{
 
   static ChipThemeData darkChipTheme = ChipThemeData(
     disabledColor: PColors.darkGrey,
-    labelStyle: const TextStyle(color: PColors.white),
+    labelStyle: const TextStyle(color: PColors.white, fontFamily: 'Cabin'),
     selectedColor: PColors.primary,
     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12),
     checkmarkColor: PColors.white,

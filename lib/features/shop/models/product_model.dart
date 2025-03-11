@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pine/features/shop/models/product_attribute_model.dart';
 import 'package:pine/features/shop/models/product_variation_model.dart';
-import 'package:pine/utils/constants/enums.dart';
 
 import 'brand_model.dart';
 

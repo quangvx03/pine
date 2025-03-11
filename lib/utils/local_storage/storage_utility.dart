@@ -19,11 +19,15 @@ class PLocalStorage {
     _instance!._storage = GetStorage(bucketName);
   }
 
-
   // generic method to save data
-  Future<void> saveData<P>(String key, P value) async {
+  Future<void> writeData<P>(String key, P value) async{
     await _storage.write(key, value);
   }
+
+  // // generic method to save data
+  // Future<void> saveData<P>(String key, P value) async {
+  //   await _storage.write(key, value);
+  // }
 
   // generic method to read data
   P? readData<P>(String key) {

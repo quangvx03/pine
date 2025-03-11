@@ -15,7 +15,7 @@ class PAppBarTheme{
     surfaceTintColor: Colors.transparent,
     iconTheme: IconThemeData(color: PColors.black, size: PSizes.iconMd),
     actionsIconTheme: IconThemeData(color: PColors.black, size: PSizes.iconMd),
-    titleTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: PColors.black),
+    titleTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: PColors.black, fontFamily: 'Cabin'),
     systemOverlayStyle: SystemUiOverlayStyle(
       statusBarColor: PColors.white,
       statusBarIconBrightness: Brightness.dark,
@@ -31,7 +31,7 @@ class PAppBarTheme{
     surfaceTintColor: Colors.transparent,
     iconTheme: IconThemeData(color: PColors.white, size: PSizes.iconMd),
     actionsIconTheme: IconThemeData(color: PColors.white, size: PSizes.iconMd),
-    titleTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: PColors.white),
+    titleTextStyle: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: PColors.white, fontFamily: 'Cabin'),
     systemOverlayStyle: SystemUiOverlayStyle(
       statusBarColor: PColors.dark,
       statusBarIconBrightness: Brightness.light,

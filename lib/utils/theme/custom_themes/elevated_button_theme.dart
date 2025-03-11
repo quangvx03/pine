@@ -14,7 +14,7 @@ class PElevatedButtonTheme{
       disabledBackgroundColor: PColors.buttonDisabled,
       side: const BorderSide(color: PColors.primary),
       padding: const EdgeInsets.symmetric(vertical: PSizes.buttonHeight),
-      textStyle: const TextStyle(fontSize: 16, color: PColors.textWhite, fontWeight: FontWeight.w600),
+      textStyle: const TextStyle(fontSize: 16, color: PColors.textWhite, fontWeight: FontWeight.w600, fontFamily: 'Cabin'),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PSizes.buttonRadius)),
     )
   );
@@ -28,7 +28,7 @@ class PElevatedButtonTheme{
         disabledBackgroundColor: PColors.darkerGrey,
         side: const BorderSide(color: PColors.primary),
         padding: const EdgeInsets.symmetric(vertical: PSizes.buttonHeight),
-        textStyle: const TextStyle(fontSize: 16, color: PColors.white, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(fontSize: 16, color: PColors.white, fontWeight: FontWeight.w600, fontFamily: 'Cabin'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PSizes.buttonRadius)),
       )
   );

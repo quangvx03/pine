@@ -28,7 +28,7 @@ class ProductDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: PBottomAddToCart(),
+      bottomNavigationBar: PBottomAddToCart(product: product),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -92,7 +92,7 @@ class ProductDetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const PSectionHeading(
-                            title: 'Đánh giá (156)', showActionButton: false),
+                            title: 'Đánh giá (11)', showActionButton: false),
                         IconButton(
                             icon: const Icon(Iconsax.arrow_right_3, size: 18),
                             onPressed: () =>

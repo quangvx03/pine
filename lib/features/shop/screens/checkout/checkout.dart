@@ -16,7 +16,7 @@ import '../../../../common/widgets/appbar/appbar.dart';
 import '../../../../common/widgets/products/cart/coupon_widget.dart';
 
 class CheckoutScreen extends StatelessWidget {
-  const CheckoutScreen({Key? key}) : super(key: key);
+  const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class CheckoutScreen extends StatelessWidget {
           child: Column(
             children: [
               /// Items in Cart
-              const PCartItems(showPriceCheckout: true, showAddRemoveButtons: false),
+              const PCartItems( showAddRemoveButtons: false),
               const SizedBox(height: PSizes.spaceBtwSections),
 
               /// Coupon TextField

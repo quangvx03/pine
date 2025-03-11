@@ -40,7 +40,6 @@ class StoreScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium),
             actions: [
               PCartCounterIcon(
-                onPressed: () {},
                 iconColor: (PHelperFunctions.isDarkMode(context))
                     ? PColors.light
                     : PColors.dark,

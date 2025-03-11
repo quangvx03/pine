@@ -17,6 +17,7 @@ import 'package:pine/utils/helpers/helper_functions.dart';
 import '../../icons/circular_icon.dart';
 import '../../texts/brand_title_text_with_verified_icon.dart';
 import '../../texts/product_price_text.dart';
+import '../cart/add_to_cart_button.dart';
 
 class PProductCardVertical extends StatelessWidget {
   const PProductCardVertical({super.key, required this.product});
@@ -57,20 +58,6 @@ class PProductCardVertical extends StatelessWidget {
                         isNetworkImage: true,
                       ),
                     ),
-
-                    /// Thumbnail Image - before bug
-                    // Positioned.fill(
-                    //   child: FittedBox(
-                    //     fit: BoxFit.contain,
-                    //     child: Center(
-                    //       child: PRoundedImage(
-                    //         imageUrl: product.thumbnail,
-                    //         applyImageRadius: true,
-                    //         isNetworkImage: true,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
 
                     /// Sale Tag
                     if (salePercentage != null)
@@ -150,25 +137,15 @@ class PProductCardVertical extends StatelessWidget {
                                   : product.price)
                               .toString(),
                         ),
+                        // child: PProductPriceText(price: controller.getProductPrice(product)),
                       )
                     ],
                   ),
                 ),
 
                 /// Add to Cart Button
-                Container(
-                  decoration: const BoxDecoration(
-                      color: PColors.dark,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(PSizes.cardRadiusMd),
-                        bottomRight: Radius.circular(PSizes.productImageRadius),
-                      )),
-                  child: const SizedBox(
-                    width: PSizes.iconLg * 1.2,
-                    height: PSizes.iconLg * 1.2,
-                    child:
-                        Center(child: Icon(Iconsax.add, color: PColors.white)),
-                  ),
+                ProductCardAddToCartButton(
+                  product: product,
                 )
               ],
             )
