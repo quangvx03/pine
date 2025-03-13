@@ -119,7 +119,8 @@ class PProductCardHorizontal extends StatelessWidget {
                                   ProductType.single.toString() &&
                                   product.salePrice > 0)
                                 Padding(
-                                    padding: const EdgeInsets.only(left: PSizes.sm),
+                                    // padding: const EdgeInsets.only(left: PSizes.sm),
+                                  padding: EdgeInsets.zero,
                                     child: Text(
                                       PHelperFunctions.formatCurrency(product.price),
                                       style: Theme.of(context)
@@ -129,7 +130,8 @@ class PProductCardHorizontal extends StatelessWidget {
                                           decoration: TextDecoration.lineThrough),
                                     )),
                               Padding(
-                                padding: const EdgeInsets.only(left: PSizes.sm),
+                                // padding: const EdgeInsets.only(left: PSizes.sm),
+                                padding: EdgeInsets.zero,
                                 child: PProductPriceText(
                                   price: (product.salePrice > 0
                                       ? product.salePrice

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
+import 'package:pine/features/shop/controllers/product/cart_controller.dart';
 import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/helpers/helper_functions.dart';
+import 'package:pine/utils/helpers/pricing_calculator.dart';
 
 class PBillingAmountSection extends StatelessWidget {
   const PBillingAmountSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cartController = CartController.instance;
+    final subTotal = cartController.totalCartPrice.value;
+
     return Column(
       children: [
         PSectionHeading(
@@ -21,7 +27,7 @@ class PBillingAmountSection extends StatelessWidget {
           children: [
             Text('Tạm tính', style: Theme.of(context).textTheme.bodyMedium),
             Text(
-              '2,500,000₫',
+              PHelperFunctions.formatCurrency(subTotal),
               style: Theme.of(context).textTheme.bodyMedium,
             )
           ],
@@ -35,8 +41,8 @@ class PBillingAmountSection extends StatelessWidget {
             Text('Phí vận chuyển',
                 style: Theme.of(context).textTheme.bodyMedium),
             Text(
-              '30,000₫',
-              style: Theme.of(context).textTheme.bodyMedium,
+              PHelperFunctions.formatCurrency(PPricingCalculator.calculateShippingCost(subTotal, 'VN')),
+              style: Theme.of(context).textTheme.labelLarge,
             )
           ],
         ),
@@ -48,8 +54,8 @@ class PBillingAmountSection extends StatelessWidget {
           children: [
             Text('Mã giảm giá', style: Theme.of(context).textTheme.bodyMedium),
             Text(
-              '50,000₫',
-              style: Theme.of(context).textTheme.bodyMedium,
+              '0₫',
+              style: Theme.of(context).textTheme.labelLarge,
             )
           ],
         ),
@@ -62,8 +68,8 @@ class PBillingAmountSection extends StatelessWidget {
             Text('Tổng đơn hàng',
                 style: Theme.of(context).textTheme.bodyMedium),
             Text(
-              '2,480,000₫',
-              style: Theme.of(context).textTheme.bodyMedium,
+              PHelperFunctions.formatCurrency(PPricingCalculator.calculateTotalPrice(subTotal, 'VN')),
+              style: Theme.of(context).textTheme.titleLarge,
             )
           ],
         ),

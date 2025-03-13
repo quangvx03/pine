@@ -69,7 +69,7 @@ class CartController extends GetxController {
 
     updateCart();
     PLoaders.customToast(
-        message: 'Sản phẩm của bạn đã được thêm vào giỏ hàng.');
+        message: 'Sản phẩm đã được thêm vào giỏ hàng.');
   }
 
   void addOneToCart(CartItemModel item) {

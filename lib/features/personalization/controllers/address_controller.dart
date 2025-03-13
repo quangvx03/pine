@@ -2,9 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/common/widgets/loaders/circular_loader.dart';
+import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/data/repositories/address_repository.dart';
 import 'package:pine/features/personalization/models/address_model.dart';
+import 'package:pine/features/personalization/screens/address/add_new_address.dart';
+import 'package:pine/features/personalization/screens/address/widgets/single_address.dart';
 import 'package:pine/utils/constants/image_strings.dart';
+import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 import 'package:pine/utils/helpers/network_manager.dart';
 import 'package:pine/utils/popups/full_screen_loader.dart';
 import 'package:pine/utils/popups/loaders.dart';
@@ -42,7 +47,9 @@ class AddressController extends GetxController {
     try {
       Get.defaultDialog(
         title: '',
-        onWillPop: () async {return false;},
+        onWillPop: () async {
+          return false;
+        },
         barrierDismissible: false,
         backgroundColor: Colors.transparent,
         content: const PCircularLoader(),
@@ -125,6 +132,64 @@ class AddressController extends GetxController {
       PLoaders.errorSnackBar(
           title: 'Không tìm thấy địa chỉ!', message: e.toString());
     }
+  }
+
+  Future<dynamic> selectNewAddressPopup(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        isScrollControlled: true, // Cho phép cuộn toàn bộ bottom sheet
+        builder: (_) => Container(
+              padding: const EdgeInsets.all(PSizes.lg),
+              // Giới hạn chiều cao tối đa của bottom sheet
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
+              child: Column(
+                mainAxisSize:
+                    MainAxisSize.min, // Chỉ chiếm không gian cần thiết
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const PSectionHeading(
+                      title: 'Chọn địa chỉ', showActionButton: false),
+                  const SizedBox(height: PSizes.spaceBtwItems),
+
+                  // Đặt ListView trong Expanded để có thể cuộn
+                  Expanded(
+                    child: FutureBuilder(
+                        future: getAllUserAddresses(),
+                        builder: (_, snapshot) {
+                          final response =
+                              PCloudHelperFunctions.checkMultiRecordState(
+                                  snapshot: snapshot);
+                          if (response != null) return response;
+
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics:
+                                const AlwaysScrollableScrollPhysics(), // Luôn cho phép cuộn
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (_, index) => PSingleAddress(
+                              address: snapshot.data![index],
+                              onTap: () async {
+                                await selectAddress(snapshot.data![index]);
+                                Get.back();
+                              },
+                            ),
+                          );
+                        }),
+                  ),
+
+                  const SizedBox(height: PSizes.defaultSpace),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        onPressed: () =>
+                            Get.to(() => const AddNewAddressScreen()),
+                        child: const Text('Thêm địa chỉ mới')),
+                  )
+                ],
+              ),
+            ));
   }
 
   /// Reset form fields

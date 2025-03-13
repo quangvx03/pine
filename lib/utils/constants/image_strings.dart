@@ -22,6 +22,7 @@ class PImages{
   static const String deliveredInPlaneIllustration = "assets/images/animations/pine-come-back-later.gif";
   static const String deliveredEmailIllustration = "assets/images/animations/pine-receives-a-mail.gif";
   static const String verifyIllustration = "assets/images/animations/pine-verify.gif";
+
   static const String verify = "assets/images/animations/141594-animation-of-docer.json";
   static const String successfullyRegAnimation = "assets/images/animations/72462-check-register.json";
   static const String success = "assets/images/animations/success.json";

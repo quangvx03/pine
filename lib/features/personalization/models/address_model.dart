@@ -50,7 +50,7 @@ class AddressModel {
 
   factory AddressModel.fromMap(Map<String, dynamic> data) {
     return AddressModel(
-      id: data['Id'] as String,
+      id: data['Id'] as String? ?? '',
       name: data['Name'] as String,
       phoneNumber: data['PhoneNumber'] as String,
       street: data['Street'] as String,
@@ -62,8 +62,7 @@ class AddressModel {
     );
   }
 
-  // Factory constructor to create an AddressModel from a DocumentSnapshot
-  factory AddressModel.fromDocumentSnapshot(DocumentSnapshot snapshot){
+  factory AddressModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
 
     return AddressModel(

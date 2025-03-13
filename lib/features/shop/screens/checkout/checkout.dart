@@ -11,16 +11,26 @@ import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
+import 'package:pine/utils/helpers/pricing_calculator.dart';
+import 'package:pine/utils/popups/loaders.dart';
 
 import '../../../../common/widgets/appbar/appbar.dart';
 import '../../../../common/widgets/products/cart/coupon_widget.dart';
+import '../../controllers/product/cart_controller.dart';
+import '../../controllers/product/order_controller.dart';
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cartController = CartController.instance;
+    final subTotal = cartController.totalCartPrice.value;
+    final orderController = Get.put(OrderController());
+    final totalAmount = PPricingCalculator.calculateTotalPrice(subTotal, 'VN');
+
     final dark = PHelperFunctions.isDarkMode(context);
+
     return Scaffold(
       appBar: PAppBar(
           showBackArrow: true,
@@ -32,7 +42,7 @@ class CheckoutScreen extends StatelessWidget {
           child: Column(
             children: [
               /// Items in Cart
-              const PCartItems( showAddRemoveButtons: false),
+              const PCartItems(showAddRemoveButtons: false),
               const SizedBox(height: PSizes.spaceBtwSections),
 
               /// Coupon TextField
@@ -75,12 +85,13 @@ class CheckoutScreen extends StatelessWidget {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(PSizes.defaultSpace),
         child: ElevatedButton(
-            onPressed: () => Get.to(() => SuccessScreen(
-                image: PImages.success,
-                title: 'Thanh toán thành công!',
-                subTitle: 'Đơn hàng sẽ sớm được giao tới bạn!',
-                onPressed: () => Get.offAll(() => const NavigationMenu()))),
-            child: Text('Thanh toán 2,480,000₫')),
+            onPressed: subTotal > 0
+                ? () => orderController.processOrder(totalAmount)
+                : () => PLoaders.warningSnackBar(
+                    title: 'Giỏ hàng trống',
+                    message: 'Thêm sản phẩm vào giỏ hàng để tiến hành.'),
+            child: Text(
+                'Thanh toán ${PHelperFunctions.formatCurrency(totalAmount)}')),
       ),
     );
   }

@@ -15,7 +15,6 @@ Future<void> main() async {
   /// GetX Local Storage
   await GetStorage.init();
 
-
   /// Await Splash until other items load
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
