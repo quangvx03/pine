@@ -1,21 +1,21 @@
 name: pine
 description: "A new Flutter project."
 
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
   sdk: ^3.6.1
 
-
 #--------------- PACKAGES ---------------
 dependencies:
   flutter:
     sdk: flutter
-  
+
   # Utility packages
   http: ^1.1.0
   intl: ^0.18.1
+  shared_preferences: ^2.2.2
   logger: ^2.0.1
   lottie: ^2.7.0
   shimmer: ^3.0.0
@@ -24,6 +24,7 @@ dependencies:
   connectivity_plus: ^5.0.1
   flutter_native_splash: ^2.4.4
   smooth_page_indicator: ^1.2.0+3
+  flutter_slidable: ^4.0.0
 
   # Icons
   iconsax: ^0.0.8
@@ -65,11 +66,6 @@ flutter_launcher_icons:
     image_path: "assets/logos/pine-logo-white.png"
     background_color: "#hexcode"
     theme_color: "#hexcode"
-  windows:
-    generate: true
-    image_path: "assets/logos/pine-logo-white.png"
-    icon_size: 48 # min:48, max:256, default: 48
-
 
 flutter:
   uses-material-design: true
@@ -111,33 +107,3 @@ flutter:
       fonts:
         - asset: assets/fonts/Agbalumo-Regular.ttf
           weight: 400
-  
-  
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  

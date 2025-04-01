@@ -11,23 +11,17 @@ class ImagesController extends GetxController{
 
   RxString selectedProductImage = ''.obs;
 
-  /// Get all Image from product and variations
   List<String> getAllProductImages(ProductModel product){
-    // Use set to add unique images only
     Set<String> images = {};
 
-    // Load thumbnail image
     images.add(product.thumbnail);
 
-    // Assign thumbnail as selected image
     selectedProductImage.value = product.thumbnail;
 
-    // Get all images from the product model if not null
     if(product.images != null){
       images.addAll(product.images!);
     }
 
-    // Get all image from the product variations if not null
     if (product.productVariations != null || product.productVariations!.isNotEmpty){
       images.addAll(product.productVariations!.map((variation) => variation.image));
     }
@@ -35,7 +29,6 @@ class ImagesController extends GetxController{
     return images.toList();
   }
 
-  /// Show image popup
   void showEnlargedImage(String image){
     Get.to(
       fullscreenDialog: true,

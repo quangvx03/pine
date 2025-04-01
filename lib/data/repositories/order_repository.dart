@@ -9,7 +9,6 @@ class OrderRepository extends GetxController {
 
   final _db = FirebaseFirestore.instance;
 
-  /// Get all order related to current user
   Future<List<OrderModel>> fetchUserOrders() async {
     try {
       final userId = AuthenticationRepository.instance.authUser.uid;
@@ -27,7 +26,6 @@ class OrderRepository extends GetxController {
     }
   }
 
-  /// Store new user order
   Future<void> saveOrder(OrderModel order, String userId) async {
     try {
       await _db

@@ -9,7 +9,6 @@ class BannerController extends GetxController {
   final carouselCurrentIndex = 0.obs;
   final RxList<BannerModel> banners = <BannerModel>[].obs;
 
-
   @override
   void onInit() {
     fetchBanners();

@@ -25,7 +25,7 @@ class PImages{
 
   static const String verify = "assets/images/animations/141594-animation-of-docer.json";
   static const String successfullyRegAnimation = "assets/images/animations/72462-check-register.json";
-  static const String success = "assets/images/animations/success.json";
+  static const String success = "assets/images/animations/120978-payment-successful.json";
   static const String empty = "assets/images/animations/53207-empty-file.json";
 
 

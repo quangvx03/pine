@@ -22,7 +22,6 @@ class OrderController extends GetxController {
   final checkoutController = CheckoutController.instance;
   final orderRepository = Get.put(OrderRepository());
 
-  /// Fetch user order history
   Future<List<OrderModel>> fetchUserOrders() async {
     try {
       final userOrders = await orderRepository.fetchUserOrders();
@@ -33,17 +32,14 @@ class OrderController extends GetxController {
     }
   }
 
-  /// Add methods for order processing
   void processOrder(double totalAmount) async {
     try {
       PFullScreenLoader.openLoadingDiaLog(
           'Đơn hàng đang được xử lý', PImages.verify);
 
-      // Get user authentication Id
       final userId = AuthenticationRepository.instance.authUser.uid;
       if (userId.isEmpty) return;
 
-      // Add details
       final order = OrderModel(
         id: UniqueKey().toString(),
         userId: userId,

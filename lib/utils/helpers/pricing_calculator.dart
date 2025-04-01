@@ -14,6 +14,6 @@ class PPricingCalculator {
   }
 
   static double getShippingCost(String location) {
-    return 30000;
+    return 15000;
   }
 }

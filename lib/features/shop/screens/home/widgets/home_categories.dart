@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/features/shop/controllers/category_controller.dart';
-import 'package:pine/features/shop/screens/sub_category/sub_categories.dart';
+import 'package:pine/features/shop/screens/category/sub_categories.dart';
 import 'package:pine/utils/constants/colors.dart';
 import '../../../../../common/widgets/image_text_widgets/vertical_image_text.dart';
 import '../../../../../common/widgets/shimmers/category_shimmer.dart';

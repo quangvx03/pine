@@ -24,8 +24,8 @@ class PProductQuantityWithAddRemoveButton extends StatelessWidget {
       children: [
         PCircularIcon(
           icon: Iconsax.minus,
-          width: 32,
-          height: 32,
+          width: 24,
+          height: 24,
           size: PSizes.md,
           color: PHelperFunctions.isDarkMode(context)
               ? PColors.white
@@ -41,8 +41,8 @@ class PProductQuantityWithAddRemoveButton extends StatelessWidget {
         const SizedBox(width: PSizes.spaceBtwItems),
         PCircularIcon(
           icon: Iconsax.add,
-          width: 32,
-          height: 32,
+          width: 24,
+          height: 24,
           size: PSizes.md,
           color: PColors.white,
           backgroundColor: PColors.primary,

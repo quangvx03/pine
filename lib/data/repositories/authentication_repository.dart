@@ -36,7 +36,6 @@ class AuthenticationRepository extends GetxController {
     if (user != null) {
       if (user.emailVerified) {
 
-        // Initialize user specific storage
         await PLocalStorage.init(user.uid);
 
         Get.offAll(() => const NavigationMenu());
@@ -44,7 +43,6 @@ class AuthenticationRepository extends GetxController {
         Get.offAll(() => VerifyEmailScreen(email: _auth.currentUser?.email));
       }
     } else {
-      // Local Storage
       deviceStorage.writeIfNull('IsFirstTime', true);
 
       deviceStorage.read('IsFirstTime') != true

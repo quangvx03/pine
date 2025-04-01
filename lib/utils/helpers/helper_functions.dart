@@ -126,7 +126,7 @@ class PHelperFunctions {
     }
 
     final formattedWithSeparators = intAmount.toString().replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.');
 
     return '$formattedWithSeparators₫';
   }

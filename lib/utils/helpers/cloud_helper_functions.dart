@@ -42,7 +42,6 @@ class PCloudHelperFunctions {
     return null;
   }
 
-  /// Create a reference with an initial file path and name and retrieve the download URL.
   static Future<String> getURLFromFilePathAndName(String path) async {
     try {
       if (path.isEmpty) return '';
@@ -58,7 +57,6 @@ class PCloudHelperFunctions {
     }
   }
 
-  /// Retrieve the download URL from a given storage URI.
   static Future<String> getURLFromURI(String url) async {
     try {
       if (url.isEmpty) return '';

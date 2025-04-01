@@ -1,6 +1,4 @@
-
-
-class PRoutes{
+class PRoutes {
   static const home = '/';
   static const store = '/store';
   static const favorites = '/favorites';

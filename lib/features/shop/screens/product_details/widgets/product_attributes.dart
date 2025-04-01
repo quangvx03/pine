@@ -34,9 +34,6 @@ class PProductAttributes extends StatelessWidget {
                   /// Title, Price and Stock Status
                   Row(
                     children: [
-                      // const PSectionHeading(
-                      //     title: 'Phân loại', showActionButton: false),
-                      // const SizedBox(width: PSizes.spaceBtwItems),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -47,8 +44,10 @@ class PProductAttributes extends StatelessWidget {
                                   title: 'Trạng thái:', smallSize: true),
                               const SizedBox(width: PSizes.spaceBtwItems / 2),
                               Text(controller.variationStockStatus.value,
-                                  style:
-                                  Theme.of(context).textTheme.titleMedium!.apply(color: PColors.info)),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .apply(color: PColors.info)),
                             ],
                           ),
                           Row(
@@ -75,23 +74,17 @@ class PProductAttributes extends StatelessWidget {
                               PProductDetailPriceText(
                                 price: controller.getVariationPrice(),
                                 isLarge: true,
-                                textStyle: Theme.of(context).textTheme.headlineMedium!.copyWith(color: PColors.primary), // Ghi đè style trực tiếp
+                                textStyle: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium!
+                                    .copyWith(color: PColors.primary),
                               ),
                             ],
                           ),
-
-
                         ],
                       ),
                     ],
                   ),
-
-                  // /// Variation Description
-                  // PProductTitleText(
-                  //   title: controller.selectedVariation.value.description ?? '',
-                  //   smallSize: true,
-                  //   maxLines: 4,
-                  // )
                 ],
               ),
             ),
@@ -106,6 +99,7 @@ class PProductAttributes extends StatelessWidget {
                       children: [
                         PSectionHeading(
                             title: attribute.name ?? '',
+                            isDetail: true,
                             showActionButton: false),
                         const SizedBox(height: PSizes.spaceBtwItems / 2),
                         Obx(

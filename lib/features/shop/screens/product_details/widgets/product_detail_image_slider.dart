@@ -1,15 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
 import 'package:pine/features/shop/controllers/product/images_controller.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
 import '../../../../../common/widgets/appbar/appbar.dart';
-import '../../../../../common/widgets/custom_shapes/curved_edges/curved_edges_widget.dart';
-import '../../../../../common/widgets/icons/circular_icon.dart';
 import '../../../../../common/widgets/images/rounded_image.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/sizes.dart';
@@ -29,8 +26,7 @@ class PProductImageSlider extends StatelessWidget {
     final controller = Get.put(ImagesController());
     final images = controller.getAllProductImages(product);
 
-    return PCurvedEdgeWidget(
-        child: Container(
+    return Container(
       color: dark ? PColors.darkerGrey : PColors.light,
       child: Stack(
         children: [
@@ -88,13 +84,8 @@ class PProductImageSlider extends StatelessWidget {
                       })),
             ),
           ),
-
-          PAppBar(
-            showBackArrow: true,
-            actions: [PFavoriteIcon(productId: product.id)],
-          )
         ],
       ),
-    ));
+    );
   }
 }

@@ -47,6 +47,17 @@ class ProductController extends GetxController {
     }
   }
 
+  Future<List<ProductModel>> fetchAllProducts() async {
+    try {
+      final products = await productRepository.getAllProducts();
+
+      return products;
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra ', message: e.toString());
+      return [];
+    }
+  }
+
   /// Get price or price range for variations
   String getProductPrice(ProductModel product) {
     double smallestPrice = double.infinity;
@@ -86,7 +97,7 @@ class ProductController extends GetxController {
   /// Calculate Discount Percentage
   String? calculateSalePercentage(double originalPrice, double? salePrice) {
     if (salePrice == null || salePrice <= 0) return null;
-    if (originalPrice <= 0) return null;
+    if (originalPrice <= 0 || originalPrice <= salePrice) return null;
 
     double percentage = ((originalPrice - salePrice) / originalPrice) * 100;
     return percentage.toStringAsFixed(0);

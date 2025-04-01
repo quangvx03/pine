@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:pine/common/styles/shadows.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
 import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
@@ -10,14 +9,12 @@ import 'package:pine/common/widgets/texts/product_price_text.dart';
 import 'package:pine/common/widgets/texts/product_title_text.dart';
 import 'package:pine/features/shop/controllers/product/product_controller.dart';
 import 'package:pine/utils/constants/colors.dart';
-import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
 import '../../../../features/shop/models/product_model.dart';
 import '../../../../features/shop/screens/product_details/product_detail.dart';
 import '../../../../utils/constants/enums.dart';
-import '../../icons/circular_icon.dart';
 
 class PProductCardHorizontal extends StatelessWidget {
   const PProductCardHorizontal({super.key, required this.product});
@@ -29,7 +26,8 @@ class PProductCardHorizontal extends StatelessWidget {
     final dark = PHelperFunctions.isDarkMode(context);
 
     final controller = ProductController.instance;
-    final salePercentage = controller.calculateSalePercentage(product.price, product.salePrice);
+    final salePercentage =
+        controller.calculateSalePercentage(product.price, product.salePrice);
 
     return GestureDetector(
       onTap: () => Get.to(() => ProductDetailScreen(product: product)),
@@ -44,35 +42,38 @@ class PProductCardHorizontal extends StatelessWidget {
           children: [
             /// Thumbnail
             PRoundedContainer(
-              height: 110,
+              height: 115,
               padding: const EdgeInsets.all(PSizes.sm),
               backgroundColor: dark ? PColors.dark : PColors.white,
               child: Stack(
                 children: [
                   /// Thumbnail Image
                   SizedBox(
-                      height: 110,
+                      height: 115,
                       width: 110,
                       child: PRoundedImage(
-                          imageUrl: product.thumbnail,
-                          applyImageRadius: true, isNetworkImage: true,)),
+                        imageUrl: product.thumbnail,
+                        applyImageRadius: true,
+                        isNetworkImage: true,
+                      )),
 
                   /// Sale Tag
-                  if(salePercentage != null)
-                  Positioned(
-                    top: 0,
-                    child: PRoundedContainer(
-                      radius: PSizes.sm,
-                      backgroundColor: PColors.secondary.withValues(alpha: 0.8),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: PSizes.sm, vertical: PSizes.xs),
-                      child: Text('$salePercentage%',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelLarge!
-                              .apply(color: PColors.black)),
+                  if (salePercentage != null)
+                    Positioned(
+                      top: 0,
+                      child: PRoundedContainer(
+                        radius: PSizes.sm,
+                        backgroundColor:
+                            PColors.secondary.withValues(alpha: 0.8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: PSizes.sm, vertical: PSizes.xs),
+                        child: Text('$salePercentage%',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge!
+                                .apply(color: PColors.black)),
+                      ),
                     ),
-                  ),
 
                   /// Favorite Icon Button
                   Positioned(
@@ -101,12 +102,12 @@ class PProductCardHorizontal extends StatelessWidget {
                           PProductTitleText(
                               title: product.title, smallSize: true),
                           SizedBox(height: PSizes.spaceBtwItems / 2),
-                          PBrandTitleWithVerifiedIcon(title: product.brand!.name),
+                          PBrandTitleWithVerifiedIcon(
+                              title: product.brand!.name),
                         ],
                       ),
                     ),
                     const Spacer(),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -116,26 +117,31 @@ class PProductCardHorizontal extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if (product.productType ==
-                                  ProductType.single.toString() &&
-                                  product.salePrice > 0)
+                                      ProductType.single.toString() &&
+                                  product.salePrice > 0 &&
+                                  product.salePrice < product.price)
                                 Padding(
-                                    // padding: const EdgeInsets.only(left: PSizes.sm),
-                                  padding: EdgeInsets.zero,
+                                    padding: const EdgeInsets.only(right: 5),
                                     child: Text(
-                                      PHelperFunctions.formatCurrency(product.price),
+                                      PHelperFunctions.formatCurrency(
+                                          product.price),
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelMedium!
                                           .apply(
-                                          decoration: TextDecoration.lineThrough),
+                                              decoration:
+                                                  TextDecoration.lineThrough),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     )),
                               Padding(
-                                // padding: const EdgeInsets.only(left: PSizes.sm),
-                                padding: EdgeInsets.zero,
+                                padding: const EdgeInsets.only(right: 2),
+                                // padding: EdgeInsets.zero,
                                 child: PProductPriceText(
-                                  price: (product.salePrice > 0
-                                      ? product.salePrice
-                                      : product.price)
+                                  price: (product.salePrice > 0 &&
+                                              product.salePrice < product.price
+                                          ? product.salePrice
+                                          : product.price)
                                       .toString(),
                                 ),
                               )
@@ -149,13 +155,14 @@ class PProductCardHorizontal extends StatelessWidget {
                               color: PColors.dark,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(PSizes.cardRadiusMd),
-                                bottomRight: Radius.circular(PSizes.productImageRadius),
+                                bottomRight:
+                                    Radius.circular(PSizes.productImageRadius),
                               )),
                           child: const SizedBox(
                             width: PSizes.iconLg * 1.2,
                             height: PSizes.iconLg * 1.2,
-                            child:
-                            Center(child: Icon(Iconsax.add, color: PColors.white)),
+                            child: Center(
+                                child: Icon(Iconsax.add, color: PColors.white)),
                           ),
                         )
                       ],

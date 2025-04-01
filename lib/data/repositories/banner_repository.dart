@@ -12,7 +12,6 @@ class BannerRepository extends GetxController {
 
   final _db = FirebaseFirestore.instance;
 
-  /// Get all order related to current User
   Future<List<BannerModel>> fetchBanners() async {
     try {
       final result = await _db

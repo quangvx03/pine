@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pine/features/shop/models/product_model.dart';
@@ -10,7 +11,38 @@ class ProductRepository extends GetxController {
 
   final _db = FirebaseFirestore.instance;
 
-  /// Get limited featured products
+  // Add this method to the ProductRepository class
+  Future<ProductModel> getProductById(String productId) async {
+    try {
+      final snapshot = await _db.collection('Products').doc(productId).get();
+
+      if (!snapshot.exists) {
+        throw 'Sản phẩm không tồn tại';
+      }
+
+      return ProductModel.fromSnapshot(snapshot);
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra khi tải sản phẩm: $e';
+    }
+  }
+
+  Future<List<ProductModel>> getAllProducts() async {
+    try {
+      final snapshot = await _db.collection('Products').get();
+      return snapshot.docs.map((e) => ProductModel.fromSnapshot(e)).toList();
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
   Future<List<ProductModel>> getFeaturedProducts() async {
     try {
       final snapshot = await _db
@@ -28,7 +60,6 @@ class ProductRepository extends GetxController {
     }
   }
 
-  /// Get All featured products
   Future<List<ProductModel>> getAllFeaturedProducts() async {
     try {
       final snapshot = await _db
@@ -45,7 +76,6 @@ class ProductRepository extends GetxController {
     }
   }
 
-  /// Get products based on the query
   Future<List<ProductModel>> fetchProductsByQuery(Query query) async {
     try {
       final querySnapshot = await query.get();
@@ -62,11 +92,16 @@ class ProductRepository extends GetxController {
     }
   }
 
-  /// Get products based on the query
-  Future<List<ProductModel>> getFavoriteProducts(List<String> productIds) async {
+  Future<List<ProductModel>> getFavoriteProducts(
+      List<String> productIds) async {
     try {
-      final snapshot = await _db.collection('Products').where(FieldPath.documentId, whereIn: productIds).get();
-      return snapshot.docs.map((querySnapshot) => ProductModel.fromSnapshot(querySnapshot)).toList();
+      final snapshot = await _db
+          .collection('Products')
+          .where(FieldPath.documentId, whereIn: productIds)
+          .get();
+      return snapshot.docs
+          .map((querySnapshot) => ProductModel.fromSnapshot(querySnapshot))
+          .toList();
     } on FirebaseException catch (e) {
       throw PFirebaseException(e.code).message;
     } on PlatformException catch (e) {
@@ -138,6 +173,34 @@ class ProductRepository extends GetxController {
       throw PPlatformException(e.code).message;
     } catch (e) {
       throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
+  Future<List<ProductModel>> searchProducts(String query) async {
+    try {
+      if (query.isEmpty) return [];
+
+      // Lấy tất cả sản phẩm từ Firestore
+      final productsSnapshot = await _db.collection('Products').get();
+
+      // Chuyển đổi thành danh sách ProductModel
+      final allProducts = productsSnapshot.docs
+          .map((doc) => ProductModel.fromSnapshot(doc))
+          .toList();
+
+      // Tìm kiếm không phân biệt hoa thường, CHỈ THEO TIÊU ĐỀ
+      final queryLower = query.toLowerCase();
+      final results = allProducts.where((product) {
+        // Chỉ tìm kiếm theo tiêu đề sản phẩm
+        final titleMatch = product.title.toLowerCase().contains(queryLower);
+        return titleMatch;
+      }).toList();
+
+      debugPrint('Tìm thấy ${results.length} kết quả phù hợp');
+      return results;
+    } catch (e) {
+      debugPrint('Lỗi trong quá trình tìm kiếm: $e');
+      throw 'Lỗi khi tìm kiếm sản phẩm: $e';
     }
   }
 }

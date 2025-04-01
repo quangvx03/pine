@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pine/features/personalization/models/address_model.dart';
-import 'package:pine/features/shop/models/cart_item_model.dart';
+import 'package:pine/features/shop/models/cart_model.dart';
 import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
@@ -13,7 +13,7 @@ class OrderModel {
   final String paymentMethod;
   final AddressModel? address;
   final DateTime? deliveryDate;
-  final List<CartItemModel> items;
+  final List<CartModel> items;
 
   OrderModel({
     required this.id,
@@ -70,7 +70,7 @@ class OrderModel {
             : (data['deliveryDate'] as Timestamp).toDate(),
         items: (data['items'] as List<dynamic>)
             .map((itemData) =>
-                CartItemModel.fromJson(itemData as Map<String, dynamic>))
+                CartModel.fromJson(itemData as Map<String, dynamic>))
             .toList());
   }
 }

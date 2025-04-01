@@ -3,13 +3,13 @@ import 'package:get/get.dart';
 import 'package:pine/features/personalization/controllers/user_controller.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/helpers/helper_functions.dart';
 
 import '../../../../../common/widgets/appbar/appbar.dart';
 import '../../../../../common/widgets/shimmers/shimmer.dart';
 import '../../../../../common/widgets/products/cart/cart_menu_icon.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/text_strings.dart';
-import '../../cart/cart.dart';
 
 class PHomeAppBar extends StatelessWidget {
   const PHomeAppBar({
@@ -41,21 +41,22 @@ class PHomeAppBar extends StatelessWidget {
                   return const PShimmerEffect(width: 80, height: 15);
                 } else {
                   return Text(controller.user.value.fullName,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .apply(color: PColors.darkerGrey));
+                      style: PHelperFunctions.isDarkMode(context)
+                          ? Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .apply(color: PColors.white)
+                          : Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .apply(color: PColors.darkerGrey));
                 }
               }),
             ],
           ),
         ],
       ),
-      actions: [
-        PCartCounterIcon(
-          iconColor: PColors.black, counterBgColor: PColors.black, counterTextColor: PColors.white,
-        )
-      ],
+      actions: [PCartCounterIcon()],
     );
   }
 }

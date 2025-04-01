@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-
-import '../../../../utils/constants/colors.dart';
-import '../../../../utils/constants/sizes.dart';
-import '../../../../utils/device/device_utility.dart';
-import '../../../../utils/helpers/helper_functions.dart';
+import 'package:pine/features/shop/screens/search/search.dart';
+import 'package:pine/utils/constants/colors.dart';
+import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/device/device_utility.dart';
+import 'package:pine/utils/helpers/helper_functions.dart';
 
 class PSearchContainer extends StatelessWidget {
   const PSearchContainer({
@@ -15,7 +16,7 @@ class PSearchContainer extends StatelessWidget {
     this.showBorder = true,
     this.onTap,
     this.padding = const EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
-    this.height = 50, // Thêm thuộc tính chiều cao
+    this.height = 50,
   });
 
   final String text;
@@ -23,31 +24,36 @@ class PSearchContainer extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showBackground, showBorder;
   final EdgeInsetsGeometry padding;
-  final double height; // Thêm thuộc tính chiều cao
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     final dark = PHelperFunctions.isDarkMode(context);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap ?? () => Get.to(() => const SearchScreen()),
       child: Padding(
         padding: padding,
         child: Container(
           width: PDeviceUtils.getScreenWidth(context),
-          height: height, // Sử dụng thuộc tính chiều cao
-          padding: const EdgeInsets.symmetric(horizontal: PSizes.md, vertical: PSizes.sm), // Giảm padding dọc
+          height: height,
+          padding: const EdgeInsets.symmetric(
+              horizontal: PSizes.md, vertical: PSizes.sm),
           decoration: BoxDecoration(
               color: showBackground
                   ? dark
                   ? PColors.dark
-                  : PColors.light
+                  : PColors.white
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
               border: showBorder ? Border.all(color: PColors.grey) : null),
           child: Row(
             children: [
-              Icon(icon, color: dark ?  PColors.darkerGrey : PColors.grey, size: 20,), // Giảm kích thước icon
+              Icon(
+                icon,
+                color: dark ? PColors.darkerGrey : PColors.darkGrey,
+                size: 20,
+              ),
               const SizedBox(width: PSizes.spaceBtwItems),
               Text(text, style: Theme.of(context).textTheme.bodySmall),
             ],

@@ -3,12 +3,13 @@ import 'package:intl/intl.dart';
 class PFormatter {
   static String formatDate(DateTime? date) {
     date ??= DateTime.now();
-    return DateFormat('dd-MM-yyyy').format(date); // Định dạng ngày tháng kiểu Việt Nam
+    return DateFormat('dd-MM-yyyy')
+        .format(date); // Định dạng ngày tháng kiểu Việt Nam
     // Hoặc sử dụng DateFormat('dd/MM/yyyy') cho định dạng dd/MM/yyyy
   }
 
   static String formatCurrency(double amount) {
-    final format = NumberFormat.currency(locale: 'vi_VN', symbol: '₫'); // Định dạng tiền tệ Việt Nam
+    final format = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
     return format.format(amount);
   }
 
@@ -23,7 +24,6 @@ class PFormatter {
     // Nếu không đúng định dạng, trả về số gốc
     return phoneNumber;
   }
-
 
   static String internationalFormatPhoneNumber(String phoneNumber) {
     // Remove any non-digit characters from the phone number

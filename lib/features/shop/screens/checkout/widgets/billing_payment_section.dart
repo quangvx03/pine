@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/utils/constants/colors.dart';
-import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
@@ -31,7 +30,7 @@ class PBillingPaymentSection extends StatelessWidget {
                 width: 60,
                 height: 35,
                 backgroundColor: dark ? PColors.light : PColors.white,
-                padding: const EdgeInsets.all(PSizes.sm),
+                padding: const EdgeInsets.all(PSizes.xs),
                 child:  Image(
                     image: AssetImage(controller.selectedPaymentMethod.value.image), fit: BoxFit.contain),
               ),

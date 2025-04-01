@@ -16,62 +16,68 @@ class PBottomAddToCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = CartController.instance;
-    controller.updateAlreadyAddedProductCount(product);
+    final cartController = CartController.instance;
     final dark = PHelperFunctions.isDarkMode(context);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartController.updateAlreadyAddedProductCount(product);
+    });
+
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: PSizes.defaultSpace, vertical: PSizes.defaultSpace / 2),
-      decoration: BoxDecoration(
-          color: dark ? PColors.darkerGrey : PColors.light,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(PSizes.cardRadiusLg),
-            topRight: Radius.circular(PSizes.cardRadiusLg),
-          )),
-      child: Obx(
-        () => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                PCircularIcon(
-                  icon: Iconsax.minus,
-                  backgroundColor: PColors.darkerGrey,
-                  width: 40,
-                  height: 40,
-                  color: PColors.white,
-                  onPressed: () => controller.productQuantityInCart.value < 1
-                      ? null
-                      : controller.productQuantityInCart.value -= 1,
-                ),
-                const SizedBox(width: PSizes.spaceBtwItems),
-                Text(controller.productQuantityInCart.value.toString(),
-                    style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(width: PSizes.spaceBtwItems),
-                PCircularIcon(
-                  icon: Iconsax.add,
-                  backgroundColor: PColors.black,
-                  width: 40,
-                  height: 40,
-                  color: PColors.white,
-                  onPressed: () => controller.productQuantityInCart.value += 1,
-                ),
-              ],
-            ),
-            ElevatedButton(
-                onPressed: controller.productQuantityInCart.value < 1
-                    ? null
-                    : () => controller.addToCart(product),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(PSizes.md),
-                  backgroundColor: PColors.primary,
-                  // side: const BorderSide(color: PColors.black),
-                ),
-                child: const Text('Thêm vào giỏ hàng'))
-          ],
-        ),
-      ),
-    );
+        padding: const EdgeInsets.symmetric(
+            horizontal: PSizes.defaultSpace, vertical: PSizes.defaultSpace / 2),
+        decoration: BoxDecoration(
+            color: dark ? PColors.darkerGrey : PColors.light,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(PSizes.cardRadiusLg),
+              topRight: Radius.circular(PSizes.cardRadiusLg),
+            )),
+        child: Obx(() {
+          if (cartController.productQuantityInCart.value < 1) {
+            cartController.productQuantityInCart.value = 1;
+          }
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  PCircularIcon(
+                    icon: Iconsax.minus,
+                    backgroundColor: PColors.grey,
+                    width: 36,
+                    height: 36,
+                    color: PColors.black,
+                    onPressed: () {
+                      if (cartController.productQuantityInCart.value > 1) {
+                        cartController.productQuantityInCart.value -= 1;
+                      }
+                    },
+                  ),
+                  const SizedBox(width: PSizes.spaceBtwItems),
+                  Text(cartController.productQuantityInCart.value.toString(),
+                      style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(width: PSizes.spaceBtwItems),
+                  PCircularIcon(
+                    icon: Iconsax.add,
+                    backgroundColor: PColors.primary,
+                    width: 36,
+                    height: 36,
+                    color: PColors.white,
+                    onPressed: () =>
+                        cartController.productQuantityInCart.value += 1,
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                  onPressed: () => cartController.addToCart(product),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(PSizes.md),
+                    backgroundColor: PColors.primary,
+                    side: const BorderSide(color: PColors.primary),
+                  ),
+                  child: const Text('Thêm vào giỏ hàng'))
+            ],
+          );
+        }));
   }
 }

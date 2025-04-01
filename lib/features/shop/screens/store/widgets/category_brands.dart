@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pine/common/widgets/brands/brand_show_case.dart';
 import 'package:pine/features/shop/controllers/brand_controller.dart';
 import 'package:pine/features/shop/models/category_model.dart';
-import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 

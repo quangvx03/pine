@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pine/common/widgets/shimmers/shimmer.dart';
 
-import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 
 class PRoundedImage extends StatelessWidget {
@@ -18,7 +17,7 @@ class PRoundedImage extends StatelessWidget {
     this.fit = BoxFit.contain,
     this.backgroundColor,
     this.isNetworkImage = false,
-    this.borderRadius = PSizes.md,
+    this.borderRadius = PSizes.productImageRadius,
   });
 
   final double? width, height;

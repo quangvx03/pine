@@ -6,15 +6,11 @@ import 'package:pine/common/widgets/shimmers/vertical_product_shimmer.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/features/shop/controllers/category_controller.dart';
 import 'package:pine/features/shop/models/category_model.dart';
-import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/features/shop/screens/all_product/all_products.dart';
 import 'package:pine/features/shop/screens/store/widgets/category_brands.dart';
 import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 
-import '../../../../../common/widgets/brands/brand_show_case.dart';
-import '../../../../../utils/constants/image_strings.dart';
 import '../../../../../utils/constants/sizes.dart';
-import '../../../controllers/product/product_controller.dart';
 
 class PCategoryTab extends StatelessWidget {
   const PCategoryTab({super.key, required this.category});
@@ -42,14 +38,12 @@ class PCategoryTab extends StatelessWidget {
                   future:
                       controller.getCategoryProducts(categoryId: category.id),
                   builder: (context, snapshot) {
-                    /// Helper function: handle loader, no record or error message
                     final response =
                         PCloudHelperFunctions.checkMultiRecordState(
                             snapshot: snapshot,
                             loader: const PVerticalProductShimmer());
                     if (response != null) return response;
 
-                    /// Record Found
                     final products = snapshot.data!;
 
                     return Column(

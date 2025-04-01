@@ -33,8 +33,7 @@ class PVerticalImageText extends StatelessWidget {
           /// Circular Icon
           PCircularImage(
               image: image,
-              padding: 7,
-              fit: BoxFit.fitWidth,
+              padding: 6,
               isNetworkImage: isNetworkImage,
               backgroundColor: backgroundColor),
 

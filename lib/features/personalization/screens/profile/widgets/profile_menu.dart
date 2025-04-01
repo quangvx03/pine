@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:pine/utils/constants/sizes.dart';
 
 class PProfileMenu extends StatelessWidget {
   const PProfileMenu({
     super.key,
-    required this.onPressed,
+    this.onPressed,
     required this.title,
     required this.value,
-    this.icon = Iconsax.arrow_right_34,
+    this.icon,
   });
 
-  final IconData icon;
-  final VoidCallback onPressed;
+  final IconData? icon;
+  final VoidCallback? onPressed;
   final String title, value;
 
   @override
@@ -35,7 +34,7 @@ class PProfileMenu extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyMedium,
                       overflow: TextOverflow.ellipsis)),
               Expanded(
-                  child: Icon(icon, size: 18),
+                child: Icon(icon, size: 18),
               )
             ],
           )),

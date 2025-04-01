@@ -9,10 +9,11 @@ class PSectionHeading extends StatelessWidget {
     this.buttonTitle = 'Tất cả',
     required this.title,
     this.showActionButton = true,
+    this.isDetail = false,
   });
 
   final Color? textColor;
-  final bool showActionButton;
+  final bool showActionButton, isDetail;
   final String title, buttonTitle;
   final void Function()? onPressed;
 
@@ -22,10 +23,12 @@ class PSectionHeading extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title,
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall!
-                .apply(color: textColor),
+            style: isDetail
+                ? Theme.of(context).textTheme.headlineSmall
+                : Theme.of(context)
+                    .textTheme
+                    .headlineSmall!
+                    .apply(color: textColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis),
         if (showActionButton)

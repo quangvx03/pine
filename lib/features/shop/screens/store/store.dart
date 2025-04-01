@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/appbar/tabbar.dart';
 import 'package:pine/common/widgets/brands/brand_card.dart';
-import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/search_container.dart';
 import 'package:pine/common/widgets/layouts/grid_layout.dart';
 import 'package:pine/common/widgets/products/cart/cart_menu_icon.dart';
@@ -14,15 +13,10 @@ import 'package:pine/features/shop/screens/brand/all_brands.dart';
 import 'package:pine/features/shop/screens/brand/brand_products.dart';
 import 'package:pine/features/shop/screens/store/widgets/category_tab.dart';
 import 'package:pine/utils/constants/colors.dart';
-import 'package:pine/utils/constants/enums.dart';
-import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
-import '../../../../common/widgets/brands/brand_show_case.dart';
-import '../../../../common/widgets/images/circular_image.dart';
 import '../../../../common/widgets/shimmers/brands_shimmer.dart';
-import '../../../../common/widgets/texts/brand_title_text_with_verified_icon.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -38,13 +32,7 @@ class StoreScreen extends StatelessWidget {
           appBar: PAppBar(
             title: Text('Cửa hàng',
                 style: Theme.of(context).textTheme.headlineMedium),
-            actions: [
-              PCartCounterIcon(
-                iconColor: (PHelperFunctions.isDarkMode(context))
-                    ? PColors.light
-                    : PColors.dark,
-              )
-            ],
+            actions: [PCartCounterIcon()],
           ),
           body: NestedScrollView(
 
@@ -71,7 +59,6 @@ class StoreScreen extends StatelessWidget {
                           const PSearchContainer(
                               text: 'Tìm kiếm',
                               showBorder: true,
-                              showBackground: false,
                               padding: EdgeInsets.zero),
                           const SizedBox(height: PSizes.spaceBtwItems),
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/styles/shadows.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
@@ -14,7 +13,6 @@ import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
-import '../../icons/circular_icon.dart';
 import '../../texts/brand_title_text_with_verified_icon.dart';
 import '../../texts/product_price_text.dart';
 import '../cart/add_to_cart_button.dart';
@@ -118,9 +116,11 @@ class PProductCardVertical extends StatelessWidget {
                     children: [
                       if (product.productType ==
                               ProductType.single.toString() &&
-                          product.salePrice > 0)
+                          product.salePrice > 0 &&
+                          product.salePrice < product.price)
                         Padding(
-                            padding: const EdgeInsets.only(left: PSizes.sm),
+                            padding: const EdgeInsets.only(
+                                left: PSizes.sm, right: 4),
                             child: Text(
                               PHelperFunctions.formatCurrency(product.price),
                               style: Theme.of(context)
@@ -128,16 +128,19 @@ class PProductCardVertical extends StatelessWidget {
                                   .labelMedium!
                                   .apply(
                                       decoration: TextDecoration.lineThrough),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             )),
                       Padding(
-                        padding: const EdgeInsets.only(left: PSizes.sm),
+                        padding:
+                            const EdgeInsets.only(left: PSizes.sm, right: 2),
                         child: PProductPriceText(
-                          price: (product.salePrice > 0
+                          price: (product.salePrice > 0 &&
+                                      product.salePrice < product.price
                                   ? product.salePrice
                                   : product.price)
                               .toString(),
                         ),
-                        // child: PProductPriceText(price: controller.getProductPrice(product)),
                       )
                     ],
                   ),

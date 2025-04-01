@@ -43,12 +43,25 @@ class CategoryController extends GetxController {
     }
   }
 
+  /// Load all categories data
+  Future<List<CategoryModel>> fetchAllCategories() async {
+    try {
+      final categories = await _categoryRepository.getAllCategories();
+
+      return categories;
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
+      return [];
+    }
+  }
+
   /// Load selected category data
   Future<List<CategoryModel>> getSubCategories(String categoryId) async {
-    try{
-      final subCategories = await _categoryRepository.getSubCategories(categoryId);
+    try {
+      final subCategories =
+          await _categoryRepository.getSubCategories(categoryId);
       return subCategories;
-    } catch(e){
+    } catch (e) {
       PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
       return [];
     }
@@ -57,13 +70,13 @@ class CategoryController extends GetxController {
   /// Get Category or Sub-Category Products
   Future<List<ProductModel>> getCategoryProducts(
       {required String categoryId, int limit = 4}) async {
-   try{
-     final products = await ProductRepository.instance
-         .getProductsForCategory(categoryId: categoryId, limit: limit);
-     return products;
-   } catch(e){
-     PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
-     return [];
-   }
+    try {
+      final products = await ProductRepository.instance
+          .getProductsForCategory(categoryId: categoryId, limit: limit);
+      return products;
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
+      return [];
+    }
   }
 }

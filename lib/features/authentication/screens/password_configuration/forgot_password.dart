@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/features/authentication/controllers/forgot_password/forgot_password_controller.dart';
-import 'package:pine/features/authentication/screens/password_configuration/reset_password.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/constants/text_strings.dart';
 import 'package:pine/utils/validators/validation.dart';

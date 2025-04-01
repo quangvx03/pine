@@ -39,8 +39,7 @@ class PAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ))
               : leadingIcon != null
                   ? IconButton(
-                      onPressed: leadingOnPressed,
-                      icon: Icon(leadingIcon))
+                      onPressed: leadingOnPressed, icon: Icon(leadingIcon))
                   : null,
           title: title,
           actions: actions),
@@ -48,6 +47,5 @@ class PAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => Size.fromHeight(PDeviceUtils.getAppBarHeight());
 }

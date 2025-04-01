@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/products/ratings/ratings_indicator.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/image_strings.dart';
@@ -8,7 +7,7 @@ import 'package:pine/utils/helpers/helper_functions.dart';
 import 'package:readmore/readmore.dart';
 
 class UserReviewCard extends StatelessWidget {
-  const UserReviewCard({Key? key}) : super(key: key);
+  const UserReviewCard({super.key});
 
   @override
   Widget build(BuildContext context) {

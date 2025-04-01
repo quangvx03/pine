@@ -41,9 +41,6 @@ class ProductModel {
     this.productVariations,
   });
 
-  /// Create Empty func for clean code
-  // static ProductModel empty() => ProductModel(
-  //     id: '', title: '', stock: 0, price: 0, thumbnail: '', productType: '', );
   static ProductModel empty() {
     return ProductModel(
       id: '',
@@ -80,7 +77,6 @@ class ProductModel {
     };
   }
 
-  /// Map Json oriented document snapshot from Firebase to Model
   factory ProductModel.fromSnapshot(
       DocumentSnapshot<Map<String, dynamic>> document) {
     if (document.data() == null) return ProductModel.empty();
@@ -108,7 +104,6 @@ class ProductModel {
     );
   }
 
-  /// Map Json oriented document snapshot from Firebase to Model
   factory ProductModel.fromQuerySnapshot(
       QueryDocumentSnapshot<Object?> document) {
     final data = document.data() as Map<String, dynamic>;

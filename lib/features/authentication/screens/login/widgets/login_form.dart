@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pine/features/authentication/controllers/login/login_controller.dart';
 import 'package:pine/features/authentication/screens/password_configuration/forgot_password.dart';
 import 'package:pine/features/authentication/screens/signup/signup.dart';
-import 'package:pine/navigation_menu.dart';
 import 'package:pine/utils/validators/validation.dart';
 
 import '../../../../../utils/constants/sizes.dart';

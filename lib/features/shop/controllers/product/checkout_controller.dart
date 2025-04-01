@@ -1,11 +1,9 @@
 
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/features/shop/models/payment_method_model.dart';
-import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/constants/sizes.dart';
 

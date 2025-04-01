@@ -30,7 +30,6 @@ class AddressRepository extends GetxController {
     }
   }
 
-  /// Clear the "selected" field for all addresses
   Future<void> updateSelectedField(String addressId, bool selected) async {
     try {
       final userId = AuthenticationRepository.instance.authUser.uid;
@@ -45,7 +44,6 @@ class AddressRepository extends GetxController {
     }
   }
 
-  /// Store new user order
   Future<String> addAddress(AddressModel address) async {
     try {
       final userId = AuthenticationRepository.instance.authUser.uid;
