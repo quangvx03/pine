@@ -57,4 +57,32 @@ class AddressRepository extends GetxController {
       throw 'Đã xảy ra lỗi trong quá trình lưu thông tin địa chỉ. Vui lòng thử lại sau.';
     }
   }
+
+  Future<void> deleteAddress(String addressId) async {
+    try {
+      final userId = AuthenticationRepository.instance.authUser.uid;
+      await _db
+          .collection('Users')
+          .doc(userId)
+          .collection('Addresses')
+          .doc(addressId)
+          .delete();
+    } catch (e) {
+      throw 'Xóa địa chỉ không thành công. Vui lòng thử lại.';
+    }
+  }
+
+  Future<void> updateAddress(AddressModel address) async {
+    try {
+      final userId = AuthenticationRepository.instance.authUser.uid;
+      await _db
+          .collection('Users')
+          .doc(userId)
+          .collection('Addresses')
+          .doc(address.id)
+          .update(address.toJson());
+    } catch (e) {
+      throw 'Cập nhật địa chỉ không thành công. Vui lòng thử lại.';
+    }
+  }
 }

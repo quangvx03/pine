@@ -10,6 +10,7 @@ import 'package:pine/features/shop/screens/cart/cart.dart';
 import 'package:pine/features/shop/screens/checkout/checkout.dart';
 import 'package:pine/features/shop/screens/order/order.dart';
 import 'package:pine/features/shop/screens/product_reviews/product_reviews.dart';
+import 'package:pine/features/shop/screens/wishlist/wishlist.dart';
 import 'package:pine/navigation_menu.dart';
 import 'package:pine/routes/routes.dart';
 
@@ -48,6 +49,7 @@ class AppRoutes {
     GetPage(name: PRoutes.order, page: () => const OrderScreen()),
     GetPage(name: PRoutes.checkout, page: () => const CheckoutScreen()),
     GetPage(name: PRoutes.cart, page: () => const CartScreen()),
+    GetPage(name: PRoutes.favorites, page: () => const FavoriteScreen()),
     GetPage(name: PRoutes.userProfile, page: () => const ProfileScreen()),
     GetPage(name: PRoutes.userAddress, page: () => const UserAddressScreen()),
     GetPage(name: PRoutes.signup, page: () => const SignupScreen()),

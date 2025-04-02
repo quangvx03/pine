@@ -4,18 +4,24 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/features/personalization/controllers/address_controller.dart';
+import 'package:pine/features/personalization/models/address_model.dart';
 import 'package:pine/utils/constants/sizes.dart';
 
-class AddNewAddressScreen extends StatelessWidget {
-  const AddNewAddressScreen({super.key});
+class AddEditAddressScreen extends StatelessWidget {
+  final bool isEditMode;
+  final AddressModel? addressToEdit;
+
+  const AddEditAddressScreen(
+      {super.key, this.isEditMode = false, this.addressToEdit});
 
   @override
   Widget build(BuildContext context) {
     final controller = AddressController.instance;
 
     return Scaffold(
-      appBar:
-      const PAppBar(showBackArrow: true, title: Text('Thêm địa chỉ mới')),
+      appBar: PAppBar(
+          showBackArrow: true,
+          title: Text(isEditMode ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ mới')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(PSizes.defaultSpace),
@@ -40,10 +46,7 @@ class AddNewAddressScreen extends StatelessWidget {
                       return null;
                     },
                     decoration: const InputDecoration(
-                        prefixIcon: Icon(Iconsax.user),
-                        labelText: 'Tên'
-                    )
-                ),
+                        prefixIcon: Icon(Iconsax.user), labelText: 'Tên')),
                 const SizedBox(height: PSizes.spaceBtwInputFields),
 
                 TextFormField(
@@ -72,9 +75,9 @@ class AddNewAddressScreen extends StatelessWidget {
                     labelText: 'Số điện thoại',
                     hintText: 'VD: 0901234567',
                     hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[400],
-                      fontSize: 12,
-                    ),
+                          color: Colors.grey[400],
+                          fontSize: 12,
+                        ),
                   ),
                 ),
                 const SizedBox(height: PSizes.spaceBtwInputFields),
@@ -97,48 +100,43 @@ class AddNewAddressScreen extends StatelessWidget {
                     },
                     decoration: const InputDecoration(
                         prefixIcon: Icon(Iconsax.map),
-                        labelText: 'Tên đường, số nhà'
-                    )
-                ),
+                        labelText: 'Tên đường, số nhà')),
                 const SizedBox(height: PSizes.spaceBtwInputFields),
 
                 TextFormField(
                     controller: controller.ward,
                     decoration: const InputDecoration(
                         prefixIcon: Icon(Iconsax.house_2),
-                        labelText: 'Phường/Xã'
-                    )
-                ),
+                        labelText: 'Phường/Xã')),
                 const SizedBox(height: PSizes.spaceBtwInputFields),
 
                 TextFormField(
                     controller: controller.city,
                     decoration: const InputDecoration(
                         prefixIcon: Icon(Iconsax.building),
-                        labelText: 'Thành phố'
-                    )
-                ),
+                        labelText: 'Thành phố')),
                 const SizedBox(height: PSizes.spaceBtwInputFields),
 
                 TextFormField(
                     controller: controller.province,
                     decoration: const InputDecoration(
-                        prefixIcon: Icon(Iconsax.activity),
-                        labelText: 'Tỉnh'
-                    )
-                ),
+                        prefixIcon: Icon(Iconsax.activity), labelText: 'Tỉnh')),
                 const SizedBox(height: PSizes.spaceBtwItems),
 
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                       onPressed: () {
-                        if (controller.addressFormKey.currentState!.validate()) {
-                          controller.addNewAddresses();
+                        if (controller.addressFormKey.currentState!
+                            .validate()) {
+                          if (isEditMode && addressToEdit != null) {
+                            controller.updateAddress(addressToEdit!);
+                          } else {
+                            controller.addNewAddresses();
+                          }
                         }
                       },
-                      child: const Text('Lưu')
-                  ),
+                      child: Text(isEditMode ? 'Cập nhật' : 'Lưu')),
                 )
               ],
             ),

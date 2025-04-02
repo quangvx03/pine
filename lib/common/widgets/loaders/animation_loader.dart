@@ -37,8 +37,8 @@ class PAnimationLoaderWidget extends StatelessWidget {
                   width: 250,
                   child: OutlinedButton(
                     onPressed: onActionPressed,
-                    style:
-                        OutlinedButton.styleFrom(backgroundColor: PColors.dark),
+                    style: OutlinedButton.styleFrom(
+                        backgroundColor: PColors.primary),
                     child: Text(
                       actionText!,
                       style: Theme.of(context)

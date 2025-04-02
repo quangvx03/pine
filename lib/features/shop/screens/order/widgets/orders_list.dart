@@ -21,13 +21,20 @@ class POrderListItems extends StatelessWidget {
       future: controller.fetchUserOrders(),
       builder: (_, snapshot) {
         /// Nothing found widget
-        final emptyWidget = PAnimationLoaderWidget(
-          text: 'Chưa có đơn đặt hàng nào!',
-          animation: PImages.empty,
-          showAction: true,
-          actionText: 'Hãy thêm sản phẩm vào giỏ hàng',
-          onActionPressed: () => Get.off(() => const NavigationMenu()),
-        );
+        final emptyWidget = SizedBox(
+            height: PHelperFunctions.screenHeight() * 0.7,
+            child: Center(
+                child: PAnimationLoaderWidget(
+              text: 'Chưa có đơn đặt hàng nào!',
+              animation: PImages.empty,
+              showAction: true,
+              actionText: 'Khám phá ngay',
+              onActionPressed: () {
+                final navController = Get.find<NavigationController>();
+                Get.back();
+                navController.navigateToTab(0);
+              },
+            )));
 
         /// Handle loader, no record, or error message
         final response = PCloudHelperFunctions.checkMultiRecordState(

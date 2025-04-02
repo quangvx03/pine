@@ -62,22 +62,6 @@ class AddressModel {
     );
   }
 
-  // factory AddressModel.fromMap(Map<String, dynamic> data) {
-  //   return AddressModel(
-  //     id: data['Id'] as String? ?? '',
-  //     name: data['Name'] as String? ?? '',
-  //     phoneNumber: data['PhoneNumber'] as String? ?? '',
-  //     street: data['Street'] as String? ?? '',
-  //     ward: data['Ward'] as String? ?? '',
-  //     city: data['City'] as String? ?? '',
-  //     province: data['Province'] as String? ?? '',
-  //     dateTime: data['DateTime'] != null
-  //         ? (data['DateTime'] as Timestamp).toDate()
-  //         : DateTime.now(),
-  //     selectedAddress: data['SelectedAddress'] as bool? ?? false,
-  //   );
-  // }
-
   factory AddressModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
 

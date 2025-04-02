@@ -89,16 +89,21 @@ class CartScreen extends StatelessWidget {
             }),
           ]),
       body: Obx(() {
-        final emptyWidget = PAnimationLoaderWidget(
-            text: 'Giỏ hàng của bạn đang trống.',
-            animation: PImages.empty,
-            showAction: true,
-            actionText: 'Hãy thêm sản phẩm vào giỏ hàng',
-            onActionPressed: () => Get.to(() => AllProductsScreen(
-                  title: 'Tất cả sản phẩm',
-                  futureMethod:
-                      productController.productRepository.getAllProducts(),
-                )));
+        final emptyWidget = SizedBox(
+          height: PHelperFunctions.screenHeight() * 0.7,
+          child: Center(
+            child: PAnimationLoaderWidget(
+                text: 'Giỏ hàng của bạn đang trống.',
+                animation: PImages.empty,
+                showAction: true,
+                actionText: 'Khám phá ngay',
+                onActionPressed: () => Get.to(() => AllProductsScreen(
+                      title: 'Tất cả sản phẩm',
+                      futureMethod:
+                          productController.productRepository.getAllProducts(),
+                    ))),
+          ),
+        );
 
         if (controller.cartItems.isEmpty) {
           return emptyWidget;

@@ -7,8 +7,10 @@ import 'package:pine/features/personalization/screens/address/address.dart';
 import 'package:pine/features/shop/screens/cart/cart.dart';
 import 'package:pine/features/shop/screens/order/order.dart';
 import 'package:pine/features/shop/screens/wishlist/wishlist.dart';
+import 'package:pine/routes/routes.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/helpers/helper_functions.dart';
 import '../profile/profile.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -27,26 +29,9 @@ class SettingsScreen extends StatelessWidget {
             // Main content
             Column(
               children: [
-                AppBar(
-                  titleSpacing: 8,
-                  title: Padding(
-                    padding: const EdgeInsets.only(left: PSizes.defaultSpace),
-                    child: Text(
-                      'Tài khoản',
-                      style:
-                          Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                    ),
-                  ),
-                  backgroundColor: PColors.primary,
-                ),
-                // Header với avatar và thông tin người dùng
-                _buildProfileHeader(context, userController, isDark),
+                _buildHeaderWithQuickAccess(context, userController, isDark),
 
-                // Khoảng trống để tránh menu truy cập nhanh che nội dung
-                const SizedBox(height: PSizes.appBarHeight),
+                SizedBox(height: PHelperFunctions.screenHeight() * 0.065),
 
                 // Phần menu với các mục cài đặt
                 Padding(
@@ -60,21 +45,21 @@ class SettingsScreen extends StatelessWidget {
                           icon: Iconsax.user_edit,
                           iconColor: PColors.primary,
                           title: "Thông tin cá nhân",
-                          onTap: () => Get.to(() => const ProfileScreen()),
+                          onTap: () => Get.toNamed(PRoutes.userProfile),
                         ),
                         _buildSettingItem(
                           context,
                           icon: Iconsax.safe_home,
                           iconColor: Colors.blue,
                           title: "Địa chỉ giao hàng",
-                          onTap: () => Get.to(() => const UserAddressScreen()),
+                          onTap: () => Get.toNamed(PRoutes.userAddress),
                         ),
                         _buildSettingItem(
                           context,
                           icon: Iconsax.heart,
                           iconColor: Colors.red,
                           title: "Sản phẩm yêu thích",
-                          onTap: () => Get.to(() => const FavoriteScreen()),
+                          onTap: () => Get.toNamed(PRoutes.favorites),
                         ),
                         _buildSettingItem(
                           context,
@@ -95,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
                           iconColor: Colors.blue,
                           title: "Giỏ hàng",
                           subtitle: "Xem và chỉnh sửa giỏ hàng của bạn",
-                          onTap: () => Get.to(() => const CartScreen()),
+                          onTap: () => Get.toNamed(PRoutes.cart),
                         ),
                         _buildSettingItem(
                           context,
@@ -103,7 +88,7 @@ class SettingsScreen extends StatelessWidget {
                           iconColor: Colors.purple,
                           title: "Đơn hàng",
                           subtitle: "Xem và theo dõi đơn hàng của bạn",
-                          onTap: () => Get.to(() => const OrderScreen()),
+                          onTap: () => Get.toNamed(PRoutes.order),
                         ),
                         _buildSettingItem(
                           context,
@@ -177,20 +162,50 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-            Positioned(
-              top: 235, // Điều chỉnh vị trí để phù hợp với header mới
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
-                child: _buildQuickAccessMenu(context),
-              ),
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeaderWithQuickAccess(
+      BuildContext context, UserController userController, bool isDark) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.bottomCenter,
+      children: [
+        // Header
+        Column(
+          children: [
+            AppBar(
+              titleSpacing: 8,
+              title: Padding(
+                padding: const EdgeInsets.only(left: PSizes.defaultSpace),
+                child: Text(
+                  'Tài khoản',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              backgroundColor: PColors.primary,
+            ),
+            _buildProfileHeader(context, userController, isDark),
+          ],
+        ),
+
+        // Quick Access Menu - positioned relative to header
+        Positioned(
+          bottom: -45,
+          left: PSizes.defaultSpace,
+          right: PSizes.defaultSpace,
+          child: _buildQuickAccessMenu(context),
+        ),
+
+        // Spacer to push content below the quick access menu
+        SizedBox(height: 60), // Điều chỉnh chiều cao phù hợp với menu
+      ],
     );
   }
 
@@ -199,7 +214,7 @@ class SettingsScreen extends StatelessWidget {
       BuildContext context, UserController userController, bool isDark) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(bottom: 40),
+      padding: const EdgeInsets.only(bottom: 45), // Tăng padding bottom
       decoration: const BoxDecoration(
         color: PColors.primary,
       ),
@@ -208,6 +223,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           const SizedBox(height: PSizes.spaceBtwItems / 2),
 
+          // Avatar
           Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
@@ -242,7 +258,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
               )),
 
-          // Khoảng trống dưới email để đặt menu truy cập nhanh
+          // Khoảng cách để menu quick access
           const SizedBox(height: PSizes.defaultSpace),
         ],
       ),
@@ -274,28 +290,28 @@ class SettingsScreen extends StatelessWidget {
               icon: Iconsax.bag_2,
               label: "Giỏ hàng",
               color: Colors.blue,
-              onTap: () => Get.to(() => const CartScreen()),
+              onTap: () => Get.toNamed(PRoutes.cart),
             ),
             _buildQuickAccessItem(
               context,
               icon: Iconsax.heart,
               label: "Yêu thích",
               color: Colors.red,
-              onTap: () => Get.to(() => const FavoriteScreen()),
+              onTap: () => Get.toNamed(PRoutes.favorites),
             ),
             _buildQuickAccessItem(
               context,
               icon: Iconsax.receipt_item,
               label: "Đơn hàng",
               color: Colors.purple,
-              onTap: () => Get.to(() => const OrderScreen()),
+              onTap: () => Get.toNamed(PRoutes.order),
             ),
             _buildQuickAccessItem(
               context,
               icon: Iconsax.user_edit,
               label: "Cá nhân",
               color: Colors.green,
-              onTap: () => Get.to(() => const ProfileScreen()),
+              onTap: () => Get.toNamed(PRoutes.userProfile),
             ),
           ],
         ),
