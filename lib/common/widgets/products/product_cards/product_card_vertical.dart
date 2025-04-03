@@ -50,10 +50,47 @@ class PProductCardVertical extends StatelessWidget {
                   children: [
                     /// Thumbnail Image
                     Center(
-                      child: PRoundedImage(
-                        imageUrl: product.thumbnail,
-                        applyImageRadius: true,
-                        isNetworkImage: true,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          PRoundedImage(
+                            imageUrl: product.thumbnail,
+                            applyImageRadius: true,
+                            isNetworkImage: true,
+                          ),
+
+                          // Hiển thị overlay "Hết hàng" nếu sản phẩm hết tồn kho
+                          if (!controller.isProductInStock(
+                              product.stock, product.soldQuantity))
+                            Container(
+                              decoration: BoxDecoration(
+                                color:
+                                    PColors.darkerGrey.withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(
+                                    PSizes.productImageRadius + 2),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: PSizes.sm,
+                                    vertical: PSizes.xs,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: PColors.error.withValues(alpha: 0.8),
+                                    borderRadius:
+                                        BorderRadius.circular(PSizes.xs),
+                                  ),
+                                  child: const Text(
+                                    'Hết hàng',
+                                    style: TextStyle(
+                                      color: PColors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
 

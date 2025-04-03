@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pine/data/repositories/product_repository.dart';
 import 'package:pine/features/shop/controllers/product/variation_controller.dart';
 import 'package:pine/features/shop/models/cart_model.dart';
 import 'package:pine/features/shop/models/product_model.dart';
+import 'package:pine/features/shop/models/product_variation_model.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
@@ -79,67 +81,217 @@ class CartController extends GetxController {
     }
   }
 
-  void addToCart(ProductModel product) {
-    if (product.productType == ProductType.variable.toString() &&
-        variationController.selectedVariation.value.id.isEmpty) {
-      showToast('Chọn phân loại', 'variation_check');
-      return;
-    }
+  // Sửa phương thức addToCart để cộng dồn thay vì cập nhật
+  void addToCart(ProductModel product, [bool additive = false]) async {
+    try {
+      // Lấy dữ liệu mới nhất để đảm bảo cập nhật tồn kho
+      final currentProduct =
+          await ProductRepository.instance.getProductById(product.id);
 
-    if (product.productType == ProductType.variable.toString()) {
-      if (variationController.selectedVariation.value.stock < 1) {
-        showWarning('Có lỗi xảy ra!', 'Phân loại đã chọn hiện hết hàng.',
-            'variation_stock_check');
-        return;
+      // Xử lý sản phẩm biến thể
+      if (currentProduct.productType == ProductType.variable.toString()) {
+        final variationController = VariationController.instance;
+
+        // Kiểm tra đã chọn biến thể chưa
+        if (variationController.selectedVariation.value.id.isEmpty) {
+          showToast('Vui lòng chọn phân loại', 'choose_variation');
+          return;
+        }
+
+        // Lấy biến thể được chọn
+        final variation = currentProduct.productVariations!.firstWhere(
+            (v) => v.id == variationController.selectedVariation.value.id,
+            orElse: () => ProductVariationModel.empty());
+
+        if (variation.id.isEmpty) {
+          showWarning('Có lỗi xảy ra', 'Không tìm thấy phân loại đã chọn',
+              'variation_not_found');
+          return;
+        }
+
+        // Tính số lượng tồn kho khả dụng
+        final availableStock = variation.stock - variation.soldQuantity;
+
+        if (availableStock <= 0) {
+          showWarning('Hết hàng', 'Phân loại này đã hết hàng', 'out_of_stock');
+          return;
+        }
+
+        // Kiểm tra số lượng hiện có trong giỏ
+        final currentQuantityInCart =
+            getVariationQuantityInCart(currentProduct.id, variation.id);
+
+        // Nếu thêm mới vượt quá tồn khọ
+        if (currentQuantityInCart + productQuantityInCart.value >
+            availableStock) {
+          final remainingStock = availableStock - currentQuantityInCart;
+
+          if (remainingStock <= 0) {
+            showWarning(
+                'Đã đạt giới hạn',
+                'Bạn đã thêm hết số lượng tồn kho vào giỏ hàng',
+                'max_stock_reached');
+            return;
+          }
+
+          // Điều chỉnh số lượng thêm vào để không vượt quá tồn kho
+          productQuantityInCart.value = remainingStock;
+        }
+
+        // Tạo đối tượng CartModel
+        final cartItem =
+            convertToCartItem(currentProduct, productQuantityInCart.value);
+
+        // Tìm trong giỏ hàng
+        int index = cartItems.indexWhere((item) =>
+            item.productId == cartItem.productId &&
+            item.variationId == cartItem.variationId);
+
+        if (index >= 0) {
+          if (additive) {
+            // Cộng dồn số lượng
+            cartItems[index].quantity += cartItem.quantity;
+          } else {
+            // Thay thế số lượng (hành vi cũ)
+            cartItems[index].quantity = cartItem.quantity;
+          }
+        } else {
+          // Thêm mới
+          cartItems.add(cartItem);
+          final key = getItemKey(cartItem);
+          selectedItems[key] = false;
+          selectAll.value = false;
+        }
+      } else {
+        // Xử lý sản phẩm thường
+        final availableStock =
+            currentProduct.stock - currentProduct.soldQuantity;
+
+        if (availableStock <= 0) {
+          showWarning('Hết hàng', 'Sản phẩm này đã hết hàng', 'out_of_stock');
+          return;
+        }
+
+        // Kiểm tra số lượng hiện có trong giỏ
+        final currentQuantityInCart =
+            getProductQuantityInCart(currentProduct.id);
+
+        // Nếu thêm mới vượt quá tồn khọ
+        if (currentQuantityInCart + productQuantityInCart.value >
+            availableStock) {
+          final remainingStock = availableStock - currentQuantityInCart;
+
+          if (remainingStock <= 0) {
+            showWarning(
+                'Đã đạt giới hạn',
+                'Bạn đã thêm hết số lượng tồn kho vào giỏ hàng',
+                'max_stock_reached');
+            return;
+          }
+
+          // Điều chỉnh số lượng
+          productQuantityInCart.value = remainingStock;
+        }
+
+        // Tạo đối tượng CartModel
+        final cartItem =
+            convertToCartItem(currentProduct, productQuantityInCart.value);
+
+        int index = cartItems.indexWhere((item) =>
+            item.productId == cartItem.productId &&
+            item.variationId == cartItem.variationId);
+
+        if (index >= 0) {
+          if (additive) {
+            // Cộng dồn số lượng
+            cartItems[index].quantity += cartItem.quantity;
+          } else {
+            // Thay thế số lượng (hành vi cũ)
+            cartItems[index].quantity = cartItem.quantity;
+          }
+        } else {
+          // Thêm mới
+          cartItems.add(cartItem);
+          final key = getItemKey(cartItem);
+          selectedItems[key] = false;
+          selectAll.value = false;
+        }
       }
-    } else {
-      if (product.stock < 1) {
-        showWarning(
-            'Có lỗi xảy ra!', 'Sản phẩm hiện hết hàng.', 'product_stock_check');
-        return;
-      }
+
+      // Cập nhật giỏ hàng và thông báo
+      updateCart();
+      showOSuccess('Đã thêm vào giỏ hàng', 'add_to_cart');
+    } catch (e) {
+      showWarning(
+          'Có lỗi xảy ra', 'Không thể thêm vào giỏ hàng: $e', 'add_error');
     }
-
-    final selectedCartItem =
-        convertToCartItem(product, productQuantityInCart.value);
-
-    int index = cartItems.indexWhere((cartItem) =>
-        cartItem.productId == selectedCartItem.productId &&
-        cartItem.variationId == selectedCartItem.variationId);
-
-    if (index >= 0) {
-      cartItems[index].quantity = selectedCartItem.quantity;
-    } else {
-      cartItems.add(selectedCartItem);
-
-      final key = getItemKey(selectedCartItem);
-      selectedItems[key] = false;
-
-      selectAll.value = false;
-    }
-
-    updateCart();
-
-    showOSuccess('Sản phẩm đã được thêm vào giỏ hàng', 'add_to_cart');
   }
 
-  void addOneToCart(CartModel item) {
-    int index = cartItems.indexWhere((cartItem) =>
-        cartItem.productId == item.productId &&
-        cartItem.variationId == item.variationId);
+  void addOneToCart(CartModel item) async {
+    try {
+      // Lấy dữ liệu sản phẩm mới nhất để có thông tin tồn kho cập nhật
+      final product =
+          await ProductRepository.instance.getProductById(item.productId);
 
-    if (index >= 0) {
-      cartItems[index].quantity += 1;
-    } else {
-      cartItems.add(item);
+      // Xác định số lượng tồn kho khả dụng
+      int availableStock;
 
-      final key = getItemKey(item);
-      selectedItems[key] = false;
+      // Kiểm tra nếu là sản phẩm biến thể
+      if (item.variationId.isNotEmpty) {
+        // Tìm biến thể tương ứng
+        final variation = product.productVariations!.firstWhere(
+            (v) => v.id == item.variationId,
+            orElse: () => ProductVariationModel.empty());
 
-      selectAll.value = false;
+        if (variation.id.isEmpty) {
+          showWarning('Có lỗi xảy ra', 'Không tìm thấy phân loại sản phẩm',
+              'variation_not_found');
+          return;
+        }
+
+        availableStock = variation.stock - variation.soldQuantity;
+      } else {
+        // Sản phẩm thường
+        availableStock = product.stock - product.soldQuantity;
+      }
+
+      // Kiểm tra số lượng hiện có trong giỏ
+      final currentInCart = cartItems
+          .firstWhere(
+              (cartItem) =>
+                  cartItem.productId == item.productId &&
+                  cartItem.variationId == item.variationId,
+              orElse: () => CartModel.empty())
+          .quantity;
+
+      // Kiểm tra xem có thể thêm 1 sản phẩm nữa không
+      if (currentInCart >= availableStock) {
+        showWarning(
+            'Đã đạt giới hạn tồn kho',
+            'Chỉ còn $availableStock sản phẩm, bạn đã có $currentInCart trong giỏ hàng',
+            'stock_limit');
+        return;
+      }
+
+      // Tiếp tục thêm sản phẩm nếu còn tồn kho
+      int index = cartItems.indexWhere((cartItem) =>
+          cartItem.productId == item.productId &&
+          cartItem.variationId == item.variationId);
+
+      if (index >= 0) {
+        cartItems[index].quantity += 1;
+      } else {
+        cartItems.add(item);
+        final key = getItemKey(item);
+        selectedItems[key] = false;
+        selectAll.value = false;
+      }
+
+      updateCart();
+    } catch (e) {
+      showWarning('Có lỗi xảy ra', 'Không thể thêm sản phẩm vào giỏ hàng: $e',
+          'add_error');
     }
-
-    updateCart();
   }
 
   void removeOneFromCart(CartModel item) {

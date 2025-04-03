@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
+import 'package:pine/common/widgets/products/cart/add_to_cart_button.dart';
 import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
 import 'package:pine/common/widgets/texts/brand_title_text_with_verified_icon.dart';
 import 'package:pine/common/widgets/texts/product_price_text.dart';
@@ -28,6 +29,9 @@ class PProductCardHorizontal extends StatelessWidget {
     final controller = ProductController.instance;
     final salePercentage =
         controller.calculateSalePercentage(product.price, product.salePrice);
+
+    final isInStock =
+        controller.isProductInStock(product.stock, product.soldQuantity);
 
     return GestureDetector(
       onTap: () => Get.to(() => ProductDetailScreen(product: product)),
@@ -56,6 +60,35 @@ class PProductCardHorizontal extends StatelessWidget {
                         applyImageRadius: true,
                         isNetworkImage: true,
                       )),
+
+                  if (!isInStock)
+                    Container(
+                      width: 110,
+                      decoration: BoxDecoration(
+                        color: PColors.darkerGrey.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(
+                            PSizes.productImageRadius + 2),
+                      ),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: PSizes.sm,
+                            vertical: PSizes.xs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: PColors.error.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(PSizes.xs),
+                          ),
+                          child: const Text(
+                            'Hết hàng',
+                            style: TextStyle(
+                              color: PColors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
 
                   /// Sale Tag
                   if (salePercentage != null)
@@ -149,21 +182,8 @@ class PProductCardHorizontal extends StatelessWidget {
                           ),
                         ),
 
-                        /// Add to Cart Button
-                        Container(
-                          decoration: const BoxDecoration(
-                              color: PColors.dark,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(PSizes.cardRadiusMd),
-                                bottomRight:
-                                    Radius.circular(PSizes.productImageRadius),
-                              )),
-                          child: const SizedBox(
-                            width: PSizes.iconLg * 1.2,
-                            height: PSizes.iconLg * 1.2,
-                            child: Center(
-                                child: Icon(Iconsax.add, color: PColors.white)),
-                          ),
+                        ProductCardAddToCartButton(
+                          product: product,
                         )
                       ],
                     )
