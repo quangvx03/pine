@@ -7,7 +7,16 @@ import 'package:pine/utils/popups/loaders.dart';
 import '../../../data/repositories/brand_repository.dart';
 
 class BrandController extends GetxController {
-  static BrandController get instance => Get.find();
+  static BrandController getInstance(String brandId) {
+    if (Get.isRegistered<BrandController>(tag: brandId)) {
+      return Get.find<BrandController>(tag: brandId);
+    } else {
+      return Get.put(BrandController(), tag: brandId);
+    }
+  }
+
+  // Thêm biến để lưu trữ sản phẩm của thương hiệu
+  final RxList<ProductModel> brandProducts = <ProductModel>[].obs;
 
   RxBool isLoading = true.obs;
   final RxList<BrandModel> allBrands = <BrandModel>[].obs;
@@ -49,16 +58,21 @@ class BrandController extends GetxController {
     }
   }
 
-  /// Get Brand specific products
   Future<List<ProductModel>> getBrandProducts(
       {required String brandId, int limit = -1}) async {
     try {
+      isLoading.value = true;
       final products = await ProductRepository.instance
           .getProductsForBrand(brandId: brandId, limit: limit);
+
+      // Lưu sản phẩm vào danh sách có thể quan sát
+      brandProducts.assignAll(products);
       return products;
     } catch (e) {
       PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
       return [];
+    } finally {
+      isLoading.value = false;
     }
   }
 }

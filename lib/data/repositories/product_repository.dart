@@ -11,7 +11,6 @@ class ProductRepository extends GetxController {
 
   final _db = FirebaseFirestore.instance;
 
-  // Add this method to the ProductRepository class
   Future<ProductModel> getProductById(String productId) async {
     try {
       final snapshot = await _db.collection('Products').doc(productId).get();

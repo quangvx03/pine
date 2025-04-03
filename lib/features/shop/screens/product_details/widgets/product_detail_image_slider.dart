@@ -1,17 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
 import 'package:pine/features/shop/controllers/product/images_controller.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
-import '../../../../../common/widgets/appbar/appbar.dart';
 import '../../../../../common/widgets/images/rounded_image.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/sizes.dart';
 
-class PProductImageSlider extends StatelessWidget {
+class PProductImageSlider extends StatefulWidget {
   const PProductImageSlider({
     super.key,
     required this.product,
@@ -20,11 +18,34 @@ class PProductImageSlider extends StatelessWidget {
   final ProductModel product;
 
   @override
+  State<PProductImageSlider> createState() => _PProductImageSliderState();
+}
+
+class _PProductImageSliderState extends State<PProductImageSlider> {
+  // Controller initialization moved outside build method
+  late final ImagesController controller;
+  late final List<String> images;
+
+  @override
+  void initState() {
+    super.initState();
+    // Create controller with unique tag based on product ID
+    controller = Get.put(ImagesController(), tag: widget.product.id);
+    images = controller.getAllProductImages(widget.product);
+    // Set initial selected image
+    controller.selectedProductImage.value = images.isNotEmpty ? images[0] : '';
+  }
+
+  @override
+  void dispose() {
+    // Properly dispose of the controller when widget is removed
+    Get.delete<ImagesController>(tag: widget.product.id);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final dark = PHelperFunctions.isDarkMode(context);
-
-    final controller = Get.put(ImagesController());
-    final images = controller.getAllProductImages(product);
 
     return Container(
       color: dark ? PColors.darkerGrey : PColors.light,

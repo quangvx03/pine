@@ -14,7 +14,7 @@ class AllBrandsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brandController = BrandController.instance;
+    final brandController = BrandController.getInstance("all_brands");
 
     return Scaffold(
       appBar: PAppBar(title: Text('Thương hiệu'), showBackArrow: true),
@@ -47,9 +47,11 @@ class AllBrandsScreen extends StatelessWidget {
                   return PBrandCard(
                     showBorder: true,
                     brand: brand,
-                    onTap: () => Get.to(() => BrandProducts(
-                          brand: brand,
-                        )),
+                    onTap: () => Get.to(
+                      () => BrandProducts(brand: brand),
+                      preventDuplicates:
+                          false, // Quan trọng: cho phép tạo màn hình mới
+                    ),
                   );
                 },
               );

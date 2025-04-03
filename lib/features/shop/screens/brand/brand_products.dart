@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
-import 'package:pine/common/widgets/images/circular_image.dart';
 import 'package:pine/common/widgets/products/sortable/sortable_products.dart';
 import 'package:pine/common/widgets/shimmers/vertical_product_shimmer.dart';
-import 'package:pine/common/widgets/texts/brand_title_text_with_verified_icon.dart';
 import 'package:pine/features/shop/controllers/brand_controller.dart';
 import 'package:pine/utils/constants/colors.dart';
-import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
@@ -23,7 +20,8 @@ class BrandProducts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = BrandController.instance;
+    // Tạo controller với tag riêng cho mỗi thương hiệu
+    final controller = BrandController.getInstance(brand.id);
     final dark = PHelperFunctions.isDarkMode(context);
 
     return Scaffold(
@@ -34,7 +32,7 @@ class BrandProducts extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            /// Brand Header - Thiết kế nổi bật
+            /// Brand Header
             Container(
               width: double.infinity,
               color:
@@ -106,25 +104,30 @@ class BrandProducts extends StatelessWidget {
                         ),
 
                         // Số lượng sản phẩm - Có thiết kế nổi bật hơn
-                        Container(
-                          margin: const EdgeInsets.only(top: PSizes.sm),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: PSizes.md,
-                            vertical: PSizes.xs,
-                          ),
-                          decoration: BoxDecoration(
-                            color: PColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(PSizes.sm),
-                          ),
-                          child: Text(
-                            '${brand.productsCount ?? 0} sản phẩm',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      color: PColors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                          ),
-                        ),
+                        Obx(() {
+                          final productCount = controller.brandProducts.length;
+                          return Container(
+                            margin: const EdgeInsets.only(top: PSizes.sm),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: PSizes.md,
+                              vertical: PSizes.xs,
+                            ),
+                            decoration: BoxDecoration(
+                              color: PColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(PSizes.sm),
+                            ),
+                            child: Text(
+                              '$productCount sản phẩm',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                    color: PColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),

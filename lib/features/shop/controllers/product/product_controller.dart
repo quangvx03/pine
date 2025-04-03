@@ -29,7 +29,7 @@ class ProductController extends GetxController {
       // Assign Products
       featuredProducts.assignAll(products);
     } catch (e) {
-      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra ', message: e.toString());
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -42,7 +42,7 @@ class ProductController extends GetxController {
 
       return products;
     } catch (e) {
-      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra ', message: e.toString());
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
       return [];
     }
   }
@@ -53,7 +53,7 @@ class ProductController extends GetxController {
 
       return products;
     } catch (e) {
-      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra ', message: e.toString());
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
       return [];
     }
   }
@@ -103,8 +103,19 @@ class ProductController extends GetxController {
     return percentage.toStringAsFixed(0);
   }
 
-  /// Check Product Stock Status
-  String getProductStockStatus(int stock) {
-    return stock > 0 ? 'Còn hàng' : 'Hết hàng';
+  /// Lấy số lượng tồn kho thực tế của sản phẩm
+  int getProductAvailableStock(int stock, int soldQuantity) {
+    return stock - (soldQuantity);
+  }
+
+  /// Kiểm tra trạng thái tồn kho và trả về chuỗi hiển thị với số lượng
+  String getFormattedStockStatus(int stock, int soldQuantity) {
+    final availableStock = getProductAvailableStock(stock, soldQuantity);
+    return availableStock > 0 ? 'Còn hàng ($availableStock)' : 'Hết hàng';
+  }
+
+  /// Kiểm tra sản phẩm còn hàng hay không
+  bool isProductInStock(int stock, int soldQuantity) {
+    return getProductAvailableStock(stock, soldQuantity) > 0;
   }
 }

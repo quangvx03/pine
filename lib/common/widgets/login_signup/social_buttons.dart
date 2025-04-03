@@ -22,26 +22,13 @@ class PSocialButtons extends StatelessWidget {
               border: Border.all(color: PColors.grey),
               borderRadius: BorderRadius.circular(100)),
           child: IconButton(
-              onPressed: () =>  controller.googleSignIn(),
+              onPressed: () => controller.googleSignIn(),
               icon: const Image(
                 width: PSizes.iconMd,
                 height: PSizes.iconMd,
                 image: AssetImage(PImages.google),
               )),
         ),
-        // const SizedBox(width: PSizes.spaceBtwItems),
-        // Container(
-        //   decoration: BoxDecoration(
-        //       border: Border.all(color: PColors.grey),
-        //       borderRadius: BorderRadius.circular(100)),
-        //   child: IconButton(
-        //       onPressed: () {},
-        //       icon: const Image(
-        //         width: PSizes.iconMd,
-        //         height: PSizes.iconMd,
-        //         image: AssetImage(PImages.facebook),
-        //       )),
-        // ),
       ],
     );
   }

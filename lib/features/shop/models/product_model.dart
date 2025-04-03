@@ -17,8 +17,9 @@ class ProductModel {
   BrandModel? brand;
   String? description;
   String? categoryId;
-  List<String>? images;
   String productType;
+  List<String>? images;
+  int soldQuantity;
   List<ProductAttributeModel>? productAttributes;
   List<ProductVariationModel>? productVariations;
 
@@ -39,6 +40,7 @@ class ProductModel {
     this.description,
     this.productAttributes,
     this.productVariations,
+    this.soldQuantity = 0,
   });
 
   static ProductModel empty() {
@@ -50,6 +52,7 @@ class ProductModel {
       thumbnail: '',
       brand: BrandModel(id: '', name: '', image: ''),
       productType: '',
+      soldQuantity: 0,
     );
   }
 
@@ -68,6 +71,7 @@ class ProductModel {
       'Brand': brand!.toJson(),
       'Description': description,
       'ProductType': productType,
+      'SoldQuantity': soldQuantity,
       'ProductAttributes': productAttributes != null
           ? productAttributes!.map((e) => e.toJson()).toList()
           : [],
@@ -95,6 +99,8 @@ class ProductModel {
       productType: data['ProductType'] ?? '',
       brand: BrandModel.fromJson(data['Brand']),
       images: data['Images'] != null ? List<String>.from(data['Images']) : [],
+      soldQuantity:
+          data.containsKey('SoldQuantity') ? data['SoldQuantity'] ?? 0 : 0,
       productAttributes: (data['ProductAttributes'] as List<dynamic>)
           .map((e) => ProductAttributeModel.fromJson(e))
           .toList(),
@@ -121,6 +127,8 @@ class ProductModel {
       productType: data['ProductType'] ?? '',
       brand: BrandModel.fromJson(data['Brand']),
       images: data['Images'] != null ? List<String>.from(data['Images']) : [],
+      soldQuantity:
+          data.containsKey('SoldQuantity') ? data['SoldQuantity'] ?? 0 : 0,
       productAttributes: (data['ProductAttributes'] as List<dynamic>)
           .map((e) => ProductAttributeModel.fromJson(e))
           .toList(),

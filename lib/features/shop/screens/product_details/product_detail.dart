@@ -5,7 +5,8 @@ import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/products/cart/cart_menu_icon.dart';
 import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
-import 'package:pine/features/shop/controllers/product/variation_controller.dart'; // Thêm import
+import 'package:pine/features/shop/controllers/product/product_controller.dart';
+import 'package:pine/features/shop/controllers/product/variation_controller.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/features/shop/models/product_variation_model.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/bottom_add_to_cart_widget.dart';
@@ -19,7 +20,6 @@ import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:readmore/readmore.dart';
 
-// Chuyển sang StatefulWidget
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key, required this.product});
 
@@ -49,6 +49,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isVariableProduct =
+        widget.product.productType == ProductType.variable.toString();
+
     return Scaffold(
       appBar: PAppBar(
         showBackArrow: true,
@@ -74,20 +77,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   left: PSizes.defaultSpace,
                   bottom: PSizes.defaultSpace),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// Rating
                   const PRatingAndShare(),
                   const SizedBox(height: PSizes.spaceBtwItems / 2),
 
-                  /// Price, Title, Stock & Brand
+                  /// Price, Title & Brand
                   PProductMetaData(product: widget.product),
 
-                  /// Attributes
-                  if (widget.product.productType ==
-                      ProductType.variable.toString())
-                    PProductAttributes(product: widget.product),
+                  /// Trạng thái tồn kho cho sản phẩm đơn giản
+                  if (!isVariableProduct)
+                    _buildStockStatus(context, widget.product.stock,
+                        widget.product.soldQuantity),
 
-                  const SizedBox(height: PSizes.spaceBtwItems),
+                  /// Attributes (chỉ hiển thị cho sản phẩm biến thể)
+                  if (isVariableProduct) ...[
+                    PProductAttributes(product: widget.product),
+                    const SizedBox(height: PSizes.spaceBtwItems * 1.5),
+                  ],
 
                   /// Description
                   const PSectionHeading(
@@ -111,7 +119,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                   /// Reviews
                   const Divider(),
-                  const SizedBox(height: PSizes.spaceBtwSections),
+                  const SizedBox(height: PSizes.spaceBtwItems),
                   GestureDetector(
                     onTap: () => Get.to(() => const ProductReviewsScreen()),
                     child: Row(
@@ -126,12 +134,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: PSizes.spaceBtwSections),
+                  // const SizedBox(height: PSizes.spaceBtwSections),
                 ],
               ),
             )
           ],
         ),
+      ),
+    );
+  }
+
+  /// Widget hiển thị trạng thái tồn kho
+  Widget _buildStockStatus(BuildContext context, int stock, int soldQuantity) {
+    final productController = ProductController.instance;
+
+    // Sử dụng phương thức từ controller để kiểm tra trạng thái tồn kho
+    final isInStock = productController.isProductInStock(stock, soldQuantity);
+    final stockStatus =
+        productController.getFormattedStockStatus(stock, soldQuantity);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: PSizes.spaceBtwSections),
+      padding: const EdgeInsets.symmetric(
+          horizontal: PSizes.md, vertical: PSizes.sm),
+      decoration: BoxDecoration(
+        color: isInStock
+            ? PColors.info.withValues(alpha: 0.1)
+            : PColors.error.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(PSizes.sm),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Icon trạng thái
+          Icon(
+            isInStock ? Icons.check_circle : Icons.cancel,
+            color: isInStock ? PColors.info : PColors.error,
+            size: 18,
+          ),
+
+          const SizedBox(width: PSizes.sm),
+
+          // Văn bản trạng thái
+          Text(
+            stockStatus,
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: isInStock ? PColors.info : PColors.error,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+        ],
       ),
     );
   }

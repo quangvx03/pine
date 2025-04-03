@@ -6,6 +6,7 @@ class ProductVariationModel {
   double price;
   double salePrice;
   int stock;
+  int soldQuantity;
   Map<String, String> attributeValues;
 
   ProductVariationModel({
@@ -16,6 +17,7 @@ class ProductVariationModel {
     this.price = 0,
     this.salePrice = 0,
     this.stock = 0,
+    this.soldQuantity = 0,
     required this.attributeValues,
   });
 
@@ -33,6 +35,7 @@ class ProductVariationModel {
       'SalePrice': salePrice,
       'SKU': sku,
       'Stock': stock,
+      'SoldQuantity': soldQuantity,
       'AttributeValues': attributeValues,
     };
   }
@@ -45,6 +48,8 @@ class ProductVariationModel {
       price: double.parse((data['Price'] ?? 0).toString()),
       sku: data['SKU'] ?? '',
       stock: data['Stock'] ?? 0,
+      soldQuantity:
+          data.containsKey('SoldQuantity') ? data['SoldQuantity'] ?? 0 : 0,
       salePrice: double.parse((data['SalePrice'] ?? 0).toString()),
       image: data['Image'] ?? '',
       description: data['description'] ?? '',

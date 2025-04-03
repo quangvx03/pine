@@ -20,11 +20,10 @@ class PProductAttributes extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(VariationController());
     final dark = PHelperFunctions.isDarkMode(context);
+
     return Obx(
       () => Column(
         children: [
-          /// Selected Attribute Pricing & Description
-          // Display variation price and stock when same variation is selected
           if (controller.selectedVariation.value.id.isNotEmpty)
             PRoundedContainer(
               padding: const EdgeInsets.all(PSizes.md),
@@ -37,19 +36,41 @@ class PProductAttributes extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// Stock
+                          /// Stock - Hiển thị trạng thái tồn kho với icon và số lượng
                           Row(
                             children: [
-                              const PProductTitleText(
-                                  title: 'Trạng thái:', smallSize: true),
+                              Icon(
+                                controller.getVariationAvailableStock() > 0
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color:
+                                    controller.getVariationAvailableStock() > 0
+                                        ? PColors.info
+                                        : PColors.error,
+                                size: 18,
+                              ),
                               const SizedBox(width: PSizes.spaceBtwItems / 2),
-                              Text(controller.variationStockStatus.value,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .apply(color: PColors.info)),
+
+                              // Sử dụng giá trị từ controller đã được cập nhật
+                              Text(
+                                controller.variationStockStatus.value,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: controller
+                                                  .getVariationAvailableStock() >
+                                              0
+                                          ? PColors.info
+                                          : PColors.error,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
                             ],
                           ),
+
+                          const SizedBox(height: PSizes.spaceBtwItems / 2),
+
                           Row(
                             children: [
                               const PProductTitleText(
@@ -89,8 +110,6 @@ class PProductAttributes extends StatelessWidget {
               ),
             ),
           const SizedBox(height: PSizes.spaceBtwItems),
-
-          /// Attributes
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: product.productAttributes!
@@ -103,32 +122,38 @@ class PProductAttributes extends StatelessWidget {
                             showActionButton: false),
                         const SizedBox(height: PSizes.spaceBtwItems / 2),
                         Obx(
-                          () => Wrap(
-                              spacing: 8,
-                              children: attribute.values!.map((attributeValue) {
-                                final isSelected = controller
-                                        .selectedAttributes[attribute.name] ==
-                                    attributeValue;
-                                final available = controller
-                                    .getAttributesAvailabilityInVariation(
-                                        product.productVariations!,
-                                        attribute.name!)
-                                    .contains(attributeValue);
+                          () {
+                            final availableValues =
+                                controller.getAvailableAttributeValues(
+                              product.productVariations!,
+                              attribute.name!,
+                              controller.selectedAttributes,
+                            );
 
-                                return PChoiceChip(
-                                    text: attributeValue,
-                                    selected: isSelected,
-                                    onSelected: available
-                                        ? (selected) {
-                                            if (selected && available) {
+                            return Wrap(
+                                spacing: 8,
+                                children:
+                                    attribute.values!.map((attributeValue) {
+                                  final isSelected = controller
+                                          .selectedAttributes[attribute.name] ==
+                                      attributeValue;
+                                  // Kiểm tra xem giá trị thuộc tính có khả dụng không
+                                  final available =
+                                      availableValues.contains(attributeValue);
+
+                                  return PChoiceChip(
+                                      text: attributeValue,
+                                      selected: isSelected,
+                                      onSelected: (available || isSelected)
+                                          ? (selected) {
                                               controller.onAttributeSelected(
                                                   product,
                                                   attribute.name ?? '',
                                                   attributeValue);
                                             }
-                                          }
-                                        : null);
-                              }).toList()),
+                                          : null);
+                                }).toList());
+                          },
                         ),
                         const SizedBox(height: PSizes.spaceBtwItems / 2),
                       ],
