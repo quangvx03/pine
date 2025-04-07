@@ -56,21 +56,41 @@ class OrderModel {
   factory OrderModel.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
 
+    // Xử lý trường hợp address có thể null hoặc không phải Map
+    AddressModel? addressModel;
+    if (data['address'] != null && data['address'] is Map<String, dynamic>) {
+      try {
+        addressModel =
+            AddressModel.fromMap(data['address'] as Map<String, dynamic>);
+      } catch (e) {
+        throw ('Lỗi khi chuyển đổi địa chỉ: $e');
+      }
+    }
+
     return OrderModel(
-        id: data['id'] as String,
-        userId: data['userId'] as String,
-        status: OrderStatus.values
-            .firstWhere((e) => e.toString() == data['status']),
-        totalAmount: data['totalAmount'] as double,
-        orderDate: (data['orderDate'] as Timestamp).toDate(),
-        paymentMethod: data['paymentMethod'] as String,
-        address: AddressModel.fromMap(data['address'] as Map<String, dynamic>),
-        deliveryDate: data['deliveryDate'] == null
-            ? null
-            : (data['deliveryDate'] as Timestamp).toDate(),
-        items: (data['items'] as List<dynamic>)
-            .map((itemData) =>
-                CartModel.fromJson(itemData as Map<String, dynamic>))
-            .toList());
+      id: data['id'] as String? ?? '',
+      userId: data['userId'] as String? ?? '',
+      status: OrderStatus.values.firstWhere(
+        (e) => e.toString() == data['status'],
+        orElse: () => OrderStatus.pending,
+      ),
+      totalAmount: (data['totalAmount'] is double)
+          ? data['totalAmount'] as double
+          : (data['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      orderDate: data['orderDate'] is Timestamp
+          ? (data['orderDate'] as Timestamp).toDate()
+          : DateTime.now(),
+      paymentMethod:
+          data['paymentMethod'] as String? ?? 'Thanh toán khi nhận hàng',
+      address: addressModel,
+      deliveryDate: data['deliveryDate'] == null
+          ? null
+          : (data['deliveryDate'] as Timestamp).toDate(),
+      items: (data['items'] as List<dynamic>?)
+              ?.map((itemData) =>
+                  CartModel.fromJson(itemData as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
   }
 }

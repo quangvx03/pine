@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/sizes.dart';
+import 'package:pine/utils/helpers/helper_functions.dart';
 
 class PAnimationLoaderWidget extends StatelessWidget {
   const PAnimationLoaderWidget(
@@ -23,8 +24,7 @@ class PAnimationLoaderWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Lottie.asset(animation,
-              width: MediaQuery.of(context).size.width * 0.8),
+          Lottie.asset(animation, width: PHelperFunctions.screenWidth() * 0.8),
           const SizedBox(height: PSizes.defaultSpace),
           Text(
             text,

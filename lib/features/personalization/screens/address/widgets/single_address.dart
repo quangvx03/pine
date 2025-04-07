@@ -236,7 +236,7 @@ class PSingleAddress extends StatelessWidget {
                                 : dark
                                     ? PColors.darkerGrey
                                     : PColors.light,
-                            borderRadius: BorderRadius.circular(4),
+                            shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Iconsax.call,
@@ -266,25 +266,22 @@ class PSingleAddress extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: address.selectedAddress
-                                  ? PColors.primary.withValues(alpha: 0.1)
-                                  : dark
-                                      ? Colors.grey.shade700
-                                      : Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Icon(
-                              Iconsax.location,
-                              size: 16,
-                              color: address.selectedAddress
-                                  ? PColors.primary
-                                  : textColor,
-                            ),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: address.selectedAddress
+                                ? PColors.primary.withValues(alpha: 0.1)
+                                : dark
+                                    ? PColors.darkerGrey
+                                    : PColors.light,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Iconsax.location,
+                            size: 16,
+                            color: address.selectedAddress
+                                ? PColors.primary
+                                : textColor,
                           ),
                         ),
                         const SizedBox(width: PSizes.sm),

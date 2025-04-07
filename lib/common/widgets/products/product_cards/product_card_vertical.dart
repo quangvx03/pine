@@ -78,7 +78,7 @@ class PProductCardVertical extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: PColors.error.withValues(alpha: 0.8),
                                     borderRadius:
-                                        BorderRadius.circular(PSizes.xs),
+                                        BorderRadius.circular(PSizes.sm),
                                   ),
                                   child: const Text(
                                     'Hết hàng',

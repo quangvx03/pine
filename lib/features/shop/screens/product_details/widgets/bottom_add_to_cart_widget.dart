@@ -167,6 +167,7 @@ class PBottomAddToCart extends StatelessWidget {
                     color: !canAddToCart() ? PColors.grey : PColors.primary),
                 disabledBackgroundColor: PColors.grey,
                 disabledForegroundColor: PColors.white,
+                minimumSize: Size(160, 0),
               ),
               child: Text(!canAddToCart()
                   ? (product.productType == ProductType.variable.toString() &&

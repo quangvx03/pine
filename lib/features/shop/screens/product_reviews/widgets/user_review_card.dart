@@ -61,46 +61,6 @@ class UserReviewCard extends StatelessWidget {
               color: PColors.primary),
         ),
         const SizedBox(height: PSizes.spaceBtwItems),
-
-        /// Company Review
-        // PRoundedContainer(
-        //   backgroundColor: dark ? PColors.darkerGrey : PColors.grey,
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(PSizes.md),
-        //     child: Column(
-        //       children: [
-        //         Row(
-        //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //           children: [
-        //             Text('Pine Store',
-        //                 style: Theme.of(context).textTheme.titleMedium),
-        //             Text('29/01/2025',
-        //                 style: Theme.of(context).textTheme.titleMedium),
-        //           ],
-        //         ),
-        //         const SizedBox(height: PSizes.spaceBtwItems),
-        //         const ReadMoreText(
-        //           'Cảm ơn quý khách đã tin tưởng và ủng hộ cửa hàng. Rất mong được phục vụ quý khách trong những lần mua sắm tiếp theo!',
-        //           trimLines: 3,
-        //           trimMode: TrimMode.Line,
-        //           trimCollapsedText: ' xem thêm',
-        //           trimExpandedText: ' thu gọn',
-        //           moreStyle: TextStyle(
-        //               fontSize: 14,
-        //               fontWeight: FontWeight.bold,
-        //               color: PColors.primary),
-        //           lessStyle: TextStyle(
-        //               fontSize: 14,
-        //               fontWeight: FontWeight.bold,
-        //               color: PColors.primary),
-        //         )
-        //       ],
-        //     ),
-        //   ),
-        // ),
-        // const SizedBox(
-        //   height: PSizes.spaceBtwSections,
-        // )
       ],
     );
   }

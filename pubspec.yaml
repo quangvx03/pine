@@ -25,6 +25,7 @@ dependencies:
   flutter_native_splash: ^2.4.4
   smooth_page_indicator: ^1.2.0+3
   flutter_slidable: ^4.0.0
+  timeline_tile: ^2.0.0
 
   # Icons
   iconsax: ^0.0.8

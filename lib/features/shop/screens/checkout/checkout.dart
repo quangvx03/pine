@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:pine/common/widgets/products/cart/coupon_widget.dart';
+import 'package:pine/features/shop/controllers/product/cart_controller.dart';
+import 'package:pine/features/shop/controllers/product/order_controller.dart';
 import 'package:pine/features/shop/screens/cart/widgets/cart_items.dart';
 import 'package:pine/features/shop/screens/checkout/widgets/billing_address_section.dart';
 import 'package:pine/features/shop/screens/checkout/widgets/billing_amount_section.dart';
@@ -11,18 +15,14 @@ import 'package:pine/utils/helpers/helper_functions.dart';
 import 'package:pine/utils/helpers/pricing_calculator.dart';
 import 'package:pine/utils/popups/loaders.dart';
 
-import '../../../../common/widgets/appbar/appbar.dart';
-import '../../../../common/widgets/products/cart/coupon_widget.dart';
-import '../../controllers/product/cart_controller.dart';
-import '../../controllers/product/order_controller.dart';
-
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final cartController = CartController.instance;
-    final subTotal = cartController.totalCartPrice.value;
+    // Sử dụng giá trị của sản phẩm đã chọn
+    final subTotal = cartController.selectedItemsPrice.value;
     final orderController = Get.put(OrderController());
     final totalAmount = PPricingCalculator.calculateTotalPrice(subTotal, 'VN');
 
@@ -38,8 +38,11 @@ class CheckoutScreen extends StatelessWidget {
           padding: const EdgeInsets.all(PSizes.defaultSpace),
           child: Column(
             children: [
-              /// Items in Cart
-              const PCartItems(showAddRemoveButtons: false),
+              /// Hiển thị sản phẩm đã chọn
+              const PCartItems(
+                showAddRemoveButtons: false,
+                selectedItemsOnly: true, // Chỉ hiển thị sản phẩm đã chọn
+              ),
               const SizedBox(height: PSizes.spaceBtwSections),
 
               /// Coupon TextField
@@ -82,13 +85,13 @@ class CheckoutScreen extends StatelessWidget {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(PSizes.defaultSpace),
         child: ElevatedButton(
-            onPressed: subTotal > 0
-                ? () => orderController.processOrder(totalAmount)
-                : () => PLoaders.warningSnackBar(
-                    title: 'Giỏ hàng trống',
-                    message: 'Thêm sản phẩm vào giỏ hàng để tiến hành.'),
+            onPressed: cartController.getSelectedItems().isEmpty
+                ? () => PLoaders.warningSnackBar(
+                    title: 'Không có sản phẩm được chọn',
+                    message: 'Vui lòng chọn sản phẩm để thanh toán.')
+                : () => orderController.processOrder(totalAmount),
             child: Text(
-                'Thanh toán ${PHelperFunctions.formatCurrency(totalAmount)}')),
+                'Đặt hàng ${PHelperFunctions.formatCurrency(totalAmount)}')),
       ),
     );
   }

@@ -530,7 +530,7 @@ class CartController extends GetxController {
     selectedItemsPrice.value = total;
   }
 
-  void removeSelectedItems() {
+  void removeSelectedItems({bool showNotification = true}) {
     // Tạo danh sách các sản phẩm cần xóa
     List<CartModel> itemsToRemove = [];
 
@@ -553,9 +553,11 @@ class CartController extends GetxController {
     updateSelectAll();
     updateSelectedPrice();
 
-    // Sử dụng phương thức mới để hiển thị thông báo
-    showSuccess('Đã xóa', 'Các sản phẩm đã chọn đã được xóa khỏi giỏ hàng',
-        'remove_selected');
+    // Chỉ hiển thị thông báo nếu được yêu cầu
+    if (showNotification) {
+      showSuccess('Đã xóa', 'Các sản phẩm đã chọn đã được xóa khỏi giỏ hàng',
+          'remove_selected');
+    }
   }
 
   // Phương thức kiểm tra giỏ hàng hợp lệ để thanh toán

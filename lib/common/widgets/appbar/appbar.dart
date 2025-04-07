@@ -14,6 +14,7 @@ class PAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leadingIcon,
     this.leadingOnPressed,
     this.showBackArrow = false,
+    this.bottom,
   });
 
   final Widget? title;
@@ -21,6 +22,7 @@ class PAppBar extends StatelessWidget implements PreferredSizeWidget {
   final IconData? leadingIcon;
   final List<Widget>? actions;
   final VoidCallback? leadingOnPressed;
+  final PreferredSizeWidget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class PAppBar extends StatelessWidget implements PreferredSizeWidget {
               ? IconButton(
                   onPressed: () => Get.back(),
                   icon: Icon(
-                    Iconsax.arrow_left,
+                    Icons.arrow_back_ios_rounded,
                     color: dark ? PColors.white : PColors.dark,
                   ))
               : leadingIcon != null
@@ -42,10 +44,14 @@ class PAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onPressed: leadingOnPressed, icon: Icon(leadingIcon))
                   : null,
           title: title,
-          actions: actions),
+          actions: actions,
+          bottom: bottom),
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(PDeviceUtils.getAppBarHeight());
+  Size get preferredSize {
+    final bottomHeight = bottom?.preferredSize.height ?? 0;
+    return Size.fromHeight(PDeviceUtils.getAppBarHeight() + bottomHeight);
+  }
 }

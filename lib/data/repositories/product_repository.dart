@@ -202,4 +202,30 @@ class ProductRepository extends GetxController {
       throw 'Lỗi khi tìm kiếm sản phẩm: $e';
     }
   }
+
+  /// Cập nhật số lượng đã bán (soldQuantity) của sản phẩm
+  Future<void> updateProductStock(ProductModel product) async {
+    try {
+      final productRef = _db.collection('Products').doc(product.id);
+
+      // Cập nhật soldQuantity cho sản phẩm
+      final Map<String, dynamic> data = {
+        'SoldQuantity': product.soldQuantity,
+      };
+
+      // Nếu có biến thể, cập nhật thông tin biến thể
+      if (product.productVariations != null &&
+          product.productVariations!.isNotEmpty) {
+        final variations = product.productVariations!
+            .map((variation) => variation.toJson())
+            .toList();
+        data['ProductVariations'] = variations;
+      }
+
+      // Thực hiện cập nhật lên Firestore
+      await productRef.update(data);
+    } catch (e) {
+      throw 'Lỗi khi cập nhật tồn kho: $e';
+    }
+  }
 }

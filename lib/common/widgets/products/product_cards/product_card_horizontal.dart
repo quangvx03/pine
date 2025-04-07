@@ -77,7 +77,7 @@ class PProductCardHorizontal extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: PColors.error.withValues(alpha: 0.8),
-                            borderRadius: BorderRadius.circular(PSizes.xs),
+                            borderRadius: BorderRadius.circular(PSizes.sm),
                           ),
                           child: const Text(
                             'Hết hàng',
@@ -128,18 +128,20 @@ class PProductCardHorizontal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Align(
-                      alignment: Alignment.topLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PProductTitleText(
-                              title: product.title, smallSize: true),
-                          SizedBox(height: PSizes.spaceBtwItems / 2),
-                          PBrandTitleWithVerifiedIcon(
-                              title: product.brand!.name),
-                        ],
-                      ),
-                    ),
+                        alignment: Alignment.topLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 2),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PProductTitleText(
+                                  title: product.title, smallSize: true),
+                              SizedBox(height: PSizes.spaceBtwItems / 2),
+                              PBrandTitleWithVerifiedIcon(
+                                  title: product.brand!.name),
+                            ],
+                          ),
+                        )),
                     const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
