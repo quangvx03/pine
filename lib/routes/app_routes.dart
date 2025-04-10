@@ -9,7 +9,6 @@ import 'package:pine/features/personalization/screens/profile/profile.dart';
 import 'package:pine/features/shop/screens/cart/cart.dart';
 import 'package:pine/features/shop/screens/checkout/checkout.dart';
 import 'package:pine/features/shop/screens/order/order.dart';
-import 'package:pine/features/shop/screens/product_reviews/product_reviews.dart';
 import 'package:pine/features/shop/screens/wishlist/wishlist.dart';
 import 'package:pine/navigation_menu.dart';
 import 'package:pine/routes/routes.dart';
@@ -44,8 +43,6 @@ class AppRoutes {
           controller.navigateToAccount();
           return const NavigationMenu();
         }),
-    GetPage(
-        name: PRoutes.productReviews, page: () => const ProductReviewsScreen()),
     GetPage(name: PRoutes.order, page: () => const OrderScreen()),
     GetPage(name: PRoutes.checkout, page: () => const CheckoutScreen()),
     GetPage(name: PRoutes.cart, page: () => const CartScreen()),

@@ -4,17 +4,21 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/products/cart/cart_menu_icon.dart';
 import 'package:pine/common/widgets/products/favorite_icon/favorite_icon.dart';
+import 'package:pine/common/widgets/products/ratings/ratings_indicator.dart';
 import 'package:pine/common/widgets/texts/section_heading.dart';
 import 'package:pine/features/shop/controllers/product/product_controller.dart';
 import 'package:pine/features/shop/controllers/product/variation_controller.dart';
+import 'package:pine/features/shop/controllers/review_controller.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/features/shop/models/product_variation_model.dart';
+import 'package:pine/features/shop/models/review_model.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/bottom_add_to_cart_widget.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/product_attributes.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/product_detail_image_slider.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/product_meta_data.dart';
-import 'package:pine/features/shop/screens/product_details/widgets/rating_share_widget.dart';
+import 'package:pine/features/shop/screens/product_details/widgets/rating.dart';
 import 'package:pine/features/shop/screens/product_reviews/product_reviews.dart';
+import 'package:pine/features/shop/screens/product_reviews/widgets/user_review_card.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
@@ -80,7 +84,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// Rating
-                  const PRatingAndShare(),
+                  PRating(productId: widget.product.id),
                   const SizedBox(height: PSizes.spaceBtwItems / 2),
 
                   /// Price, Title & Brand
@@ -103,7 +107,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: PSizes.spaceBtwItems),
                   ReadMoreText(
                     widget.product.description ?? '',
-                    trimLines: 2,
+                    trimLines: 3,
                     trimMode: TrimMode.Line,
                     trimCollapsedText: ' xem thêm',
                     trimExpandedText: ' thu gọn',
@@ -120,21 +124,163 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   /// Reviews
                   const Divider(),
                   const SizedBox(height: PSizes.spaceBtwItems),
-                  GestureDetector(
-                    onTap: () => Get.to(() => const ProductReviewsScreen()),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const PSectionHeading(
-                            title: 'Đánh giá (11)', showActionButton: false),
-                        IconButton(
-                            icon: const Icon(Iconsax.arrow_right_3, size: 18),
-                            onPressed: () =>
-                                Get.to(() => const ProductReviewsScreen())),
-                      ],
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final ReviewController reviewController =
+                          Get.put(ReviewController(), permanent: true);
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FutureBuilder<double>(
+                            future: reviewController
+                                .getAverageRating(widget.product.id),
+                            builder: (context, ratingSnapshot) {
+                              final rating = ratingSnapshot.data ?? 0.0;
+
+                              return FutureBuilder<int>(
+                                future: reviewController
+                                    .getReviewCount(widget.product.id),
+                                builder: (context, countSnapshot) {
+                                  final reviewCount = countSnapshot.data ?? 0;
+
+                                  return InkWell(
+                                    onTap: () => Get.to(() =>
+                                        ProductReviewsScreen(
+                                            productId: widget.product.id)),
+                                    borderRadius: BorderRadius.circular(
+                                        PSizes.borderRadiusSm),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: PSizes.sm),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // Tiêu đề "Đánh giá (số lượng)"
+                                          Row(
+                                            children: [
+                                              Text('Đánh giá',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headlineSmall),
+                                              const SizedBox(width: PSizes.xs),
+                                              Text(
+                                                '($reviewCount)',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          // Điểm trung bình, sao và mũi tên
+                                          Row(
+                                            children: [
+                                              // Điểm trung bình
+                                              Text(
+                                                rating.toStringAsFixed(1),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge!
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: PColors.primary,
+                                                    ),
+                                              ),
+                                              const SizedBox(width: 4),
+
+                                              // Hiển thị sao
+                                              SizedBox(
+                                                height: 20,
+                                                child: PRatingBarIndicator(
+                                                  rating: rating,
+                                                ),
+                                              ),
+
+                                              // Mũi tên
+                                              const Icon(
+                                                Iconsax.arrow_right_3,
+                                                color: PColors.darkGrey,
+                                                size: 16,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: PSizes.sm),
+
+                          // Tiếp tục hiển thị các bình luận
+                          FutureBuilder<List<ReviewModel>>(
+                            future: reviewController
+                                .getSortedProductReviews(widget.product.id),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox(
+                                  height: 100,
+                                  child: Center(
+                                      child: CircularProgressIndicator()),
+                                );
+                              }
+
+                              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: PSizes.md),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Iconsax.message_question,
+                                          size: 18, color: Colors.grey),
+                                      const SizedBox(width: PSizes.sm),
+                                      Text(
+                                        'Chưa có đánh giá nào cho sản phẩm này',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(
+                                              color: Colors.grey.shade600,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              // Lấy tối đa 2 bình luận mới nhất
+                              final reviews = snapshot.data!;
+                              final displayedReviews = reviews.length > 2
+                                  ? reviews.sublist(0, 2)
+                                  : reviews;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: displayedReviews
+                                    .map((review) => Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: PSizes.spaceBtwItems),
+                                          child: UserReviewCard(review: review),
+                                        ))
+                                    .toList(),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                  // const SizedBox(height: PSizes.spaceBtwSections),
                 ],
               ),
             )

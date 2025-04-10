@@ -189,7 +189,7 @@ class PCartItems extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: dark
                                           ? PColors.darkerGrey
-                                          : PColors.grey.withOpacity(0.2),
+                                          : PColors.grey.withValues(alpha: 0.2),
                                       borderRadius:
                                           BorderRadius.circular(PSizes.sm),
                                     ),

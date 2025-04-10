@@ -13,7 +13,6 @@ import '../../../../common/widgets/texts/section_heading.dart';
 import '../../../../utils/constants/colors.dart';
 import '../../../../utils/constants/sizes.dart';
 import '../../../../utils/device/device_utility.dart';
-import '../../../../utils/helpers/helper_functions.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});

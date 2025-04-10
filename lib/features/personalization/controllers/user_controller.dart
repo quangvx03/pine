@@ -185,7 +185,7 @@ class UserController extends GetxController {
       }
     } catch (e) {
       PLoaders.errorSnackBar(title: 'Có lỗi xảy ra', message: e.toString());
-    } finally{
+    } finally {
       imageUploading.value = false;
     }
   }

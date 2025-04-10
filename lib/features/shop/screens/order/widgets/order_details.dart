@@ -4,8 +4,13 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:pine/common/widgets/images/rounded_image.dart';
+import 'package:pine/common/widgets/shimmers/product_detail_shimmer.dart';
+import 'package:pine/data/repositories/product_repository.dart';
 import 'package:pine/features/shop/controllers/product/order_controller.dart';
 import 'package:pine/features/shop/models/order_model.dart';
+import 'package:pine/features/shop/screens/product_details/product_detail.dart';
+import 'package:pine/features/shop/screens/product_reviews/widgets/product_select_review.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/enums.dart';
 import 'package:pine/utils/constants/sizes.dart';
@@ -164,7 +169,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
                     // Các nút hành động
                     if (order.status == OrderStatus.delivered)
-                      _buildReviewButton(context),
+                      _buildReviewButton(context, order),
                     if (order.status == OrderStatus.delivered)
                       const SizedBox(height: PSizes.spaceBtwItems),
 
@@ -264,7 +269,7 @@ class OrderDetailsScreen extends StatelessWidget {
   }
 
   // Nút đánh giá sản phẩm
-  Widget _buildReviewButton(BuildContext context) {
+  Widget _buildReviewButton(BuildContext context, OrderModel order) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
@@ -276,7 +281,7 @@ class OrderDetailsScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(PSizes.buttonRadius),
           ),
         ),
-        onPressed: () => Get.toNamed('/product-reviews'),
+        onPressed: () => Get.to(() => ProductSelectReviewScreen(order: order)),
         icon: const Icon(Iconsax.star1, color: Colors.amber),
         label: Text(
           'Đánh giá sản phẩm',
@@ -579,7 +584,6 @@ class OrderDetailsScreen extends StatelessWidget {
   }
 
   // Địa chỉ giao hàng
-  // Địa chỉ giao hàng - sử dụng text thay vì icon
   Widget _buildDeliveryAddress(
       BuildContext context, OrderModel order, bool dark) {
     final address = order.address!;
@@ -815,6 +819,7 @@ class OrderDetailsScreen extends StatelessWidget {
           const SizedBox(height: PSizes.sm),
 
           // Danh sách sản phẩm
+          // Thay thế phần hiển thị danh sách sản phẩm trong _buildOrderInfoCard
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -827,111 +832,139 @@ class OrderDetailsScreen extends StatelessWidget {
             itemBuilder: (_, index) {
               final item = order.items[index];
 
-              // Tách biến thể thành danh sách các cặp key-value
-              List<MapEntry<String, String>> variations = [];
-              if (item.selectedVariation != null &&
-                  item.selectedVariation!.isNotEmpty) {
-                variations = item.selectedVariation!.entries.toList();
+              // Danh sách thứ tự ưu tiên các thuộc tính
+              final attributeOrder = [
+                'Thể loại',
+                'Kích cỡ',
+                'Màu sắc',
+                'Chất liệu'
+              ];
+
+              // Tạo danh sách các thuộc tính đã được sắp xếp
+              final Map<String, String> variations =
+                  item.selectedVariation ?? {};
+              final orderedVariations = attributeOrder
+                  .where((attr) => variations.containsKey(attr))
+                  .map((key) => MapEntry(key, variations[key]!))
+                  .toList();
+
+              // Thêm các thuộc tính khác không nằm trong danh sách ưu tiên
+              for (final entry in variations.entries) {
+                if (!attributeOrder.contains(entry.key)) {
+                  orderedVariations.add(entry);
+                }
               }
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Hình ảnh sản phẩm
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(PSizes.sm),
-                        child: Image.network(
-                          item.image ?? '',
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductDetailShimmer(),
+                      ));
+                  _loadProductDetails(context, item.productId);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Hình ảnh sản phẩm
+                        PRoundedImage(
+                          imageUrl: item.image ?? '',
                           width: 65,
                           height: 65,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => Container(
-                            width: 65,
-                            height: 65,
-                            color: Colors.grey.shade200,
-                            child:
-                                const Icon(Iconsax.image, color: Colors.grey),
-                          ),
+                          isNetworkImage: true,
+                          padding: const EdgeInsets.all(PSizes.xs),
+                          backgroundColor:
+                              dark ? PColors.darkerGrey : PColors.light,
                         ),
-                      ),
-                      const SizedBox(width: PSizes.sm),
 
-                      // Thông tin sản phẩm
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.title,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                              overflow: TextOverflow.visible,
-                            ),
+                        const SizedBox(width: PSizes.sm),
 
-                            // Hiển thị các biến thể mỗi biến thể một dòng
-                            if (variations.isNotEmpty)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: variations.map((entry) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 2),
-                                    child: Text(
-                                      '${entry.key}: ${entry.value}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: dark
-                                                ? Colors.white70
-                                                : Colors.grey.shade700,
-                                          ),
+                        // Thông tin sản phẩm
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Tên sản phẩm
+                              Text(
+                                item.title,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  );
-                                }).toList(),
+                                overflow: TextOverflow.visible,
                               ),
 
-                            const SizedBox(height: 4),
+                              // Hiển thị các biến thể theo thứ tự ưu tiên
+                              if (orderedVariations.isNotEmpty)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: orderedVariations
+                                      .map((e) => Text.rich(
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: '${e.key}: ',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelMedium,
+                                                ),
+                                                TextSpan(
+                                                  text: e.value,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${PHelperFunctions.formatCurrency(item.price)} × ${item.quantity}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: dark
-                                            ? Colors.white70
-                                            : Colors.grey.shade600,
-                                      ),
-                                ),
-                                Text(
-                                  PHelperFunctions.formatCurrency(
-                                      item.price * item.quantity),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: PColors.primary,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+
+                              // Giá và số lượng
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${PHelperFunctions.formatCurrency(item.price)} × ${item.quantity}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(
+                                          color: dark
+                                              ? Colors.white70
+                                              : Colors.grey.shade600,
+                                        ),
+                                  ),
+                                  Text(
+                                    PHelperFunctions.formatCurrency(
+                                        item.price * item.quantity),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: PColors.primary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -1092,4 +1125,34 @@ class _StatusInfo {
     required this.color,
     required this.icon,
   });
+}
+
+// Thêm phương thức này vào lớp OrderDetailsScreen
+Future<void> _loadProductDetails(BuildContext context, String productId) async {
+  try {
+    final productRepository = ProductRepository.instance;
+    final product = await productRepository.getProductById(productId);
+
+    if (!context.mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(product: product),
+      ),
+    );
+  } catch (e) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Không thể tải thông tin sản phẩm: $e'),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.red.shade700,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PSizes.borderRadiusSm),
+        ),
+      ),
+    );
+    Navigator.pop(context);
+  }
 }

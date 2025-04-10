@@ -93,7 +93,7 @@ class ProfileEditController extends GetxController {
         message: 'Thông tin cá nhân đã được cập nhật',
       );
 
-      Get.off(() => const ProfileScreen());
+      Navigator.of(Get.context!).pop();
     } catch (e) {
       // Đảm bảo đóng loading dialog nếu có lỗi
       PFullScreenLoader.stopLoading();

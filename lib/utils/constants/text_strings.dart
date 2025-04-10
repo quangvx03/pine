@@ -1,6 +1,4 @@
-
-class PTexts{
-
+class PTexts {
   // Global Texts
 
   // OnBoarding Texts
@@ -8,9 +6,12 @@ class PTexts{
   static const String onBoardingTitle2 = "Chọn phương thức thanh toán";
   static const String onBoardingTitle3 = "Giao hàng tận cửa nhà bạn";
 
-  static const String onBoardingSubTitle1 = "Chào mừng bạn đến với thế giới mua sắm vô tận - Sản phẩm tuyệt vời đang chờ bạn.";
-  static const String onBoardingSubTitle2 = "Chọn phương thức thanh toán dễ dàng - Tiện lợi của bạn là ưu tiên của chúng tôi";
-  static const String onBoardingSubTitle3 = "Giao hàng tận nơi – Nhanh chóng, an toàn và không tiếp xúc";
+  static const String onBoardingSubTitle1 =
+      "Chào mừng bạn đến với thế giới mua sắm vô tận - Sản phẩm tuyệt vời đang chờ bạn.";
+  static const String onBoardingSubTitle2 =
+      "Chọn phương thức thanh toán dễ dàng - Tiện lợi của bạn là ưu tiên của chúng tôi";
+  static const String onBoardingSubTitle3 =
+      "Giao hàng tận nơi – Nhanh chóng, an toàn và không tiếp xúc";
 
   // Authentication Form Text
   static const String firstName = "Tên";
@@ -36,23 +37,30 @@ class PTexts{
 
   // Authentication Headings Text
   static const String loginTitle = "Chào mừng trở lại,";
-  static const String loginSubTitle = "Khám phá những lựa chọn vô hạn và sự tiện lợi không gì sánh bằng.";
+  static const String loginSubTitle =
+      "Khám phá những lựa chọn vô hạn và sự tiện lợi không gì sánh bằng.";
   static const String signupTitle = "Hãy tạo tài khoản của bạn";
   static const String forgotPasswordTitle = "Quên mật khẩu";
-  static const String forgotPasswordSubTitle = "Đừng lo lắng, đôi khi mọi người cũng có thể quên, nhập email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại mật khẩu.";
-  static const String changeYourPasswordTitle = "Email đặt lại mật khẩu đã được gửi";
-  static const String changeYourPasswordSubTitle = "Bảo mật tài khoản của bạn là ưu tiên của chúng tôi! Chúng tôi đã gửi cho bạn một liên kết an toàn để thay đổi mật khẩu và bảo vệ tài khoản của bạn.";
+  static const String forgotPasswordSubTitle =
+      "Đừng lo lắng, đôi khi mọi người cũng có thể quên, nhập email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại mật khẩu.";
+  static const String changeYourPasswordTitle =
+      "Email đặt lại mật khẩu đã được gửi";
+  static const String changeYourPasswordSubTitle =
+      "Bảo mật tài khoản của bạn là ưu tiên của chúng tôi! Chúng tôi đã gửi cho bạn một liên kết an toàn để thay đổi mật khẩu và bảo vệ tài khoản của bạn.";
   static const String confirmEmail = "Xác minh địa chỉ email của bạn!";
-  static const String confirmEmailSubTitle = "Chúc mừng! Tài khoản của bạn đang chờ đợi: Xác minh email của bạn để bắt đầu mua sắm và trải nghiệm những ưu đãi không gì sánh bằng và các ưu đãi cá nhân hóa.";
-  static const String emailNotReceivedMessage = "Không nhận được email? Kiểm tra thư rác hoặc gửi lại.";
-  static const String yourAccountCreatedTitle = "Tài khoản của bạn đã được tạo thành công!";
-  static const String yourAccountCreatedSubTitle = "Chào mừng đến với diểm đến mua sắm tối ưu của bạn: Tài khoản của bạn đã được tạo, hãy tận hưởng niềm vui mua sắm trực tuyến liền mạch!";
+  static const String confirmEmailSubTitle =
+      "Chúc mừng! Tài khoản của bạn đang chờ đợi: Xác minh email của bạn để bắt đầu mua sắm và trải nghiệm những ưu đãi không gì sánh bằng và các ưu đãi cá nhân hóa.";
+  static const String emailNotReceivedMessage =
+      "Không nhận được email? Kiểm tra thư rác hoặc gửi lại.";
+  static const String yourAccountCreatedTitle =
+      "Tài khoản của bạn đã được tạo thành công!";
+  static const String yourAccountCreatedSubTitle =
+      "Chào mừng đến với diểm đến mua sắm tối ưu của bạn: Tài khoản của bạn đã được tạo, hãy tận hưởng niềm vui mua sắm trực tuyến liền mạch!";
   static const String submit = "Gửi";
   static const String done = "Hoàn tất";
 
   // Product
   static const String popularProducts = "Sản phẩm phổ biến";
-
 
   // Home
   static const String homeAppbarTitle = "Pine";

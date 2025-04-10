@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:pine/common/widgets/images/rounded_image.dart';
 import 'package:pine/common/widgets/loaders/animation_loader.dart';
 import 'package:pine/features/shop/controllers/product/order_controller.dart';
 import 'package:pine/features/shop/models/order_model.dart';
@@ -248,34 +249,18 @@ class POrderListItems extends StatelessWidget {
                       order.items.length,
                       (index) {
                         final item = order.items[index];
-                        return Container(
-                          padding: const EdgeInsets.all(PSizes.xs),
-                          margin: const EdgeInsets.only(right: PSizes.sm),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(PSizes.sm),
-                          ),
-                          width: 70,
-                          height: 70,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(PSizes.sm - 1),
-                            child: Image.network(
-                              item.image ?? '',
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                color: Colors.grey.shade200,
-                                alignment: Alignment.center,
-                                child: Icon(
-                                  Iconsax.image,
-                                  color: Colors.grey.shade500,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
+                        return Padding(
+                          padding: const EdgeInsets.only(right: PSizes.sm),
+                          child: PRoundedImage(
+                            imageUrl: item.image ?? '',
+                            width: 65,
+                            height: 65,
+                            isNetworkImage: true,
+                            padding: const EdgeInsets.all(PSizes.xs),
+                            backgroundColor:
+                                dark ? PColors.darkerGrey : PColors.light,
+                            fit: BoxFit.contain,
+                            onPressed: null, // Không thêm action khi nhấn
                           ),
                         );
                       },

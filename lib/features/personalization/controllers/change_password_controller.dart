@@ -63,8 +63,7 @@ class ChangePasswordController extends GetxController {
 
       // Xóa form và quay lại tương tự ProfileEditController
       clearForm();
-      Get.off(() =>
-          const ProfileScreen()); // Sử dụng Get.off thay vì Get.back để tránh stack trùng lặp
+      Navigator.of(Get.context!).pop();
     } catch (e) {
       // Đảm bảo đóng loading dialog nếu có lỗi
       PFullScreenLoader.stopLoading();

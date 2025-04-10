@@ -1,5 +1,4 @@
-
-class PaymentMethodModel{
+class PaymentMethodModel {
   String name;
   String image;
 

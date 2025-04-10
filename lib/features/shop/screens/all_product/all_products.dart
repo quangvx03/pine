@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/products/cart/cart_menu_icon.dart';
 import 'package:pine/common/widgets/shimmers/vertical_product_shimmer.dart';
+import 'package:pine/features/shop/controllers/product/product_controller.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/helpers/cloud_helper_functions.dart';
 
 import '../../../../common/widgets/products/sortable/sortable_products.dart';
-import '../../controllers/all_products_controller.dart';
 import '../../models/product_model.dart';
 
 class AllProductsScreen extends StatelessWidget {
@@ -21,7 +21,7 @@ class AllProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AllProductsController());
+    final controller = Get.put(ProductController());
 
     return Scaffold(
       appBar: PAppBar(

@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/appbar/appbar.dart';
-import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/validators/validation.dart';
-import 'package:pine/utils/popups/full_screen_loader.dart';
-import 'package:pine/utils/popups/loaders.dart';
-import 'package:pine/utils/constants/image_strings.dart';
 
 import '../../../controllers/change_password_controller.dart';
 
@@ -114,4 +110,3 @@ class ChangePasswordScreen extends StatelessWidget {
     );
   }
 }
-
