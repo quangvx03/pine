@@ -14,6 +14,9 @@ class OrderModel {
   final AddressModel? address;
   final DateTime? deliveryDate;
   final List<CartModel> items;
+  final String? couponId;
+  final String? couponCode;
+  final double discountAmount;
 
   OrderModel({
     required this.id,
@@ -25,6 +28,9 @@ class OrderModel {
     this.paymentMethod = 'Thanh toán khi nhận hàng',
     this.address,
     this.deliveryDate,
+    this.couponId,
+    this.couponCode,
+    this.discountAmount = 0,
   });
 
   String get formattedOrderDate => PHelperFunctions.getFormattedDate(orderDate);
@@ -49,7 +55,10 @@ class OrderModel {
       'paymentMethod': paymentMethod,
       'address': address?.toJson(),
       'deliveryDate': deliveryDate,
-      'items': items.map((item) => item.toJson()).toList()
+      'items': items.map((item) => item.toJson()).toList(),
+      'couponId': couponId,
+      'couponCode': couponCode,
+      'discountAmount': discountAmount,
     };
   }
 
@@ -91,6 +100,11 @@ class OrderModel {
                   CartModel.fromJson(itemData as Map<String, dynamic>))
               .toList() ??
           [],
+      couponId: data['couponId'] as String?,
+      couponCode: data['couponCode'] as String?,
+      discountAmount: (data['discountAmount'] is double)
+          ? data['discountAmount'] as double
+          : (data['discountAmount'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

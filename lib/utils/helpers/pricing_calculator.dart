@@ -1,10 +1,11 @@
 class PPricingCalculator {
-  /// calculate price based on tax and shipping
-  static double calculateTotalPrice(double productPrice, String location) {
+  static double calculateTotalPrice(double productPrice, String location,
+      {double discount = 0}) {
     double shippingCost = getShippingCost(location);
 
-    double totalPrice = productPrice + shippingCost;
-    return totalPrice;
+    double totalPrice = productPrice + shippingCost - discount;
+
+    return totalPrice > 0 ? totalPrice : 0;
   }
 
   /// calculate shipping cost

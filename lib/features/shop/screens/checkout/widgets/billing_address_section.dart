@@ -33,9 +33,6 @@ class PBillingAddressSection extends StatelessWidget {
 
         // Sử dụng Obx để phản ứng khi địa chỉ thay đổi
         Obx(() {
-          // // Kích hoạt việc refresh khi có thay đổi
-          // final refresh = addressController.refreshData.value;
-
           // Lấy địa chỉ đã chọn
           final selectedAddress = addressController.selectedAddress.value;
 

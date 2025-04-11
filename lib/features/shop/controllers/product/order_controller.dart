@@ -7,6 +7,7 @@ import 'package:pine/data/repositories/product_repository.dart';
 import 'package:pine/features/personalization/controllers/address_controller.dart';
 import 'package:pine/features/shop/controllers/product/cart_controller.dart';
 import 'package:pine/features/shop/controllers/product/checkout_controller.dart';
+import 'package:pine/features/shop/controllers/product/coupon_controller.dart';
 import 'package:pine/features/shop/models/cart_model.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/navigation_menu.dart';
@@ -25,6 +26,7 @@ class OrderController extends GetxController {
   final cartController = CartController.instance;
   final addressController = AddressController.instance;
   final checkoutController = CheckoutController.instance;
+  final couponController = CouponController.instance;
   final orderRepository = Get.put(OrderRepository());
   final productRepository = Get.put(ProductRepository());
 
@@ -90,7 +92,14 @@ class OrderController extends GetxController {
         return;
       }
 
+      // Thông tin mã giảm giá
+      final couponController = Get.find<CouponController>();
+      final coupon = couponController.selectedCoupon.value;
+      final subTotal = cartController.selectedItemsPrice.value;
+      final discountAmount = couponController.calculateDiscount(subTotal);
+
       // Tạo đơn hàng mới
+      final orderId = DateTime.now().millisecondsSinceEpoch.toString();
       final order = OrderModel(
         id: UniqueKey().toString(),
         userId: userId,
@@ -101,10 +110,18 @@ class OrderController extends GetxController {
         address: addressController.selectedAddress.value,
         deliveryDate: DateTime.now(),
         items: selectedItems,
+        couponId: coupon.id.isNotEmpty ? coupon.id : null,
+        couponCode: coupon.id.isNotEmpty ? coupon.couponCode : null,
+        discountAmount: discountAmount,
       );
 
       // Lưu đơn hàng vào Firestore
       await orderRepository.saveOrder(order, userId);
+
+      // Đánh dấu mã giảm giá đã được sử dụng
+      if (coupon.id.isNotEmpty) {
+        await couponController.markCouponAsUsed(orderId);
+      }
 
       // Xóa sản phẩm đã đặt khỏi giỏ hàng
       cartController.removeSelectedItems(showNotification: false);

@@ -4,6 +4,7 @@ import 'package:pine/common/widgets/appbar/appbar.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/products/cart/coupon_widget.dart';
 import 'package:pine/features/shop/controllers/product/cart_controller.dart';
+import 'package:pine/features/shop/controllers/product/coupon_controller.dart';
 import 'package:pine/features/shop/controllers/product/order_controller.dart';
 import 'package:pine/features/shop/screens/cart/widgets/cart_items.dart';
 import 'package:pine/features/shop/screens/checkout/widgets/billing_address_section.dart';
@@ -15,17 +16,27 @@ import 'package:pine/utils/helpers/helper_functions.dart';
 import 'package:pine/utils/helpers/pricing_calculator.dart';
 import 'package:pine/utils/popups/loaders.dart';
 
-class CheckoutScreen extends StatelessWidget {
+class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final cartController = CartController.instance;
-    // Sử dụng giá trị của sản phẩm đã chọn
-    final subTotal = cartController.selectedItemsPrice.value;
-    final orderController = Get.put(OrderController());
-    final totalAmount = PPricingCalculator.calculateTotalPrice(subTotal, 'VN');
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
 
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  final cartController = CartController.instance;
+  final orderController = Get.put(OrderController());
+  final couponController = Get.put(CouponController());
+
+  @override
+  void dispose() {
+    // Reset trạng thái mã giảm giá khi thoát khỏi màn hình checkout
+    couponController.resetCouponState();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final dark = PHelperFunctions.isDarkMode(context);
 
     return Scaffold(
@@ -81,18 +92,26 @@ class CheckoutScreen extends StatelessWidget {
         ),
       ),
 
-      /// Checkout Button
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(PSizes.defaultSpace),
-        child: ElevatedButton(
-            onPressed: cartController.getSelectedItems().isEmpty
-                ? () => PLoaders.warningSnackBar(
-                    title: 'Không có sản phẩm được chọn',
-                    message: 'Vui lòng chọn sản phẩm để thanh toán.')
-                : () => orderController.processOrder(totalAmount),
-            child: Text(
-                'Đặt hàng ${PHelperFunctions.formatCurrency(totalAmount)}')),
-      ),
+      /// Checkout Button - Sử dụng Obx để cập nhật tự động khi mã giảm giá thay đổi
+      bottomNavigationBar: Obx(() {
+        final subTotal = cartController.selectedItemsPrice.value;
+        final discountAmount = couponController.calculateDiscount(subTotal);
+        final totalAmount = PPricingCalculator.calculateTotalPrice(
+            subTotal, 'VN',
+            discount: discountAmount);
+
+        return Padding(
+          padding: const EdgeInsets.all(PSizes.defaultSpace),
+          child: ElevatedButton(
+              onPressed: cartController.getSelectedItems().isEmpty
+                  ? () => PLoaders.warningSnackBar(
+                      title: 'Không có sản phẩm được chọn',
+                      message: 'Vui lòng chọn sản phẩm để thanh toán.')
+                  : () => orderController.processOrder(totalAmount),
+              child: Text(
+                  'Đặt hàng ${PHelperFunctions.formatCurrency(totalAmount)}')),
+        );
+      }),
     );
   }
 }

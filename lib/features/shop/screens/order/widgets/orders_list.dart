@@ -6,7 +6,7 @@ import 'package:pine/common/widgets/images/rounded_image.dart';
 import 'package:pine/common/widgets/loaders/animation_loader.dart';
 import 'package:pine/features/shop/controllers/product/order_controller.dart';
 import 'package:pine/features/shop/models/order_model.dart';
-import 'package:pine/features/shop/screens/order/widgets/order_details.dart';
+import 'package:pine/features/shop/screens/order_details/order_details.dart';
 import 'package:pine/navigation_menu.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/enums.dart';
