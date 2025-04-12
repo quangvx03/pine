@@ -38,8 +38,8 @@ class SettingsScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(PSizes.defaultSpace),
                   child: Column(
                     children: [
-                      // Phần tài khoản
-                      _buildSettingsGroup(context, "Tài khoản", [
+                      // Phần cá nhân
+                      _buildSettingsGroup(context, "Cá nhân", [
                         _buildSettingItem(
                           context,
                           icon: Iconsax.user_edit,
@@ -97,7 +97,7 @@ class SettingsScreen extends StatelessWidget {
                           iconColor: Colors.purple,
                           title: "Mã giảm giá",
                           subtitle: "Danh sách mã giảm giá hiện có",
-                          onTap: () {},
+                          onTap: () => Get.toNamed(PRoutes.coupon),
                         ),
                       ]),
 

@@ -18,10 +18,8 @@ import 'package:pine/utils/local_storage/storage_utility.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();
-
   final deviceStorage = GetStorage();
   final _auth = FirebaseAuth.instance;
-
   User get authUser => _auth.currentUser!;
 
   @override
@@ -35,16 +33,13 @@ class AuthenticationRepository extends GetxController {
 
     if (user != null) {
       if (user.emailVerified) {
-
         await PLocalStorage.init(user.uid);
-
         Get.offAll(() => const NavigationMenu());
       } else {
         Get.offAll(() => VerifyEmailScreen(email: _auth.currentUser?.email));
       }
     } else {
       deviceStorage.writeIfNull('IsFirstTime', true);
-
       deviceStorage.read('IsFirstTime') != true
           ? Get.offAll(() => const LoginScreen())
           : Get.offAll(const OnBoardingScreen());

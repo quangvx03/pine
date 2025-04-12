@@ -47,7 +47,6 @@ class PPromoSlider extends StatelessWidget {
                             child: PRoundedImage(
                               imageUrl: banner.imageUrl,
                               isNetworkImage: true,
-                              // Sửa lỗi chuyển hướng bằng cách thay thế toNamed với cách mới
                               onPressed: () {
                                 if (banner.targetScreen == '/home') {
                                   final navController =

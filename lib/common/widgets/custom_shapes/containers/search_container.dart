@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pine/features/shop/screens/search/search.dart';
+import 'package:pine/navigation_menu.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/sizes.dart';
 import 'package:pine/utils/device/device_utility.dart';
@@ -31,7 +32,11 @@ class PSearchContainer extends StatelessWidget {
     final dark = PHelperFunctions.isDarkMode(context);
 
     return GestureDetector(
-      onTap: onTap ?? () => Get.to(() => const SearchScreen()),
+      onTap: onTap ??
+          () {
+            final navController = Get.find<NavigationController>();
+            navController.navigateToTab(2);
+          },
       child: Padding(
         padding: padding,
         child: Container(
@@ -42,8 +47,8 @@ class PSearchContainer extends StatelessWidget {
           decoration: BoxDecoration(
               color: showBackground
                   ? dark
-                  ? PColors.dark
-                  : PColors.white
+                      ? PColors.dark
+                      : PColors.white
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
               border: showBorder ? Border.all(color: PColors.grey) : null),

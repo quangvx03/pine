@@ -5,6 +5,7 @@ import 'package:pine/features/authentication/screens/password_configuration/forg
 import 'package:pine/features/authentication/screens/signup/signup.dart';
 import 'package:pine/features/authentication/screens/signup/verify_email.dart';
 import 'package:pine/features/personalization/screens/address/address.dart';
+import 'package:pine/features/personalization/screens/coupon/coupons.dart';
 import 'package:pine/features/personalization/screens/profile/profile.dart';
 import 'package:pine/features/shop/screens/cart/cart.dart';
 import 'package:pine/features/shop/screens/checkout/checkout.dart';
@@ -55,5 +56,6 @@ class AppRoutes {
     GetPage(
         name: PRoutes.forgotPassword, page: () => const ForgotPasswordScreen()),
     GetPage(name: PRoutes.onBoarding, page: () => const OnBoardingScreen()),
+    GetPage(name: PRoutes.coupon, page: () => const UserCouponsScreen()),
   ];
 }

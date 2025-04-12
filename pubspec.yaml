@@ -49,6 +49,11 @@ dependencies:
   cached_network_image: ^3.4.1
 
   # payment
+  webview_flutter: ^4.0.0 # Hoặc phiên bản mới nhất
+  webview_flutter_android: ^3.0.0 # Hoặc phiên bản mới nhất
+  webview_flutter_wkwebview: ^3.0.0 # Hoặc phiên bản mới nhất
+  network_info_plus: ^4.0.0 # Hoặc phiên bản mới nhất
+  crypto: ^3.0.0 # Hoặc phiên bản mới nhất
 
 #--------------- PACKAGES END ---------------
 
