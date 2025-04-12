@@ -45,7 +45,6 @@ class OrderController extends GetxController {
 
   void processOrder(double totalAmount) async {
     try {
-      // 1. Kiểm tra kết nối mạng (giữ nguyên)
       final isConnected = await NetworkManager.instance.isConnected();
       if (!isConnected) {
         PLoaders.warningSnackBar(
@@ -54,7 +53,6 @@ class OrderController extends GetxController {
         return;
       }
 
-      // 2. Lấy sản phẩm đã chọn từ CartController (giữ nguyên)
       final selectedItems = cartController.getSelectedItems();
       if (selectedItems.isEmpty) {
         PLoaders.warningSnackBar(
@@ -63,42 +61,34 @@ class OrderController extends GetxController {
         return;
       }
 
-      // 3. Kiểm tra địa chỉ (giữ nguyên)
       if (addressController.selectedAddress.value.id.isEmpty) {
         PLoaders.warningSnackBar(
             title: 'Chưa chọn địa chỉ',
             message: 'Vui lòng thêm địa chỉ giao hàng.');
         return;
       }
-
-      // 4. Lấy User ID (giữ nguyên)
-      // Sửa lại cách lấy userId từ authUser?
       final userId = AuthenticationRepository.instance.authUser?.uid;
       if (userId == null || userId.isEmpty) {
-        PFullScreenLoader.stopLoading(); // Dừng loading nếu có lỗi userId
+        PFullScreenLoader.stopLoading();
         PLoaders.warningSnackBar(
             title: 'Lỗi xác thực', message: 'Vui lòng đăng nhập để tiếp tục');
         return;
       }
 
-      // 5. Lấy phương thức thanh toán
       final paymentMethod = checkoutController.selectedPaymentMethod.value.name;
 
-      // 6. XỬ LÝ THEO PHƯƠNG THỨC THANH TOÁN
       if (paymentMethod == 'VNPAY') {
         // ================= XỬ LÝ VNPAY =================
         PFullScreenLoader.openLoadingDiaLog(
             'Đang tạo yêu cầu VNPAY...', PImages.verify);
 
-        // Tạo mã đơn hàng duy nhất cho VNPAY (vnp_TxnRef)
         final vnpayTxnRef = '${DateTime.now().millisecondsSinceEpoch}_$userId';
         final orderInfo = 'Thanh toan don hang $vnpayTxnRef';
 
-        // Lấy địa chỉ IP
         String? ipAddress = '127.0.0.1';
         try {
           ipAddress = await NetworkInfo().getWifiIP();
-          ipAddress ??= '127.0.0.1'; // Gán mặc định nếu null
+          ipAddress ??= '127.0.0.1';
         } catch (e) {
           print("Lỗi khi lấy địa chỉ IP: $e. Sử dụng IP mặc định.");
           ipAddress = '127.0.0.1';
@@ -114,24 +104,19 @@ class OrderController extends GetxController {
 
         PFullScreenLoader.stopLoading();
 
-        // Chuyển đến màn hình WebView và chờ kết quả
         final result = await Get.to<Map<String, String>?>(
             () => VnpayWebViewScreen(paymentUrl: paymentUrl));
 
-        // Xử lý kết quả từ WebView
         if (result != null) {
-          // Nếu có kết quả, gọi hàm xử lý return của VNPAY
-          // Truyền vnpayTxnRef để đối chiếu nếu cần
           await handleVnpayReturn(result, totalAmount, vnpayTxnRef);
         } else {
-          // Nếu kết quả là null, người dùng đã hủy
           PLoaders.warningSnackBar(
               title: 'Đã hủy',
               message: 'Quá trình thanh toán VNPAY đã bị hủy.');
         }
         // ================= KẾT THÚC XỬ LÝ VNPAY =================
       } else {
-        // ================= XỬ LÝ CÁC PHƯƠNG THỨC KHÁC (ví dụ: COD) =================
+        // ================= XỬ LÝ CÁC PHƯƠNG THỨC COD =================
         PFullScreenLoader.openLoadingDiaLog(
             'Đang xử lý đơn hàng...', PImages.verify);
 
@@ -144,17 +129,12 @@ class OrderController extends GetxController {
           return;
         }
 
-        // 8. Tính toán giảm giá (nếu có)
-        // final couponController = Get.find<CouponController>(); // Đã có ở trên
         final coupon = couponController.selectedCoupon.value;
         final subTotal = cartController.selectedItemsPrice.value;
         final discountAmount = couponController.calculateDiscount(subTotal);
 
-        // 9. Tạo ID đơn hàng duy nhất cho Firestore
-        final finalOrderId =
-            UniqueKey().toString(); // Sử dụng UniqueKey từ material.dart
+        final finalOrderId = UniqueKey().toString();
 
-        // 10. Tạo đối tượng OrderModel cho COD (sử dụng các trường hiện có)
         final order = OrderModel(
           id: finalOrderId,
           userId: userId,
@@ -202,7 +182,6 @@ class OrderController extends GetxController {
       PFullScreenLoader.openLoadingDiaLog(
           'Đang xác nhận thanh toán VNPAY...', PImages.verify);
 
-      // 1. Xác thực chữ ký
       final paramsToValidate = Map<String, String>.from(returnParams);
       final isValidSignature = VNPAYHelper.validateReturnData(paramsToValidate);
       if (!isValidSignature) {
@@ -212,16 +191,13 @@ class OrderController extends GetxController {
         return;
       }
 
-      // 2. Lấy thông tin từ VNPAY
       final responseCode = returnParams['vnp_ResponseCode'];
-      final transactionNo = returnParams['vnp_TransactionNo'] ??
-          'N/A'; // Có thể ghi log mã này nếu cần
+      final transactionNo = returnParams['vnp_TransactionNo'] ?? 'N/A';
       final bankCode = returnParams['vnp_BankCode'] ?? '';
       final payDate = returnParams['vnp_PayDate'] ?? '';
       final orderInfo = returnParams['vnp_OrderInfo'] ?? '';
       final returnedTxnRef = returnParams['vnp_TxnRef'] ?? '';
 
-      // 3. Kiểm tra mã tham chiếu
       if (returnedTxnRef != vnpayTxnRef) {
         PFullScreenLoader.stopLoading();
         PLoaders.errorSnackBar(
@@ -230,13 +206,10 @@ class OrderController extends GetxController {
         return;
       }
 
-      // 4. Kiểm tra mã phản hồi
       if (responseCode == '00') {
-        // --- THANH TOÁN THÀNH CÔNG ---
         PLoaders.successSnackBar(
             title: 'Thành công', message: 'Thanh toán VNPAY thành công!');
 
-        // 5. Kiểm tra và cập nhật tồn kho LẠI
         final selectedItems = cartController.getSelectedItems();
         final stockCheckResult = await _checkAndUpdateStock(selectedItems);
         if (!stockCheckResult.success) {
@@ -245,61 +218,49 @@ class OrderController extends GetxController {
               title: 'Lỗi sau thanh toán',
               message:
                   "${stockCheckResult.message}. Đã thanh toán nhưng không thể cập nhật kho. Liên hệ hỗ trợ.");
-          // Xử lý hoàn tiền / thông báo admin ở đây
           return;
         }
 
-        // 6. Lấy User ID
         final userId = AuthenticationRepository.instance.authUser?.uid;
         if (userId == null || userId.isEmpty) {
           PFullScreenLoader.stopLoading();
           PLoaders.errorSnackBar(
               title: 'Lỗi người dùng',
               message: 'Không tìm thấy người dùng sau khi thanh toán.');
-          // Xử lý hoàn tiền / thông báo admin
           return;
         }
 
-        // 7. Tính toán giảm giá
         final coupon = couponController.selectedCoupon.value;
         final subTotal = cartController.selectedItemsPrice.value;
         final discountAmount = couponController.calculateDiscount(subTotal);
 
-        // 8. Tạo ID đơn hàng Firestore
         final finalOrderId = UniqueKey().toString();
 
-        // 9. Tạo OrderModel cho VNPAY thành công (chỉ dùng các trường hiện có)
         final order = OrderModel(
           id: finalOrderId,
           userId: userId,
-          status: OrderStatus.processing, // Đã thanh toán, chờ xử lý
+          status: OrderStatus.processing,
           totalAmount: totalAmount,
           orderDate: DateTime.now(),
-          paymentMethod: 'VNPAY', // Lưu phương thức là VNPAY
+          paymentMethod: 'VNPAY',
           address: addressController.selectedAddress.value,
-          deliveryDate: null, // Chưa giao
+          deliveryDate: null,
           items: selectedItems,
           couponId: coupon.id.isNotEmpty ? coupon.id : null,
           couponCode: coupon.id.isNotEmpty ? coupon.couponCode : null,
           discountAmount: discountAmount,
-          // Không thêm transactionId và paymentInfo vào model
         );
 
-        // 10. Lưu đơn hàng
         await orderRepository.saveOrder(order, userId);
-        // Ghi log thông tin VNPAY nếu cần thiết (không lưu vào model)
         print(
             'VNPAY Success: OrderID=$finalOrderId, TxnRef=$vnpayTxnRef, VNPAYTxnNo=$transactionNo, Bank=$bankCode, PayDate=$payDate');
 
-        // 11. Đánh dấu coupon đã dùng
         if (coupon.id.isNotEmpty) {
           await couponController.markCouponAsUsed(finalOrderId);
         }
 
-        // 12. Xóa giỏ hàng
         cartController.removeSelectedItems(showNotification: false);
 
-        // 13. Chuyển màn hình thành công
         PFullScreenLoader.stopLoading();
         Get.off(() => SuccessScreen(
               image: PImages.success,
@@ -322,10 +283,8 @@ class OrderController extends GetxController {
     }
   }
 
-  // --- THÊM HÀM MỚI: getVnpayErrorMessage ---
   /// Trả về thông báo lỗi dựa trên mã phản hồi của VNPAY
   String getVnpayErrorMessage(String? responseCode) {
-    // Tham khảo: https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/
     switch (responseCode) {
       case '01':
         return 'Giao dịch đã tồn tại';

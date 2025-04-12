@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pine/features/personalization/controllers/user_controller.dart';
-import 'package:pine/features/personalization/screens/profile/profile.dart';
 import 'package:pine/utils/constants/image_strings.dart';
 import 'package:pine/utils/popups/full_screen_loader.dart';
 import 'package:pine/utils/popups/loaders.dart';

@@ -188,6 +188,11 @@ class ReviewController extends GetxController {
   final RxString sortOption = 'newest'.obs;
   final RxInt selectedStarFilter = 0.obs;
 
+  void resetFilters() {
+    selectedStarFilter.value = 0;
+    sortOption.value = 'newest';
+  }
+
 // Phương thức lọc đánh giá theo số sao
   void filterByStar(int star) {
     selectedStarFilter.value = star;

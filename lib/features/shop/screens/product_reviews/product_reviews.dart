@@ -11,14 +11,36 @@ import 'package:pine/common/widgets/products/ratings/ratings_indicator.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/helpers/helper_functions.dart';
 
-class ProductReviewsScreen extends StatelessWidget {
+// Chuyển từ StatelessWidget sang StatefulWidget
+class ProductReviewsScreen extends StatefulWidget {
   const ProductReviewsScreen({super.key, required this.productId});
 
   final String productId;
 
   @override
+  State<ProductReviewsScreen> createState() => _ProductReviewsScreenState();
+}
+
+class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
+  // Khai báo controller ở cấp độ State
+  late final ReviewController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Lấy instance của controller
+    controller = Get.find<ReviewController>();
+  }
+
+  @override
+  void dispose() {
+    // Đặt lại bộ lọc khi thoát khỏi màn hình
+    controller.resetFilters();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ReviewController());
     final dark = PHelperFunctions.isDarkMode(context);
 
     return Scaffold(
@@ -51,12 +73,12 @@ class ProductReviewsScreen extends StatelessWidget {
                 ],
               ),
               child: FutureBuilder<double>(
-                future: controller.getAverageRating(productId),
+                future: controller.getAverageRating(widget.productId),
                 builder: (context, ratingSnapshot) {
                   final rating = ratingSnapshot.data ?? 0.0;
 
                   return FutureBuilder<int>(
-                    future: controller.getReviewCount(productId),
+                    future: controller.getReviewCount(widget.productId),
                     builder: (context, countSnapshot) {
                       final count = countSnapshot.data ?? 0;
 
@@ -166,7 +188,7 @@ class ProductReviewsScreen extends StatelessWidget {
                                       padding: const EdgeInsets.only(
                                           left: PSizes.sm),
                                       child: POverallProductRating(
-                                        productId: productId,
+                                        productId: widget.productId,
                                         averageRating: rating,
                                       ),
                                     ),
@@ -260,7 +282,7 @@ class ProductReviewsScreen extends StatelessWidget {
                   // Phần lọc theo sao - đặt xuống dòng mới
                   const SizedBox(height: PSizes.spaceBtwItems),
                   FutureBuilder<Map<int, int>>(
-                    future: controller.getStarCounts(productId),
+                    future: controller.getStarCounts(widget.productId),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) return const SizedBox.shrink();
 
@@ -289,7 +311,8 @@ class ProductReviewsScreen extends StatelessWidget {
                               // Các nút lọc theo sao từ cao đến thấp
                               for (int star = 5; star >= 1; star--)
                                 Padding(
-                                  padding: EdgeInsets.only(left: PSizes.sm),
+                                  padding:
+                                      const EdgeInsets.only(left: PSizes.sm),
                                   child: _buildStarFilterChip(
                                     context: context,
                                     starCount: star,
@@ -315,7 +338,7 @@ class ProductReviewsScreen extends StatelessWidget {
 
               return FutureBuilder<List<ReviewModel>>(
                 // Sử dụng phương thức getSortedProductReviews để lấy đánh giá đã sắp xếp
-                future: controller.getSortedProductReviews(productId),
+                future: controller.getSortedProductReviews(widget.productId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
