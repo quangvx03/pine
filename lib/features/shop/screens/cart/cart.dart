@@ -34,10 +34,9 @@ class CartScreen extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () {
-                Get.to(() => AllProductsScreen(
+                Get.to(() => const AllProductsScreen(
                       title: 'Tất cả sản phẩm',
-                      futureMethod:
-                          productController.productRepository.getAllProducts(),
+                      showBackArrow: true,
                     ));
               },
               icon: const Icon(
@@ -97,10 +96,9 @@ class CartScreen extends StatelessWidget {
                 animation: PImages.empty,
                 showAction: true,
                 actionText: 'Khám phá ngay',
-                onActionPressed: () => Get.to(() => AllProductsScreen(
+                onActionPressed: () => Get.to(() => const AllProductsScreen(
                       title: 'Tất cả sản phẩm',
-                      futureMethod:
-                          productController.productRepository.getAllProducts(),
+                      showBackArrow: true,
                     ))),
           ),
         );

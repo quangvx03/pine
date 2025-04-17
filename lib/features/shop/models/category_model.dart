@@ -6,7 +6,7 @@ class CategoryModel {
   String image;
   String parentId;
   bool isFeatured;
-  String banner;
+  // String banner;
 
   CategoryModel({
     required this.id,
@@ -14,7 +14,7 @@ class CategoryModel {
     required this.image,
     required this.isFeatured,
     this.parentId = '',
-    this.banner = '',
+    // this.banner = '',
   });
 
   static CategoryModel empty() =>
@@ -26,7 +26,7 @@ class CategoryModel {
       'Image': image,
       'ParentId': parentId,
       'IsFeatured': isFeatured,
-      'Banner': banner,
+      // 'Banner': banner,
     };
   }
 
@@ -41,7 +41,7 @@ class CategoryModel {
         image: data['Image'] ?? '',
         parentId: data['ParentId'] ?? '',
         isFeatured: data['IsFeatured'] ?? false,
-        banner: data['Banner'] ?? '',
+        // banner: data['Banner'] ?? '',
       );
     } else {
       return CategoryModel.empty();

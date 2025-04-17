@@ -50,10 +50,10 @@ class PCategoryTab extends StatelessWidget {
                       children: [
                         PSectionHeading(
                             title: 'Gợi ý cho bạn',
-                            onPressed: () => Get.to(AllProductsScreen(
+                            onPressed: () => Get.to(() => AllProductsScreen(
                                   title: category.name,
-                                  futureMethod: controller.getCategoryProducts(
-                                      categoryId: category.id, limit: -1),
+                                  showBackArrow: true,
+                                  categoryId: category.id,
                                 ))),
                         const SizedBox(height: PSizes.spaceBtwItems),
                         PGridLayout(

@@ -86,10 +86,9 @@ class HomeScreen extends StatelessWidget {
                     /// Heading
                     PSectionHeading(
                         title: 'Sản phẩm phổ biến',
-                        onPressed: () => Get.to(() => AllProductsScreen(
-                              title: 'Sản phẩm',
-                              futureMethod:
-                                  controller.fetchAllFeaturedProducts(),
+                        onPressed: () => Get.to(() => const AllProductsScreen(
+                              title: 'Tất cả sản phẩm',
+                              showBackArrow: true,
                             ))),
                     const SizedBox(height: PSizes.spaceBtwItems),
 
@@ -99,15 +98,15 @@ class HomeScreen extends StatelessWidget {
                         return const PVerticalProductShimmer();
                       }
 
-                      if (controller.featuredProducts.isEmpty) {
+                      if (controller.suggestProducts.isEmpty) {
                         return Center(
                             child: Text('Không có dữ liệu!',
                                 style: Theme.of(context).textTheme.bodyMedium));
                       }
                       return PGridLayout(
-                          itemCount: controller.featuredProducts.length,
+                          itemCount: controller.suggestProducts.length,
                           itemBuilder: (_, index) => PProductCardVertical(
-                              product: controller.featuredProducts[index]));
+                              product: controller.suggestProducts[index]));
                     }),
                     const SizedBox(height: PSizes.spaceBtwSections),
                   ],

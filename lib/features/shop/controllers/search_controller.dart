@@ -18,7 +18,6 @@ class ProductSearchController extends GetxController {
 
   // Variables
   final RxList<ProductModel> searchResults = <ProductModel>[].obs;
-  final RxList<ProductModel> featuredProducts = <ProductModel>[].obs;
   final RxList<String> recentSearches = <String>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool showFilter = false.obs;

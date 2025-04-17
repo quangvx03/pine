@@ -19,9 +19,6 @@ class SubCategoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = CategoryController.instance;
-    final hasBanner = category.banner.isNotEmpty;
-    final defaultBanner =
-        'https://firebasestorage.googleapis.com/v0/b/pine-cadf8.firebasestorage.app/o/Banners%2Fpromo-banner-2.png?alt=media&token=091877c5-391a-4f98-a7ee-76d20555895e';
     return Scaffold(
       appBar: PAppBar(title: Text(category.name), showBackArrow: true),
       body: SingleChildScrollView(
@@ -29,12 +26,11 @@ class SubCategoriesScreen extends StatelessWidget {
           padding: const EdgeInsets.all(PSizes.defaultSpace),
           child: Column(
             children: [
-              /// Banner
               PRoundedImage(
                   width: double.infinity,
                   height: 100,
-                  imageUrl: hasBanner ? category.banner : defaultBanner,
-                  fit: BoxFit.cover,
+                  imageUrl: category.image,
+                  fit: BoxFit.contain,
                   applyImageRadius: true,
                   isNetworkImage: true),
               const SizedBox(height: PSizes.spaceBtwSections),
@@ -80,10 +76,8 @@ class SubCategoriesScreen extends StatelessWidget {
                                   onPressed: () =>
                                       Get.to(() => AllProductsScreen(
                                             title: subCategory.name,
-                                            futureMethod:
-                                                controller.getCategoryProducts(
-                                                    categoryId: subCategory.id,
-                                                    limit: -1),
+                                            showBackArrow: true,
+                                            categoryId: subCategory.id,
                                           )),
                                 ),
                                 const SizedBox(

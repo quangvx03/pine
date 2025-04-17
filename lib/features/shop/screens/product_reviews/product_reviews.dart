@@ -34,7 +34,6 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
 
   @override
   void dispose() {
-    // Đặt lại bộ lọc khi thoát khỏi màn hình
     controller.resetFilters();
     super.dispose();
   }

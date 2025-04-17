@@ -119,8 +119,8 @@ class AllCategoriesScreen extends StatelessWidget {
                         parentName: parentCategory?.name,
                         onTap: () => Get.to(() => AllProductsScreen(
                               title: subCategory.name,
-                              futureMethod: controller.getCategoryProducts(
-                                  categoryId: subCategory.id, limit: -1),
+                              showBackArrow: true,
+                              categoryId: subCategory.id,
                             )),
                       );
                     },
