@@ -9,7 +9,6 @@ class PImages {
   static const String facebook = "assets/logos/facebook-icon.png";
   static const String vnpay = "assets/logos/vnpay.png";
   static const String googlePay = "assets/logos/googlepay.png";
-  static const String stripe = "assets/logos/stripe.png";
 
   // OnBoarding Images
   static const String onBoardingImage1 =

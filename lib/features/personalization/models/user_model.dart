@@ -11,9 +11,6 @@ class UserModel {
   String profilePicture;
   String gender;
   String dateOfBirth;
-  // Role role;
-  // List<OrderModel>? orders;
-  // List<AddressModel> addresses;
 
   UserModel({
     required this.id,

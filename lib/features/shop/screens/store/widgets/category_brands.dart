@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pine/common/widgets/brands/brand_show_case.dart';
 import 'package:pine/features/shop/controllers/brand_controller.dart';
 import 'package:pine/features/shop/models/category_model.dart';
@@ -15,11 +16,12 @@ class CategoryBrands extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = BrandController.getInstance("all_brands");
+    final controller =
+        BrandController.getInstance("category_brands_${category.id}");
+
     return FutureBuilder(
-      future: controller.getBrandsForCategory(category.id),
+      future: controller.getTopSellingBrandsForCategory(category.id, limit: 2),
       builder: (context, snapshot) {
-        /// Handle Loader, No Record or Error Message
         const loader = Column(
           children: [
             PListTileShimmer(),
@@ -35,6 +37,10 @@ class CategoryBrands extends StatelessWidget {
 
         /// Record Found
         final brands = snapshot.data!;
+
+        if (brands.isEmpty) {
+          return const SizedBox();
+        }
 
         return ListView.builder(
           shrinkWrap: true,

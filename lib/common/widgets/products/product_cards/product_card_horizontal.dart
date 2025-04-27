@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:pine/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:pine/common/widgets/images/rounded_image.dart';
 import 'package:pine/common/widgets/products/cart/add_to_cart_button.dart';
@@ -93,7 +92,8 @@ class PProductCardHorizontal extends StatelessWidget {
                   /// Sale Tag
                   if (salePercentage != null)
                     Positioned(
-                      top: 0,
+                      bottom: 0,
+                      left: 0,
                       child: PRoundedContainer(
                         radius: PSizes.sm,
                         backgroundColor:
@@ -104,7 +104,7 @@ class PProductCardHorizontal extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .labelLarge!
-                                .apply(color: PColors.black)),
+                                .copyWith(color: PColors.black, fontSize: 10)),
                       ),
                     ),
 
@@ -135,7 +135,11 @@ class PProductCardHorizontal extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               PProductTitleText(
-                                  title: product.title, smallSize: true),
+                                title: product.title,
+                                smallSize: true,
+                                showRating: true,
+                                productId: product.id,
+                              ),
                               SizedBox(height: PSizes.spaceBtwItems / 2),
                               PBrandTitleWithVerifiedIcon(
                                   title: product.brand!.name),

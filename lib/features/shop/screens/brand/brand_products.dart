@@ -234,8 +234,8 @@ class _BrandProductsState extends State<BrandProducts> {
                     isLoading: brandController.isLoadingMore.value,
                     isLastPage: brandController.isLastPage.value,
                     currentSortOption: brandController.selectedSortOption.value,
-                    onSort: (String sortOption) {
-                      brandController.sortProducts(sortOption);
+                    onSort: (String sortOption) async {
+                      await brandController.sortProducts(sortOption);
                     },
                   ),
                 ],

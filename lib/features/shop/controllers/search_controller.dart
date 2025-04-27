@@ -5,50 +5,88 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/repositories/brand_repository.dart';
 import '../../../data/repositories/category_repository.dart';
 import '../../../data/repositories/product_repository.dart';
+import '../../../data/repositories/review_repository.dart';
 import '../models/product_model.dart';
 
 class ProductSearchController extends GetxController {
   static ProductSearchController get instance => Get.find();
 
   // Repositories
-  final _productRepository = ProductRepository.instance;
+  late final ProductRepository _productRepository;
+  late final ReviewRepository _reviewRepository;
+
+  // Constructor
+  ProductSearchController() {
+    _initializeRepositories();
+  }
 
   // Controllers
   final searchTextController = TextEditingController();
 
-  // Variables
+  // Search state
   final RxList<ProductModel> searchResults = <ProductModel>[].obs;
+  final RxList<ProductModel> originalResults = <ProductModel>[].obs;
   final RxList<String> recentSearches = <String>[].obs;
   final RxBool isLoading = false.obs;
+  final RxBool isLoadingSuggestions = false.obs;
   final RxBool showFilter = false.obs;
 
-  // Filter variables
+  // Filter state
   final RxString selectedCategory = 'Tất cả'.obs;
   final RxString selectedBrand = 'Tất cả'.obs;
+  final RxString selectedCategoryImage = ''.obs;
+  final RxString selectedBrandImage = ''.obs;
   final RxDouble minPrice = 0.0.obs;
-  final RxDouble maxPrice = 10000000.0.obs;
-  final RxInt selectedSort = 0.obs;
+  final RxDouble maxPrice = 5000000.0.obs;
 
-  // Lists for filters
-  final RxList<String> categories = <String>['Tất cả'].obs;
-  final RxList<String> brands = <String>['Tất cả'].obs;
+  // Sorting state
+  final RxInt selectedSort = 0.obs;
   final sortOptions = [
-    'Phổ biến nhất',
+    'Mặc định',
     'Giá thấp đến cao',
     'Giá cao đến thấp',
+    'Bán chạy nhất',
     'Đánh giá cao nhất',
-    'Mới nhất'
+    'Giảm giá cao nhất',
   ].obs;
 
-  // Popular searches
-  final popularSearches = [
-    'Sữa',
-    'Nước giải khát',
-    'Mì gói',
-    'Dầu gội',
-    'Bánh kẹo',
-    'Giấy vệ sinh'
-  ].obs;
+  // Auto-suggestion state
+  final RxList<String> autoSuggestions = <String>[].obs;
+  final RxList<String> allProductTitles = <String>[].obs;
+  final RxList<String> allCategoryNames = <String>[].obs;
+
+  // Filter lists
+  final RxList<String> categories = <String>['Tất cả'].obs;
+  final RxList<String> brands = <String>['Tất cả'].obs;
+
+  // Lookup maps
+  final Map<String, String> categoryNameToIdMap = <String, String>{};
+  final Map<String, String> categoryIdToNameMap = <String, String>{};
+
+  // Cache
+  final Map<String, double> _ratingsCache = <String, double>{};
+
+  //-----------------------------------------------------------------------------------
+  // LIFECYCLE METHODS
+  //-----------------------------------------------------------------------------------
+
+  void _initializeRepositories() {
+    if (!Get.isRegistered<ProductRepository>()) {
+      Get.put(ProductRepository(), permanent: true);
+    }
+    if (!Get.isRegistered<ReviewRepository>()) {
+      Get.put(ReviewRepository(), permanent: true);
+    }
+    if (!Get.isRegistered<CategoryRepository>()) {
+      Get.put(CategoryRepository(), permanent: true);
+    }
+    if (!Get.isRegistered<BrandRepository>()) {
+      Get.put(BrandRepository(), permanent: true);
+    }
+
+    _productRepository = Get.find<ProductRepository>();
+    _reviewRepository = Get.find<ReviewRepository>();
+  }
 
   @override
   void onInit() {
@@ -56,312 +94,566 @@ class ProductSearchController extends GetxController {
     loadCategories();
     loadBrands();
     loadRecentSearches();
+    loadProductTitles();
+    searchTextController.addListener(_onSearchTextChanged);
   }
 
-  // Load categories for filter
-  void loadCategories() async {
+  @override
+  void onClose() {
+    if (searchTextController.hasListeners) {
+      searchTextController.removeListener(_onSearchTextChanged);
+    }
+    super.onClose();
+  }
+
+  //-----------------------------------------------------------------------------------
+  // SEARCH METHODS
+  //-----------------------------------------------------------------------------------
+
+  void clearResults() {
+    searchResults.clear();
+    originalResults.clear();
+    autoSuggestions.clear();
+    isLoading.value = false;
+    isLoadingSuggestions.value = false;
+  }
+
+// Phương thức lấy nhanh đánh giá từ cache
+  void preloadRatingsCache(List<ProductModel> products) async {
+    if (products.isEmpty) return;
+
     try {
-      final categoryRepo = Get.find<CategoryRepository>();
-      final cats = await categoryRepo.getAllCategories();
-      categories.value = ['Tất cả', ...cats.map((cat) => cat.name)];
+      // Lấy danh sách ID sản phẩm chưa có trong cache
+      final idsToFetch = products
+          .map((p) => p.id)
+          .where((id) => !_ratingsCache.containsKey(id))
+          .toList();
+
+      if (idsToFetch.isEmpty) return;
+
+      // Lấy đánh giá cho các ID chưa có trong cache
+      final newRatings =
+          await _productRepository.getProductsAverageRatings(idsToFetch);
+
+      // Cập nhật cache
+      _ratingsCache.addAll(newRatings);
     } catch (e) {
-      debugPrint('Không thể tải danh mục: $e');
+      debugPrint('Lỗi khi tải trước đánh giá: $e');
     }
   }
 
-  // Load brands for filter
+// Sửa lại phương thức searchProducts để preload ratings
+  void searchProducts() async {
+    final query = searchTextController.text.trim();
+
+    if (query.isEmpty) {
+      clearResults();
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      autoSuggestions.clear();
+
+      final results = await _productRepository.searchProducts(query);
+      originalResults.assignAll([...results]);
+
+      // Tải trước đánh giá để có thể sử dụng sau này
+      preloadRatingsCache(results);
+
+      final filtered = applyFilters(results);
+      final sortedResults = await applySorting(filtered);
+      searchResults.assignAll(sortedResults);
+
+      saveRecentSearch(query);
+    } catch (e) {
+      // Xử lý lỗi
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _onSearchTextChanged() {
+    final query = searchTextController.text.trim();
+
+    if (query.length < 2 || searchResults.isNotEmpty) {
+      autoSuggestions.clear();
+      return;
+    }
+
+    if (!isLoading.value) {
+      _generateSuggestions(query);
+    }
+  }
+
+  void _generateSuggestions(String query) async {
+    isLoadingSuggestions.value = true;
+
+    try {
+      final lowercaseQuery = query.toLowerCase();
+      final List<String> suggestions = [];
+
+      _addProductTitleSuggestions(lowercaseQuery, suggestions);
+      _addRecentSearchSuggestions(lowercaseQuery, suggestions);
+      _sortSuggestionsByRelevance(lowercaseQuery, suggestions);
+
+      autoSuggestions.assignAll(suggestions);
+    } catch (e) {
+      // Xử lý lỗi nếu cần
+    } finally {
+      isLoadingSuggestions.value = false;
+    }
+  }
+
+  void _addProductTitleSuggestions(String query, List<String> suggestions) {
+    for (var title in allProductTitles) {
+      if (title.toLowerCase().contains(query)) {
+        suggestions.add(title);
+        if (suggestions.length >= 10) break;
+      }
+    }
+  }
+
+  void _addRecentSearchSuggestions(String query, List<String> suggestions) {
+    for (var term in recentSearches) {
+      if (term.toLowerCase().contains(query) && !suggestions.contains(term)) {
+        suggestions.add(term);
+        if (suggestions.length >= 15) break;
+      }
+    }
+  }
+
+  void _sortSuggestionsByRelevance(String query, List<String> suggestions) {
+    suggestions.sort((a, b) {
+      final aStartsWith = a.toLowerCase().startsWith(query);
+      final bStartsWith = b.toLowerCase().startsWith(query);
+
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      return a.length.compareTo(b.length);
+    });
+  }
+
+  //-----------------------------------------------------------------------------------
+  // FILTER METHODS
+  //-----------------------------------------------------------------------------------
+
+  List<ProductModel> applyFilters(List<ProductModel> results) {
+    if (results.isEmpty) return [];
+
+    var filtered = _applyCategoryFilter(results);
+    filtered = _applyBrandFilter(filtered);
+    filtered = _applyPriceFilter(filtered);
+
+    return filtered;
+  }
+
+  List<ProductModel> _applyCategoryFilter(List<ProductModel> results) {
+    if (results.isEmpty) return [];
+    if (selectedCategory.value == 'Tất cả' ||
+        selectedCategory.value == 'Tất cả sản phẩm') {
+      return [...results];
+    }
+
+    final selectedCategoryId = categoryNameToIdMap[selectedCategory.value];
+
+    if (selectedCategoryId != null) {
+      return results.where((product) {
+        bool match = product.categoryId == selectedCategoryId;
+
+        if (!match) {
+          final categoryNameLower = selectedCategory.value.toLowerCase();
+          match = product.title.toLowerCase().contains(categoryNameLower) ||
+              (product.description != null &&
+                  product.description!
+                      .toLowerCase()
+                      .contains(categoryNameLower));
+        }
+
+        return match;
+      }).toList();
+    } else {
+      final categoryNameLower = selectedCategory.value.toLowerCase();
+      return results.where((product) {
+        return product.title.toLowerCase().contains(categoryNameLower) ||
+            (product.description != null &&
+                product.description!.toLowerCase().contains(categoryNameLower));
+      }).toList();
+    }
+  }
+
+  List<ProductModel> _applyBrandFilter(List<ProductModel> results) {
+    if (results.isEmpty) return [];
+    if (selectedBrand.value == 'Tất cả') return [...results];
+
+    return results
+        .where((product) => product.brand?.name == selectedBrand.value)
+        .toList();
+  }
+
+  List<ProductModel> _applyPriceFilter(List<ProductModel> results) {
+    if (results.isEmpty) return [];
+
+    return results
+        .where((product) =>
+            product.price >= minPrice.value && product.price <= maxPrice.value)
+        .toList();
+  }
+
+  //-----------------------------------------------------------------------------------
+  // SORTING METHODS
+  //-----------------------------------------------------------------------------------
+
+  Future<List<ProductModel>> applySorting(List<ProductModel> results) async {
+    if (results.isEmpty) return [];
+    if (selectedSort.value == 0) return results;
+
+    var sorted = [...results];
+
+    switch (selectedSort.value) {
+      case 1: // Giá thấp đến cao
+        sorted.sort((a, b) => a.price.compareTo(b.price));
+        break;
+
+      case 2: // Giá cao đến thấp
+        sorted.sort((a, b) => b.price.compareTo(a.price));
+        break;
+
+      case 3:
+        _sortByBestSelling(sorted);
+        break;
+
+      case 4: // Đánh giá cao nhất
+        await _sortByHighestRating(sorted);
+        break;
+
+      case 5: // Giảm giá cao nhất
+        _sortByHighestDiscount(sorted);
+        break;
+    }
+
+    return sorted;
+  }
+
+  Future<void> _sortByHighestRating(List<ProductModel> sorted) async {
+    if (sorted.isEmpty) return;
+
+    try {
+      // Lấy danh sách ID sản phẩm
+      final productIds = sorted.map((p) => p.id).toList();
+
+      // Kiểm tra xem có sản phẩm nào đã có trong cache không
+      final List<String> idsToFetch = [];
+      final Map<String, double> ratingsFromCache = {};
+
+      // Tách các ID cần lấy từ server và ID đã có trong cache
+      for (var id in productIds) {
+        if (_ratingsCache.containsKey(id)) {
+          ratingsFromCache[id] = _ratingsCache[id]!;
+        } else {
+          idsToFetch.add(id);
+        }
+      }
+
+      // Lấy đánh giá cho các sản phẩm chưa có trong cache
+      final Map<String, double> newRatings = idsToFetch.isEmpty
+          ? {}
+          : await _productRepository.getProductsAverageRatings(idsToFetch);
+
+      // Kết hợp kết quả mới và cache
+      final Map<String, double> allRatings = {
+        ...ratingsFromCache,
+        ...newRatings
+      };
+
+      // Cập nhật cache với dữ liệu mới
+      _ratingsCache.addAll(newRatings);
+
+      // Tối ưu sắp xếp bằng cách không phân chia lại danh sách
+      sorted.sort((a, b) {
+        final ratingA = allRatings[a.id] ?? 0.0;
+        final ratingB = allRatings[b.id] ?? 0.0;
+
+        // Ưu tiên sản phẩm có đánh giá
+        if (ratingA > 0 && ratingB == 0) return -1;
+        if (ratingA == 0 && ratingB > 0) return 1;
+
+        return ratingB.compareTo(ratingA);
+      });
+    } catch (e) {
+      // Trường hợp lỗi, vẫn giữ nguyên thứ tự
+      debugPrint('Lỗi khi sắp xếp theo đánh giá: $e');
+    }
+  }
+
+  void _sortByHighestDiscount(List<ProductModel> sorted) {
+    sorted.sort((a, b) {
+      double discountPercentA = _calculateDiscountPercent(a);
+      double discountPercentB = _calculateDiscountPercent(b);
+      return discountPercentB.compareTo(discountPercentA);
+    });
+  }
+
+  double _calculateDiscountPercent(ProductModel product) {
+    if (product.price > 0 &&
+        product.salePrice > 0 &&
+        product.salePrice < product.price) {
+      return ((product.price - product.salePrice) / product.price) * 100;
+    }
+    return 0.0;
+  }
+
+  void _sortByBestSelling(List<ProductModel> sorted) {
+    sorted.sort((a, b) => b.soldQuantity.compareTo(a.soldQuantity));
+  }
+
+  //-----------------------------------------------------------------------------------
+  // CATEGORY FILTER METHODS
+  //-----------------------------------------------------------------------------------
+
+  Future<void> applyFiltersByCategory() async {
+    if (selectedCategory.value == 'Tất cả' ||
+        selectedCategory.value == 'Tất cả sản phẩm') {
+      if (searchTextController.text.isNotEmpty) {
+        searchProducts();
+      } else if (originalResults.isNotEmpty) {
+        await _reapplyFiltersWithoutCategory();
+      }
+      return;
+    }
+
+    isLoading.value = true;
+
+    try {
+      final selectedCategoryId = categoryNameToIdMap[selectedCategory.value];
+      if (selectedCategoryId == null) {
+        searchResults.clear();
+        return;
+      }
+
+      final searchQuery = searchTextController.text.trim();
+      List<ProductModel> categoryProducts = await _productRepository
+          .getProductsForCategory(categoryId: selectedCategoryId, limit: -1);
+
+      if (searchQuery.isNotEmpty) {
+        final queryLower = searchQuery.toLowerCase();
+        categoryProducts = categoryProducts
+            .where(
+                (product) => product.title.toLowerCase().contains(queryLower))
+            .toList();
+      }
+
+      originalResults.assignAll(categoryProducts);
+
+      var filtered = _applyBrandFilter(categoryProducts);
+      filtered = _applyPriceFilter(filtered);
+      final sortedResults = await applySorting(filtered);
+      searchResults.assignAll(sortedResults);
+    } catch (e) {
+      searchResults.clear();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> _reapplyFiltersWithoutCategory() async {
+    isLoading.value = true;
+
+    try {
+      var filtered = originalResults.toList();
+
+      if (selectedBrand.value != 'Tất cả') {
+        filtered = _applyBrandFilter(filtered);
+      }
+
+      filtered = _applyPriceFilter(filtered);
+      final sortedResults = await applySorting(filtered);
+      searchResults.assignAll(sortedResults);
+    } catch (e) {
+      // Xử lý lỗi nếu cần
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> reapplyFilters() async {
+    if ((selectedCategory.value == 'Tất cả' ||
+            selectedCategory.value == 'Tất cả sản phẩm') &&
+        (selectedBrand.value == 'Tất cả') &&
+        searchTextController.text.isNotEmpty) {
+      searchProducts();
+      return;
+    }
+
+    if (originalResults.isEmpty) {
+      if (searchTextController.text.isNotEmpty) {
+        searchProducts();
+      }
+      return;
+    }
+
+    isLoading.value = true;
+
+    try {
+      if (selectedCategory.value != 'Tất cả' &&
+          selectedCategory.value != 'Tất cả sản phẩm') {
+        await applyFiltersByCategory();
+        return;
+      }
+
+      final filtered = applyFilters(originalResults);
+      final sortedResults = await applySorting(filtered);
+      searchResults.assignAll(sortedResults);
+    } catch (e) {
+      // Xử lý lỗi nếu cần
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  //-----------------------------------------------------------------------------------
+  // DATA LOADING METHODS
+  //-----------------------------------------------------------------------------------
+
+  void loadCategories() async {
+    try {
+      // Đảm bảo CategoryRepository được đăng ký
+      if (!Get.isRegistered<CategoryRepository>()) {
+        Get.put(CategoryRepository(), permanent: true);
+      }
+
+      final categoryRepo = Get.find<CategoryRepository>();
+      final categories = await categoryRepo.getAllCategories();
+
+      debugPrint('Đã tải được ${categories.length} danh mục');
+
+      // Kiểm tra nếu danh sách trống
+      if (categories.isEmpty) {
+        debugPrint('Danh sách danh mục trống');
+        this.categories.value = ['Tất cả'];
+        return;
+      }
+
+      categoryNameToIdMap.clear();
+      categoryIdToNameMap.clear();
+
+      for (var category in categories) {
+        categoryNameToIdMap[category.name] = category.id;
+        categoryIdToNameMap[category.id] = category.name;
+      }
+
+      final categoryNames =
+          categories.map((category) => category.name).toList();
+      allCategoryNames.assignAll(categoryNames);
+
+      // Đảm bảo danh sách bắt đầu bằng "Tất cả"
+      final updatedCategories = ['Tất cả', ...categoryNames];
+      this.categories.assignAll(updatedCategories);
+
+      debugPrint(
+          'Đã cập nhật danh sách danh mục: ${this.categories.length} mục');
+    } catch (e) {
+      debugPrint('Lỗi khi tải danh mục: $e');
+      // Đảm bảo luôn có ít nhất "Tất cả" trong danh sách
+      this.categories.value = ['Tất cả'];
+    }
+  }
+
   void loadBrands() async {
     try {
       final brandRepo = Get.find<BrandRepository>();
       final brandsList = await brandRepo.getAllBrands();
       brands.value = ['Tất cả', ...brandsList.map((brand) => brand.name)];
     } catch (e) {
-      debugPrint('Không thể tải thương hiệu: $e');
+      // Xử lý lỗi nếu cần
     }
   }
 
-  // Load recent searches from local storage
+  void loadProductTitles() async {
+    try {
+      final products = await _productRepository.getAllProducts();
+      final titles = products.map((product) => product.title).toList();
+      allProductTitles.assignAll(titles);
+    } catch (e) {
+      // Xử lý lỗi nếu cần
+    }
+  }
+
   void loadRecentSearches() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final searches = prefs.getStringList('recent_searches') ?? [];
       recentSearches.assignAll(searches);
     } catch (e) {
-      debugPrint('Không thể tải tìm kiếm gần đây: $e');
+      // Xử lý lỗi nếu cần
     }
   }
 
-  // Save recent search to local storage
+  //-----------------------------------------------------------------------------------
+  // RECENT SEARCHES MANAGEMENT
+  //-----------------------------------------------------------------------------------
+
   void saveRecentSearch(String query) async {
     if (query.trim().isEmpty) return;
 
     try {
-      // Add to recent searches, avoid duplicates and limit to 10 items
       if (recentSearches.contains(query)) {
         recentSearches.remove(query);
       }
       recentSearches.insert(0, query);
-      if (recentSearches.length > 10) {
+      if (recentSearches.length > 16) {
         recentSearches.removeLast();
       }
 
-      // Save to local storage
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList('recent_searches', recentSearches);
     } catch (e) {
-      debugPrint('Không thể lưu tìm kiếm gần đây: $e');
+      // Xử lý lỗi nếu cần
     }
   }
 
-  // Remove a recent search
-  void removeRecentSearch(String query) async {
-    recentSearches.remove(query);
-    // Update local storage
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('recent_searches', recentSearches);
-  }
-
-  // Clear all recent searches
   void clearRecentSearches() async {
-    recentSearches.clear();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('recent_searches');
-  }
-
-  // Cập nhật phương thức searchProducts
-  void searchProducts() async {
-    final query = searchTextController.text.trim();
-
-    if (query.isEmpty) {
-      searchResults.clear(); // Xóa kết quả nếu query rỗng
-      return;
-    }
-
     try {
-      // Show loading
-      isLoading.value = true;
-
-      // Ghi log để debug
-      debugPrint('Bắt đầu tìm kiếm với từ khóa: "$query"');
-
-      // Perform search
-      final results = await _productRepository.searchProducts(query);
-
-      // Ghi log kết quả
-      debugPrint('Nhận được ${results.length} kết quả từ repository');
-
-      // Nếu đã chọn danh mục cụ thể (không phải "Tất cả"), bỏ qua bước lọc để tránh lọc quá mức
-      if (selectedCategory.value == 'Tất cả' ||
-          selectedCategory.value == 'Tất cả sản phẩm') {
-        // Chỉ lọc theo giá và sắp xếp
-        var filtered = results
-            .where((product) => (product.price >= minPrice.value &&
-                product.price <= maxPrice.value))
-            .toList();
-
-        // Sắp xếp nếu cần
-        if (selectedSort.value > 0) {
-          switch (selectedSort.value) {
-            case 1: // Giá thấp đến cao
-              filtered.sort((a, b) => a.price.compareTo(b.price));
-              break;
-            case 2: // Giá cao đến thấp
-              filtered.sort((a, b) => b.price.compareTo(a.price));
-              break;
-            // Các trường hợp khác
-          }
-        }
-
-        searchResults.assignAll(filtered);
-      } else {
-        // Nếu đã chọn danh mục cụ thể, áp dụng đầy đủ bộ lọc
-        final filtered = applyFiltersToResults(results);
-        searchResults.assignAll(filtered);
-      }
-
-      // Save search query to recent searches
-      saveRecentSearch(query);
+      recentSearches.clear();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('recent_searches');
     } catch (e) {
-      debugPrint('Lỗi tìm kiếm: $e');
-      Get.snackbar('Lỗi tìm kiếm', 'Không thể tìm kiếm sản phẩm');
-    } finally {
-      isLoading.value = false;
+      // Xử lý lỗi nếu cần
     }
   }
 
-  // Apply filters to search results - Sửa lỗi lọc theo danh mục
-  List<ProductModel> applyFiltersToResults(List<ProductModel> results) {
-    if (results.isEmpty) return [];
+  //-----------------------------------------------------------------------------------
+  // UTILITY METHODS
+  //-----------------------------------------------------------------------------------
 
-    var filtered = [...results];
-    debugPrint('Áp dụng bộ lọc cho ${results.length} kết quả');
-
-    try {
-      // Filter by category - SỬA LỖI Ở ĐÂY
-      if (selectedCategory.value != 'Tất cả' &&
-          selectedCategory.value != 'Tất cả sản phẩm') {
-        debugPrint('Lọc theo danh mục: ${selectedCategory.value}');
-        filtered = filtered.where((product) {
-          // Kiểm tra nếu sản phẩm thuộc danh mục này
-          bool match = product.categoryId == selectedCategory.value;
-
-          // Kiểm tra thêm trong title hoặc description
-          if (!match) {
-            if (product.title
-                .toLowerCase()
-                .contains(selectedCategory.value.toLowerCase())) {
-              match = true;
-            }
-            if (!match && product.description != null) {
-              if (product.description!
-                  .toLowerCase()
-                  .contains(selectedCategory.value.toLowerCase())) {
-                match = true;
-              }
-            }
-          }
-          return match;
-        }).toList();
-        debugPrint('Sau khi lọc danh mục: ${filtered.length} kết quả');
-      } else {
-        debugPrint('Bỏ qua lọc danh mục vì đã chọn "Tất cả"');
-      }
-
-      // Filter by brand
-      if (selectedBrand.value != 'Tất cả') {
-        debugPrint('Lọc theo thương hiệu: ${selectedBrand.value}');
-        filtered = filtered.where((product) {
-          return product.brand?.name == selectedBrand.value;
-        }).toList();
-        debugPrint('Sau khi lọc thương hiệu: ${filtered.length} kết quả');
-      }
-
-      // Filter by price
-      debugPrint('Lọc theo giá: ${minPrice.value} - ${maxPrice.value}');
-      filtered = filtered
-          .where((product) => (product.price >= minPrice.value &&
-              product.price <= maxPrice.value))
-          .toList();
-      debugPrint('Sau khi lọc giá: ${filtered.length} kết quả');
-
-      // Sort results
-      if (selectedSort.value > 0) {
-        debugPrint('Sắp xếp theo: ${sortOptions[selectedSort.value]}');
-        switch (selectedSort.value) {
-          case 1: // Giá thấp đến cao
-            filtered.sort((a, b) => a.price.compareTo(b.price));
-            break;
-          case 2: // Giá cao đến thấp
-            filtered.sort((a, b) => b.price.compareTo(a.price));
-            break;
-          case 3: // Stock (thay thế cho rating)
-            filtered.sort((a, b) => b.stock.compareTo(a.stock));
-            break;
-          case 4: // Ngày (nếu có)
-            filtered.sort((a, b) {
-              if (a.date != null && b.date != null) {
-                return b.date!.compareTo(a.date!);
-              }
-              return b.id.compareTo(a.id);
-            });
-            break;
-        }
-      }
-
-      return filtered;
-    } catch (e) {
-      debugPrint('Lỗi khi áp dụng bộ lọc: $e');
-      return results; // Trả về kết quả gốc nếu có lỗi
-    }
-  }
-
-  // Cập nhật phương thức searchByCategory
-  void searchByCategory(String categoryName) async {
-    try {
-      isLoading.value = true;
-      debugPrint('Đang tìm kiếm theo danh mục: $categoryName');
-
-      // Đặt category đã chọn
-      selectedCategory.value = categoryName;
-
-      // Đặt nội dung tìm kiếm vào ô tìm kiếm (chỉ khi cần)
-      if (categoryName != 'Tất cả sản phẩm' && categoryName != 'Tất cả') {
-        searchTextController.text = categoryName;
-      } else {
-        // Nếu chọn tất cả, để trống ô tìm kiếm
-        searchTextController.text = '';
-      }
-
-      // Lấy tất cả sản phẩm
-      final allProducts = await _productRepository.getAllProducts();
-      debugPrint('Đã lấy ${allProducts.length} sản phẩm');
-
-      // Lọc kết quả theo danh mục
-      List<ProductModel> results = allProducts;
-
-      if (categoryName != 'Tất cả sản phẩm' && categoryName != 'Tất cả') {
-        // Lọc sơ bộ theo danh mục
-        results = allProducts.where((product) {
-          bool match = false;
-
-          // Kiểm tra categoryId
-          if (product.categoryId == categoryName) match = true;
-
-          // Kiểm tra tên sản phẩm
-          if (!match &&
-              product.title
-                  .toLowerCase()
-                  .contains(categoryName.toLowerCase())) {
-            match = true;
-          }
-
-          // Kiểm tra mô tả
-          if (!match &&
-              product.description != null &&
-              product.description!
-                  .toLowerCase()
-                  .contains(categoryName.toLowerCase())) {
-            match = true;
-          }
-
-          return match;
-        }).toList();
-      }
-
-      debugPrint(
-          'Tìm thấy ${results.length} sản phẩm thuộc danh mục "$categoryName"');
-
-      // Áp dụng các bộ lọc khác nếu cần
-      // Bỏ qua bước này để hiển thị tất cả sản phẩm trong danh mục
-      // final filtered = applyFiltersToResults(results);
-
-      // Cập nhật kết quả trực tiếp
-      searchResults.assignAll(results);
-    } catch (e) {
-      debugPrint('Lỗi khi tìm kiếm theo danh mục: $e');
-      Get.snackbar('Lỗi', 'Không thể tìm kiếm theo danh mục: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  // Reset filters
   void resetFilters() {
+    final currentQuery = searchTextController.text;
+
     selectedCategory.value = 'Tất cả';
     selectedBrand.value = 'Tất cả';
+    selectedCategoryImage.value = '';
+    selectedBrandImage.value = '';
     minPrice.value = 0.0;
-    maxPrice.value = 10000000.0;
+    maxPrice.value = 5000000.0;
     selectedSort.value = 0;
+
+    if (currentQuery.isNotEmpty && originalResults.isNotEmpty) {
+      reapplyFilters();
+    }
   }
 
-  // Toggle filter panel
+  void resetAll() {
+    searchTextController.clear();
+    searchResults.clear();
+    originalResults.clear();
+    autoSuggestions.clear();
+    resetFilters();
+    isLoading.value = false;
+    isLoadingSuggestions.value = false;
+    showFilter.value = false;
+  }
+
   void toggleFilter() {
     showFilter.value = !showFilter.value;
-  }
-
-  @override
-  void onClose() {
-    searchTextController.dispose();
-    super.onClose();
   }
 }

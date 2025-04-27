@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pine/data/repositories/review_repository.dart';
 import 'package:pine/features/shop/models/product_model.dart';
 import 'package:pine/utils/exceptions/firebase_exceptions.dart';
 import 'package:pine/utils/exceptions/platform_exceptions.dart';
@@ -55,6 +56,7 @@ class ProductRepository extends GetxController {
       final snapshot = await _db
           .collection('Products')
           .where('IsFeatured', isEqualTo: true)
+          .orderBy('SoldQuantity', descending: true)
           .limit(6)
           .get();
       return snapshot.docs.map((e) => ProductModel.fromSnapshot(e)).toList();
@@ -353,7 +355,10 @@ class ProductRepository extends GetxController {
                 : null,
             'isLastPage': endIndex >= products.length,
           };
-
+        case 'Bán chạy':
+          orderField = 'SoldQuantity';
+          descending = true;
+          break;
         case 'Giảm giá':
           // Lấy tất cả sản phẩm và xử lý sắp xếp trên ứng dụng
           final querySnapshot = await query.get();
@@ -375,6 +380,83 @@ class ProductRepository extends GetxController {
             }
 
             return discountPercentB.compareTo(discountPercentA);
+          });
+
+          // Thực hiện phân trang thủ công
+          int startIndex = 0;
+          if (lastDocument != null) {
+            // Tìm index của document cuối cùng đã load
+            final lastId = lastDocument.id;
+            final lastIndex = products.indexWhere((p) => p.id == lastId);
+            if (lastIndex != -1) {
+              startIndex = lastIndex + 1;
+            }
+          }
+
+          final int endIndex = startIndex + limit > products.length
+              ? products.length
+              : startIndex + limit;
+
+          if (startIndex >= products.length) {
+            return {
+              'products': <ProductModel>[],
+              'lastDocument': null,
+              'isLastPage': true,
+            };
+          }
+
+          final paginatedProducts = products.sublist(startIndex, endIndex);
+
+          return {
+            'products': paginatedProducts,
+            'lastDocument': endIndex < products.length
+                ? await _db
+                    .collection('Products')
+                    .doc(paginatedProducts.last.id)
+                    .get()
+                : null,
+            'isLastPage': endIndex >= products.length,
+          };
+
+        case 'Đánh giá':
+          // Lấy tất cả sản phẩm
+          final querySnapshot = await query.get();
+          final products = querySnapshot.docs
+              .map((doc) => ProductModel.fromQuerySnapshot(doc))
+              .toList();
+
+          // Lấy đánh giá trung bình cho tất cả sản phẩm cùng lúc
+          final productIds = products.map((p) => p.id).toList();
+          final reviewRepository = ReviewRepository.instance;
+          final Map<String, double> ratingsMap = {};
+
+          // Xử lý theo batch để tối ưu hiệu suất
+          final List<List<String>> batches = [];
+          const int batchSize = 10;
+
+          for (var i = 0; i < productIds.length; i += batchSize) {
+            var end = (i + batchSize < productIds.length)
+                ? i + batchSize
+                : productIds.length;
+            batches.add(productIds.sublist(i, end));
+          }
+
+          // Lấy đánh giá cho từng batch song song
+          await Future.wait(batches.map((batch) async {
+            final ratingsForBatch = await getProductsAverageRatings(batch);
+            ratingsMap.addAll(ratingsForBatch);
+          }));
+
+          // Sắp xếp sản phẩm theo đánh giá cao nhất
+          products.sort((a, b) {
+            final ratingA = ratingsMap[a.id] ?? 0.0;
+            final ratingB = ratingsMap[b.id] ?? 0.0;
+
+            // Ưu tiên sản phẩm có đánh giá
+            if (ratingA > 0 && ratingB == 0) return -1;
+            if (ratingA == 0 && ratingB > 0) return 1;
+
+            return ratingB.compareTo(ratingA);
           });
 
           // Thực hiện phân trang thủ công
@@ -448,6 +530,149 @@ class ProductRepository extends GetxController {
       throw PPlatformException(e.code).message;
     } catch (e) {
       throw 'Có lỗi xảy ra, vui lòng thử lại';
+    }
+  }
+
+  /// Lấy mapping giữa sản phẩm và danh mục
+  Future<Map<String, List<String>>> getProductCategoryMapping() async {
+    try {
+      // Lấy tất cả mapping từ ProductCategory
+      final snapshot = await _db.collection('ProductCategory').get();
+
+      // Tạo map để lưu trữ danh sách categoryId cho mỗi productId
+      final Map<String, List<String>> productCategoryMap = {};
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final productId = data['productId'] as String;
+        final categoryId = data['categoryId'] as String;
+
+        if (!productCategoryMap.containsKey(productId)) {
+          productCategoryMap[productId] = [];
+        }
+
+        productCategoryMap[productId]!.add(categoryId);
+      }
+
+      debugPrint(
+          'Đã tải ${snapshot.docs.length} mappings giữa sản phẩm và danh mục');
+      return productCategoryMap;
+    } catch (e) {
+      debugPrint('Lỗi khi lấy mapping danh mục sản phẩm: $e');
+      return {};
+    }
+  }
+
+  // Tối ưu phương thức getProductsAverageRatings để cải thiện tốc độ
+  Future<Map<String, double>> getProductsAverageRatings(
+      List<String> productIds) async {
+    try {
+      if (productIds.isEmpty) return {};
+
+      // Sử dụng cache để giảm số lần truy vấn
+      final String cacheKey = productIds.join(',');
+
+      // Kiểm tra xem có cache hay không
+      if (_ratingsCacheMap.containsKey(cacheKey)) {
+        return _ratingsCacheMap[cacheKey]!;
+      }
+
+      // Tạo map để lưu kết quả
+      final Map<String, double> ratingsMap = {};
+
+      // Nhóm các productId thành các batch nhỏ hơn
+      List<List<String>> batches = [];
+      const int batchSize = 10;
+
+      for (var i = 0; i < productIds.length; i += batchSize) {
+        var end = (i + batchSize < productIds.length)
+            ? i + batchSize
+            : productIds.length;
+        batches.add(productIds.sublist(i, end));
+      }
+
+      // Nhóm đánh giá theo sản phẩm - sử dụng Future.wait để thực hiện song song
+      final Map<String, List<double>> ratingsByProduct = {};
+
+      final futures = batches.map((batch) async {
+        final querySnapshot = await _db
+            .collection('Reviews')
+            .where('productId', whereIn: batch)
+            .get();
+
+        return querySnapshot;
+      }).toList();
+
+      final results = await Future.wait(futures);
+
+      // Xử lý kết quả từ tất cả các batch
+      for (var querySnapshot in results) {
+        for (var doc in querySnapshot.docs) {
+          final data = doc.data();
+          final productId = data['productId'] as String;
+          final rating = (data['rating'] is double)
+              ? data['rating'] as double
+              : (data['rating'] as num).toDouble();
+
+          if (!ratingsByProduct.containsKey(productId)) {
+            ratingsByProduct[productId] = [];
+          }
+          ratingsByProduct[productId]!.add(rating);
+        }
+      }
+
+      // Đảm bảo tất cả sản phẩm đều có giá trị đánh giá
+      for (var productId in productIds) {
+        if (ratingsByProduct.containsKey(productId)) {
+          final ratings = ratingsByProduct[productId]!;
+          if (ratings.isNotEmpty) {
+            final sum = ratings.reduce((a, b) => a + b);
+            ratingsMap[productId] = sum / ratings.length;
+          } else {
+            ratingsMap[productId] = 0.0;
+          }
+        } else {
+          ratingsMap[productId] = 0.0;
+        }
+      }
+
+      // Lưu vào cache
+      _ratingsCacheMap[cacheKey] = ratingsMap;
+
+      return ratingsMap;
+    } catch (e) {
+      debugPrint('Lỗi khi lấy đánh giá trung bình: $e');
+      return {};
+    }
+  }
+
+  // Thêm biến để lưu cache
+  final Map<String, Map<String, double>> _ratingsCacheMap = {};
+
+  Future<List<ProductModel>> getTopSellingProductsForBrand(String brandId,
+      {int limit = 3}) async {
+    try {
+      // Tạo truy vấn để lấy sản phẩm của thương hiệu, sắp xếp theo SoldQuantity
+      final querySnapshot = await _db
+          .collection('Products')
+          .where('Brand.Id', isEqualTo: brandId)
+          .where('IsFeatured', isEqualTo: true)
+          .orderBy('SoldQuantity', descending: true)
+          .limit(limit)
+          .get();
+
+      // Chuyển đổi kết quả thành danh sách sản phẩm
+      final products = querySnapshot.docs
+          .map((doc) => ProductModel.fromQuerySnapshot(doc))
+          .toList();
+
+      return products;
+    } on FirebaseException catch (e) {
+      throw PFirebaseException(e.code).message;
+    } on PlatformException catch (e) {
+      throw PPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Có lỗi xảy ra trong quá trình tải sản phẩm bán chạy: $e';
     }
   }
 }

@@ -5,6 +5,8 @@ import 'package:network_info_plus/network_info_plus.dart';
 import 'package:pine/common/widgets/success_screen/success_screen.dart';
 import 'package:pine/data/repositories/authentication_repository.dart';
 import 'package:pine/data/repositories/product_repository.dart';
+import 'package:pine/data/repositories/user_repository.dart';
+import 'package:pine/data/services/email_service.dart';
 import 'package:pine/features/personalization/controllers/address_controller.dart';
 import 'package:pine/features/shop/controllers/product/cart_controller.dart';
 import 'package:pine/features/shop/controllers/product/checkout_controller.dart';
@@ -152,6 +154,8 @@ class OrderController extends GetxController {
 
         await orderRepository.saveOrder(order, userId);
 
+        _sendOrderConfirmationEmail(order, userId);
+
         if (coupon.id.isNotEmpty) {
           await couponController.markCouponAsUsed(finalOrderId);
         }
@@ -252,8 +256,8 @@ class OrderController extends GetxController {
         );
 
         await orderRepository.saveOrder(order, userId);
-        print(
-            'VNPAY Success: OrderID=$finalOrderId, TxnRef=$vnpayTxnRef, VNPAYTxnNo=$transactionNo, Bank=$bankCode, PayDate=$payDate');
+
+        _sendOrderConfirmationEmail(order, userId);
 
         if (coupon.id.isNotEmpty) {
           await couponController.markCouponAsUsed(finalOrderId);
@@ -574,6 +578,37 @@ class OrderController extends GetxController {
     } catch (e) {
       debugPrint('Lỗi khi hoàn trả sản phẩm về kho: $e');
       // Không throw exception để quá trình hủy đơn hàng tiếp tục
+    }
+  }
+
+  Future<void> _sendOrderConfirmationEmail(
+      OrderModel order, String userId) async {
+    try {
+      // Lấy thông tin người dùng
+      final userRepository = Get.find<UserRepository>();
+
+      // Sử dụng phương thức đúng để lấy thông tin người dùng
+      // UserRepository không có phương thức getUserDetails(userId)
+      final user = await userRepository.fetchUserDetails();
+
+      if (user.id.isNotEmpty) {
+        // Gửi email không đồng bộ (không làm chậm quá trình đặt hàng)
+        EmailService()
+            .sendOrderConfirmationEmail(
+          order: order,
+          user: user,
+        )
+            .then((success) {
+          if (success) {
+            debugPrint('Email xác nhận đơn hàng đã được gửi thành công');
+          } else {
+            debugPrint('Không thể gửi email xác nhận đơn hàng');
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi gửi email xác nhận đơn hàng: $e');
+      // Không hiển thị lỗi này cho người dùng vì đây chỉ là tính năng bổ sung
     }
   }
 }

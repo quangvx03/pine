@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart'; // Thêm import này
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'; // Thêm import này
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class VnpayWebViewScreen extends StatefulWidget {
   final String paymentUrl;
 
-  const VnpayWebViewScreen({Key? key, required this.paymentUrl})
-      : super(key: key);
+  const VnpayWebViewScreen({super.key, required this.paymentUrl});
 
   @override
   State<VnpayWebViewScreen> createState() => _VnpayWebViewScreenState();

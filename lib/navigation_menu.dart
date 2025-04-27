@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pine/data/repositories/product_repository.dart';
+import 'package:pine/data/repositories/review_repository.dart';
 import 'package:pine/features/personalization/screens/settings/settings.dart';
+import 'package:pine/features/shop/controllers/search_controller.dart';
 import 'package:pine/features/shop/screens/home/home.dart';
 import 'package:pine/features/shop/screens/search/search.dart';
 import 'package:pine/features/shop/screens/store/store.dart';
@@ -17,15 +20,12 @@ class NavigationMenu extends StatelessWidget {
     final controller = Get.put(NavigationController());
     final darkMode = PHelperFunctions.isDarkMode(context);
 
-    // Sử dụng WillPopScope để bắt sự kiện nút back
     return WillPopScope(
       onWillPop: () async {
-        // Nếu không phải đang ở Home, chuyển về Home
         if (controller.selectedIndex.value != 0) {
           controller.navigateToHome();
-          return false; // Không thoát ứng dụng
+          return false;
         } else {
-          // Xử lý nhấn back hai lần để thoát
           return controller.handleBackButtonPress();
         }
       },
@@ -65,17 +65,39 @@ class NavigationController extends GetxController {
   static NavigationController get instance => Get.find();
 
   final Rx<int> selectedIndex = 0.obs;
-  // Theo dõi thời gian nhấn back lần cuối
   DateTime? _lastBackPressTime;
 
   final screens = [
     const HomeScreen(),
     const StoreScreen(),
-    const SearchScreen(),
+    () {
+      if (!Get.isRegistered<ProductRepository>()) {
+        Get.put(ProductRepository(), permanent: true);
+      }
+
+      if (!Get.isRegistered<ReviewRepository>()) {
+        Get.put(ReviewRepository(), permanent: true);
+      }
+
+      if (Get.isRegistered<ProductSearchController>()) {
+        final controller = Get.find<ProductSearchController>();
+        controller.resetAll();
+      } else {
+        Get.put(ProductSearchController(), permanent: true);
+      }
+      return const SearchScreen();
+    }(),
     const SettingsScreen(),
   ];
 
   void navigateToTab(int index) {
+    if (selectedIndex.value == 2 && index != 2) {
+      if (Get.isRegistered<ProductSearchController>()) {
+        final searchController = Get.find<ProductSearchController>();
+        searchController.resetAll();
+      }
+    }
+
     selectedIndex.value = index;
     if (Get.currentRoute != '/NavigationMenu') {
       Get.offAll(() => const NavigationMenu());

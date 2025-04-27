@@ -16,9 +16,9 @@ class PFavoriteIcon extends StatelessWidget {
     final controller = Get.put(FavoritesController());
     return Obx(
       () => PCircularIcon(
-        width: 35,
-        height: 35,
-        size: 20,
+        width: 32,
+        height: 32,
+        size: 18,
         icon: controller.isFavorite(productId) ? Iconsax.heart5 : Iconsax.heart,
         color: controller.isFavorite(productId) ? PColors.favorite : null,
         onPressed: () => controller.toggleFavoriteProduct(productId),

@@ -94,5 +94,7 @@ lib/generated_plugin_registrant.dart
 **/web/**/flutter_export_environment.js
 
 
+# Sensitive information files
 android/app/google-services.json
 lib/firebase_options.dart
+lib/utils/constants/vnpay_config.dart

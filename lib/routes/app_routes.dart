@@ -6,8 +6,10 @@ import 'package:pine/features/authentication/screens/signup/signup.dart';
 import 'package:pine/features/authentication/screens/signup/verify_email.dart';
 import 'package:pine/features/personalization/screens/address/address.dart';
 import 'package:pine/features/personalization/screens/coupon/coupons.dart';
+import 'package:pine/features/personalization/screens/privacy/privacy_policy.dart';
 import 'package:pine/features/personalization/screens/profile/profile.dart';
 import 'package:pine/features/shop/screens/cart/cart.dart';
+import 'package:pine/features/shop/screens/category/sub_categories.dart';
 import 'package:pine/features/shop/screens/checkout/checkout.dart';
 import 'package:pine/features/shop/screens/order/order.dart';
 import 'package:pine/features/shop/screens/wishlist/wishlist.dart';
@@ -57,5 +59,6 @@ class AppRoutes {
         name: PRoutes.forgotPassword, page: () => const ForgotPasswordScreen()),
     GetPage(name: PRoutes.onBoarding, page: () => const OnBoardingScreen()),
     GetPage(name: PRoutes.coupon, page: () => const UserCouponsScreen()),
+    GetPage(name: PRoutes.privacy, page: () => const PrivacyPolicyScreen()),
   ];
 }

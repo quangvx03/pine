@@ -8,22 +8,22 @@ import 'data/repositories/authentication_repository.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  /// Widgets Binding
+  /// Ràng buộc Widget
   final WidgetsBinding widgetsBinding =
       WidgetsFlutterBinding.ensureInitialized();
 
-  /// GetX Local Storage
+  /// GetX Lưu trữ cục bộ
   await GetStorage.init();
 
-  /// Await Splash until other items load
+  /// Giữ màn hình Splash cho đến khi các mục khác tải xong
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  /// Initialize Firebase & Authentication Repository
+  /// Khởi tạo Firebase & Authentication Repository
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
       .then(
     (FirebaseApp value) => Get.put(AuthenticationRepository()),
   );
 
-  /// Load all the Material Design / Themes / Localizations / Bindings
+  /// Tải tất cả Material Design
   runApp(const App());
 }

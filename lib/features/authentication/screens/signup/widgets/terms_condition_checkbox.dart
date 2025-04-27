@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 
+import '../../../../../routes/routes.dart';
 import '../../../../../utils/constants/colors.dart';
 import '../../../../../utils/constants/sizes.dart';
 import '../../../../../utils/constants/text_strings.dart';
@@ -39,7 +41,9 @@ class PTermsAndConditionCheckbox extends StatelessWidget {
                       color: dark ? PColors.white : PColors.primary,
                       decoration: TextDecoration.underline,
                       decorationColor: dark ? PColors.white : PColors.primary,
-                    )),
+                    ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => Get.toNamed(PRoutes.privacy)),
             TextSpan(text: 'và ', style: Theme.of(context).textTheme.bodySmall),
             TextSpan(
                 text: PTexts.termsOfUse,
@@ -47,7 +51,9 @@ class PTermsAndConditionCheckbox extends StatelessWidget {
                       color: dark ? PColors.white : PColors.primary,
                       decoration: TextDecoration.underline,
                       decorationColor: dark ? PColors.white : PColors.primary,
-                    ))
+                    ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => Get.toNamed(PRoutes.privacy))
           ]),
           softWrap: true,
         ))

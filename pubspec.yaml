@@ -49,6 +49,7 @@ dependencies:
   cached_network_image: ^3.4.1
 
   # notification
+  mailer: ^6.4.1
 
   # payment
   webview_flutter: ^4.0.0
@@ -70,7 +71,7 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/logos/pine-logo-white.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  min_sdk_android: 23
   web:
     generate: true
     image_path: "assets/logos/pine-logo-white.png"

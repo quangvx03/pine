@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:pine/features/shop/screens/search/search.dart';
 import 'package:pine/navigation_menu.dart';
 import 'package:pine/utils/constants/colors.dart';
 import 'package:pine/utils/constants/sizes.dart';

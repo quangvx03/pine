@@ -59,9 +59,18 @@ class PProductCardVertical extends StatelessWidget {
                             isNetworkImage: true,
                           ),
 
-                          // Hiển thị overlay "Hết hàng" nếu sản phẩm hết tồn kho
-                          if (!controller.isProductInStock(
-                              product.stock, product.soldQuantity))
+                          // if (!controller.isProductInStock(
+                          //     product.stock, product.soldQuantity))
+
+                          if (product.productType ==
+                                  ProductType.single.toString()
+                              ? !controller.isProductInStock(
+                                  product.stock, product.soldQuantity)
+                              : product.productVariations != null &&
+                                  product.productVariations!.every(
+                                      (variation) =>
+                                          variation.stock <=
+                                          variation.soldQuantity))
                             Container(
                               decoration: BoxDecoration(
                                 color:
@@ -132,6 +141,8 @@ class PProductCardVertical extends StatelessWidget {
                     PProductTitleText(
                       title: product.title,
                       smallSize: true,
+                      showRating: true,
+                      productId: product.id,
                     ),
                     SizedBox(height: PSizes.spaceBtwItems / 2),
                     PBrandTitleWithVerifiedIcon(

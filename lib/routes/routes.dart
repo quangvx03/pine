@@ -22,4 +22,5 @@ class PRoutes {
   static const forgotPassword = '/forgot-password';
   static const onBoarding = '/on-boarding';
   static const coupon = '/coupon';
+  static const privacy = '/privacy';
 }

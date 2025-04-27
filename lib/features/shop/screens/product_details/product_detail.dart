@@ -16,7 +16,7 @@ import 'package:pine/features/shop/screens/product_details/widgets/bottom_add_to
 import 'package:pine/features/shop/screens/product_details/widgets/product_attributes.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/product_detail_image_slider.dart';
 import 'package:pine/features/shop/screens/product_details/widgets/product_meta_data.dart';
-import 'package:pine/features/shop/screens/product_details/widgets/rating.dart';
+import 'package:pine/features/shop/screens/product_details/widgets/rating_sold.dart';
 import 'package:pine/features/shop/screens/product_reviews/product_reviews.dart';
 import 'package:pine/features/shop/screens/product_reviews/widgets/user_review_card.dart';
 import 'package:pine/utils/constants/colors.dart';
@@ -84,7 +84,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// Rating
-                  PRating(productId: widget.product.id),
+                  PRatingAndSold(
+                    productId: widget.product.id,
+                    soldQuantity: widget.product.soldQuantity,
+                  ),
                   const SizedBox(height: PSizes.spaceBtwItems / 2),
 
                   /// Price, Title & Brand

@@ -15,6 +15,7 @@ class ProductController extends GetxController {
   RxList<ProductModel> suggestProducts = <ProductModel>[].obs;
   RxList<ProductModel> allProducts = <ProductModel>[].obs;
   final RxString selectedSortOption = 'A-Z'.obs;
+  final Map<String, double> _ratingsCache = <String, double>{}.obs;
 
   // Biến để quản lý phân trang
   DocumentSnapshot? lastDocument;
@@ -31,13 +32,15 @@ class ProductController extends GetxController {
     super.onInit();
   }
 
-  void fetchSuggestProducts() async {
+  Future<void> fetchSuggestProducts() async {
     try {
       isLoading.value = true;
-      final products = await productRepository.getSuggestProducts();
+      final productRepo = Get.put(ProductRepository());
+      final products = await productRepo.getSuggestProducts();
       suggestProducts.assignAll(products);
+      return; // Trả về Future<void>
     } catch (e) {
-      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
+      print('Lỗi khi lấy sản phẩm gợi ý: $e');
     } finally {
       isLoading.value = false;
     }
@@ -151,6 +154,10 @@ class ProductController extends GetxController {
           return displayPriceA.compareTo(displayPriceB);
         });
         break;
+      case 'Bán chạy':
+        // Sắp xếp theo số lượng đã bán từ cao đến thấp
+        products.sort((a, b) => b.soldQuantity.compareTo(a.soldQuantity));
+        break;
       case 'Giảm giá':
         products.sort((a, b) {
           // Tính phần trăm giảm giá cho cả hai sản phẩm
@@ -170,11 +177,61 @@ class ProductController extends GetxController {
           return discountPercentB.compareTo(discountPercentA);
         });
         break;
+      case 'Đánh giá':
+        _sortByRating(products);
+        break;
       default:
         products.sort((a, b) => a.title.compareTo(b.title));
     }
 
     allProducts.assignAll(products);
+  }
+
+  Future<void> _sortByRating(List<ProductModel> products) async {
+    try {
+      if (products.isEmpty) return;
+
+      // Lấy danh sách ID sản phẩm
+      final productIds = products.map((p) => p.id).toList();
+
+      // Tách các ID cần lấy từ server và ID đã có trong cache
+      final List<String> idsToFetch = [];
+      final Map<String, double> ratingsFromCache = {};
+
+      for (var id in productIds) {
+        if (_ratingsCache.containsKey(id)) {
+          ratingsFromCache[id] = _ratingsCache[id]!;
+        } else {
+          idsToFetch.add(id);
+        }
+      }
+
+      // Lấy đánh giá cho các sản phẩm chưa có trong cache
+      final Map<String, double> newRatings = idsToFetch.isEmpty
+          ? {}
+          : await productRepository.getProductsAverageRatings(idsToFetch);
+
+      // Kết hợp kết quả mới và cache
+      final Map<String, double> allRatings = {
+        ...ratingsFromCache,
+        ...newRatings
+      };
+
+      // Cập nhật cache với dữ liệu mới
+      _ratingsCache.addAll(newRatings);
+
+      // Sắp xếp sản phẩm theo đánh giá (cao đến thấp)
+      products.sort((a, b) {
+        final ratingA = allRatings[a.id] ?? 0.0;
+        final ratingB = allRatings[b.id] ?? 0.0;
+
+        // Ưu tiên sản phẩm có đánh giá
+        if (ratingA > 0 && ratingB == 0) return -1;
+        if (ratingA == 0 && ratingB > 0) return 1;
+
+        return ratingB.compareTo(ratingA);
+      });
+    } catch (e) {}
   }
 
   void assignProducts(List<ProductModel> products) {

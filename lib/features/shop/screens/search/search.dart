@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pine/data/repositories/product_repository.dart';
+import 'package:pine/data/repositories/review_repository.dart';
 import 'package:pine/features/shop/controllers/search_controller.dart';
-import 'package:pine/features/shop/screens/search/filter_bottom_sheet.dart';
+import 'package:pine/features/shop/screens/search/auto_suggestions_box.dart';
+import 'package:pine/features/shop/screens/search/filter_search.dart';
 
 import '../../../../common/widgets/appbar/appbar.dart';
 import '../../../../common/widgets/layouts/grid_layout.dart';
@@ -19,115 +22,150 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProductSearchController());
+    if (!Get.isRegistered<ProductRepository>()) {
+      Get.put(ProductRepository(), permanent: true);
+    }
 
-    return Scaffold(
-      appBar: PAppBar(
-        title:
-            Text('Tìm kiếm', style: Theme.of(context).textTheme.headlineMedium),
-        actions: [PCartCounterIcon()],
-      ),
-      body: Obx(() {
-        final hasSearchQuery = controller.searchTextController.text.isNotEmpty;
-        final isLoading = controller.isLoading.value;
+    if (!Get.isRegistered<ReviewRepository>()) {
+      Get.put(ReviewRepository(), permanent: true);
+    }
 
-        return SingleChildScrollView(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: PSizes.spaceBtwItems),
+    final controller = Get.isRegistered<ProductSearchController>()
+        ? Get.find<ProductSearchController>()
+        : Get.put(ProductSearchController(), permanent: true);
 
-                /// Thanh tìm kiếm và nút lọc
-                _buildSearchRow(context, controller),
-                const SizedBox(height: PSizes.spaceBtwItems),
-
-                /// Lịch sử tìm kiếm hoặc gợi ý tìm kiếm
-                if (!hasSearchQuery) ...[
-                  _buildSearchHistory(controller),
-                  const SizedBox(height: PSizes.spaceBtwSections),
-                  _buildSearchSuggestions(),
-                  const SizedBox(height: PSizes.spaceBtwSections),
-                ],
-
-                /// Kết quả tìm kiếm
-                if (hasSearchQuery) ...[
-                  // Hiển thị loading hoặc kết quả
-                  if (isLoading)
-                    const PVerticalProductShimmer(itemCount: 4)
-                  else
-                    _buildSearchResults(controller, context)
-                ],
-              ],
-            ),
+    return WillPopScope(
+        onWillPop: () async {
+          controller.resetAll();
+          return true;
+        },
+        child: Scaffold(
+          appBar: PAppBar(
+            title: Text('Tìm kiếm',
+                style: Theme.of(context).textTheme.headlineMedium),
+            actions: [PCartCounterIcon()],
           ),
-        );
-      }),
-    );
+          body: Obx(() {
+            final hasSearchQuery =
+                controller.searchTextController.text.isNotEmpty;
+            final isLoading = controller.isLoading.value;
+
+            return SingleChildScrollView(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: PSizes.defaultSpace),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: PSizes.spaceBtwItems),
+
+                    /// Thanh tìm kiếm và nút lọc
+                    _buildSearchRow(context, controller),
+                    const SizedBox(height: PSizes.spaceBtwItems),
+
+                    /// Lịch sử tìm kiếm hoặc gợi ý tìm kiếm
+                    if (!hasSearchQuery) ...[
+                      _buildSearchHistory(controller),
+                      const SizedBox(height: PSizes.spaceBtwSections),
+                      _buildSearchSuggestions(),
+                      const SizedBox(height: PSizes.spaceBtwSections),
+                    ],
+
+                    /// Kết quả tìm kiếm
+                    if (hasSearchQuery) ...[
+                      if (isLoading)
+                        const PVerticalProductShimmer(itemCount: 4)
+                      else
+                        _buildSearchResults(controller, context)
+                    ],
+                  ],
+                ),
+              ),
+            );
+          }),
+        ));
   }
 
+  // Cập nhật phần widget _buildSearchRow để thêm auto-suggestions
   Widget _buildSearchRow(
       BuildContext context, ProductSearchController controller) {
-    return Row(
+    return Column(
       children: [
-        // Thanh tìm kiếm
-        Expanded(
-          child: TextFormField(
-            controller: controller.searchTextController,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(
-                Iconsax.search_normal,
-                size: 18,
-              ),
-              hintText: 'Tìm kiếm sản phẩm...',
-              suffixIcon: IconButton(
-                icon: const Icon(Iconsax.close_square),
-                onPressed: () {
-                  controller.searchTextController.clear();
-                  controller.searchResults.clear();
+        Row(
+          children: [
+            // Thanh tìm kiếm
+            Expanded(
+              child: TextFormField(
+                controller: controller.searchTextController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(
+                    Iconsax.search_normal,
+                    size: 20,
+                  ),
+                  hintText: 'Tìm kiếm sản phẩm...',
+                  hintStyle: const TextStyle(
+                    color: PColors.darkGrey,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Iconsax.close_square),
+                    onPressed: () {
+                      controller.resetAll();
+                      PDeviceUtils.hideKeyboard(context);
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
+                    borderSide: BorderSide(color: PColors.primary),
+                  ),
+                ),
+                onTap: () {
+                  // Khi người dùng nhấp vào ô tìm kiếm, xóa kết quả tìm kiếm nếu có
+                  if (controller.searchResults.isNotEmpty) {
+                    controller.searchResults.clear();
+                  }
+                },
+                onFieldSubmitted: (_) {
+                  controller.searchProducts();
+                  controller.autoSuggestions.clear();
                   PDeviceUtils.hideKeyboard(context);
                 },
               ),
-              border: OutlineInputBorder(
+            ),
+
+            // Nút lọc
+            const SizedBox(width: PSizes.spaceBtwItems / 2),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
-                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
-                borderSide: BorderSide(color: PColors.primary),
+              child: IconButton(
+                onPressed: () {
+                  controller.autoSuggestions.clear();
+                  _showFilterBottomSheet(context);
+                },
+                icon: const Icon(Iconsax.filter),
+                color: PColors.primary,
+                iconSize: 20,
+                tooltip: 'Lọc sản phẩm',
+                padding: const EdgeInsets.all(PSizes.spaceBtwItems),
+                constraints: const BoxConstraints(),
               ),
             ),
-            onFieldSubmitted: (_) {
-              controller.searchProducts();
-              PDeviceUtils.hideKeyboard(context);
-            },
-          ),
+          ],
         ),
 
-        // Nút lọc
-        const SizedBox(width: PSizes.spaceBtwItems / 2),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(PSizes.cardRadiusLg),
-          ),
-          child: IconButton(
-            onPressed: () => _showFilterBottomSheet(context),
-            icon: const Icon(Iconsax.filter),
-            color: PColors.primary,
-            iconSize: 18,
-            tooltip: 'Lọc sản phẩm',
-            padding: const EdgeInsets.all(16),
-            constraints: const BoxConstraints(),
-          ),
-        ),
+        // Box hiển thị auto-suggestions
+        const AutoSuggestionsBox(),
       ],
     );
   }
@@ -218,19 +256,13 @@ class SearchScreen extends StatelessWidget {
   }
 
   Widget _buildSearchSuggestions() {
-    // Các từ khóa gợi ý tìm kiếm phổ biến
-    final suggestions = [
-      'Nước',
-      'Snack',
-      'Bánh kẹo',
-      'Mì gói',
-      'Sữa',
-      'Kem',
-      'Gia vị',
-      'Dầu gội',
-      'Sữa tắm',
-      'Bột giặt',
-    ];
+    // Các từ khóa gợi ý tìm kiếm - loại bỏ hoặc để trống
+    final suggestions = <String>[]; // Để trống không hiển thị gợi ý cứng
+
+    // Nếu không muốn hiển thị phần này nữa, trả về SizedBox
+    if (suggestions.isEmpty) {
+      return const SizedBox();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +314,8 @@ class SearchScreen extends StatelessWidget {
       onTap: () {
         final controller = Get.find<ProductSearchController>();
         controller.searchTextController.text = suggestion;
-        controller.searchProducts();
+        controller.searchProducts(); // Tìm kiếm ngay khi chọn gợi ý
+        PDeviceUtils.hideKeyboard(Get.context!);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -323,14 +356,21 @@ class SearchScreen extends StatelessWidget {
             ),
             const SizedBox(height: PSizes.spaceBtwItems),
             Text(
-              'Không tìm thấy kết quả!',
+              controller.originalResults.isEmpty
+                  ? 'Không tìm thấy kết quả!'
+                  : 'Không có sản phẩm phù hợp với bộ lọc!',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: PSizes.spaceBtwItems),
-            Text(
-              'Hãy thử tìm kiếm với từ khóa khác',
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Text(
+                controller.originalResults.isEmpty
+                    ? 'Hãy thử tìm kiếm với từ khóa khác'
+                    : 'Hãy thử chọn tiêu chí lọc khác',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -348,19 +388,6 @@ class SearchScreen extends StatelessWidget {
               '${controller.searchResults.length} kết quả tìm kiếm',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            // Nút sắp xếp kết quả
-            PopupMenuButton<int>(
-              icon: const Icon(Iconsax.sort),
-              onSelected: (index) {
-                controller.selectedSort.value = index;
-                controller.searchProducts();
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: 0, child: Text('Phổ biến nhất')),
-                const PopupMenuItem(value: 1, child: Text('Giá thấp đến cao')),
-                const PopupMenuItem(value: 2, child: Text('Giá cao đến thấp')),
-              ],
-            ),
           ],
         ),
         const SizedBox(height: PSizes.spaceBtwItems),
@@ -377,15 +404,58 @@ class SearchScreen extends StatelessWidget {
   }
 
   void _showFilterBottomSheet(BuildContext context) {
+    final controller = Get.find<ProductSearchController>();
+
+    // Đóng auto-suggestions nếu đang mở
+    controller.autoSuggestions.clear();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+      builder: (_) => Container(
+        padding: const EdgeInsets.fromLTRB(
+            PSizes.defaultSpace, 0, PSizes.defaultSpace, PSizes.spaceBtwItems),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        child: const FilterBottomSheet(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tiêu đề và nút đóng
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const PSectionHeading(
+                  title: 'Bộ lọc và sắp xếp',
+                  showActionButton: false,
+                ),
+              ],
+            ),
+            const SizedBox(height: PSizes.spaceBtwItems),
+
+            // Sử dụng widget tách riêng
+            Expanded(
+              child: SearchFilterContent(
+                onReset: () {
+                  controller.resetFilters();
+                },
+                onApply: () async {
+                  // Đóng bottom sheet trước
+                  Get.back();
+
+                  // Nếu đã chọn danh mục, sử dụng phương thức mới
+                  if (controller.selectedCategory.value != 'Tất cả') {
+                    await controller.applyFiltersByCategory();
+                  } else {
+                    // Nếu không có danh mục cụ thể, sử dụng phương thức cũ
+                    controller.reapplyFilters();
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -37,7 +37,15 @@ class _PSortableProductsState extends State<PSortableProducts> {
   final ScrollController _scrollController = ScrollController();
 
   // Tùy chọn sắp xếp
-  final sortOptions = ["A-Z", "Z-A", "Giá cao", "Giá thấp", "Giảm giá"];
+  final sortOptions = [
+    "A-Z",
+    "Z-A",
+    "Giá cao",
+    "Giá thấp",
+    "Bán chạy",
+    "Giảm giá",
+    "Đánh giá"
+  ];
 
   @override
   void initState() {

@@ -48,26 +48,7 @@ class PPromoSlider extends StatelessWidget {
                               imageUrl: banner.imageUrl,
                               isNetworkImage: true,
                               onPressed: () {
-                                if (banner.targetScreen == '/home') {
-                                  final navController =
-                                      Get.find<NavigationController>();
-                                  navController.navigateToTab(0);
-                                } else if (banner.targetScreen == '/store') {
-                                  final navController =
-                                      Get.find<NavigationController>();
-                                  navController.navigateToTab(1);
-                                } else if (banner.targetScreen == '/search') {
-                                  final navController =
-                                      Get.find<NavigationController>();
-                                  navController.navigateToTab(2);
-                                } else if (banner.targetScreen == '/settings' ||
-                                    banner.targetScreen == '/account') {
-                                  final navController =
-                                      Get.find<NavigationController>();
-                                  navController.navigateToTab(3);
-                                } else {
-                                  Get.toNamed(banner.targetScreen);
-                                }
+                                _handleNavigation(banner.targetScreen);
                               },
                               fit: BoxFit.cover,
                             ),
@@ -103,5 +84,28 @@ class PPromoSlider extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleNavigation(String targetScreen) {
+    final navController = Get.find<NavigationController>();
+
+    switch (targetScreen) {
+      case '/home':
+        navController.navigateToHome();
+        break;
+      case '/store':
+        navController.navigateToStore();
+        break;
+      case '/search':
+        navController.navigateToSearch();
+        break;
+      case '/settings':
+      case '/account':
+        navController.navigateToAccount();
+        break;
+      default:
+        Get.toNamed(targetScreen);
+        break;
+    }
   }
 }

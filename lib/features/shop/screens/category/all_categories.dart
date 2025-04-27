@@ -64,7 +64,7 @@ class AllCategoriesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: PSizes.spaceBtwItems),
 
-                  // Danh mục cha
+                  // Danh mục chính
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -96,7 +96,7 @@ class AllCategoriesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: PSizes.spaceBtwItems),
 
-                  // Danh mục con
+                  // Danh mục phụ
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

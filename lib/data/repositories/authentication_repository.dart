@@ -104,7 +104,8 @@ class AuthenticationRepository extends GetxController {
   /// Re Auth User
   Future<void> reAuthWithEmailAndPassword(String email, String password) async {
     try {
-      AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
+      AuthCredential credential =
+          EmailAuthProvider.credential(email: email, password: password);
 
       await _auth.currentUser!.reauthenticateWithCredential(credential);
     } on FirebaseAuthException catch (e) {
@@ -137,7 +138,6 @@ class AuthenticationRepository extends GetxController {
     }
   }
 
-
   /// Google
   Future<UserCredential?> signInWithGoogle() async {
     try {
@@ -150,7 +150,6 @@ class AuthenticationRepository extends GetxController {
           accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
 
       return await _auth.signInWithCredential(credentials);
-
     } on FirebaseAuthException catch (e) {
       throw PFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -160,7 +159,7 @@ class AuthenticationRepository extends GetxController {
     } on PlatformException catch (e) {
       throw PPlatformException(e.code).message;
     } catch (e) {
-      if(kDebugMode) print('Sth wrong, $e');
+      if (kDebugMode) print('Sth wrong, $e');
       return null;
     }
   }

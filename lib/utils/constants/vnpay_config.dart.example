@@ -1,0 +1,16 @@
+class VNPAYConfig {
+  // --- THÔNG TIN TEST ---
+  static const String tmnCode = 'YOUR_TMN_CODE';
+  static const String hashSecret = 'YOUR_HASH_SECRET';
+  static const String paymentUrl =
+      'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
+
+  static const String returnUrl = 'http://pine.test';
+
+  // --- THÔNG TIN KHÁC ---
+  static const String version = '2.1.0';
+  static const String command = 'pay';
+  static const String currencyCode = 'VND';
+  static const String locale = 'vn';
+  static const String orderType = 'other';
+}

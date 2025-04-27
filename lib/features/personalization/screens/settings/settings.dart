@@ -61,13 +61,6 @@ class SettingsScreen extends StatelessWidget {
                           title: "Đơn hàng",
                           onTap: () => Get.toNamed(PRoutes.order),
                         ),
-                        _buildSettingItem(
-                          context,
-                          icon: Iconsax.bank,
-                          iconColor: Colors.pinkAccent,
-                          title: "Tài khoản ngân hàng",
-                          onTap: () {},
-                        ),
                       ]),
 
                       const SizedBox(height: PSizes.spaceBtwSections),
@@ -107,6 +100,18 @@ class SettingsScreen extends StatelessWidget {
                       _buildSettingsGroup(context, "Cài đặt ứng dụng", [
                         _buildSettingItem(
                           context,
+                          icon: isDark ? Iconsax.sun_1 : Iconsax.moon,
+                          iconColor: isDark ? Colors.amber : Colors.blueGrey,
+                          title: "Chế độ tối",
+                          hasSwitch: true,
+                          switchValue: isDark,
+                          onToggle: (value) {
+                            Get.changeThemeMode(
+                                value ? ThemeMode.dark : ThemeMode.light);
+                          },
+                        ),
+                        _buildSettingItem(
+                          context,
                           icon: Iconsax.notification,
                           iconColor: Colors.red,
                           title: "Thông báo",
@@ -120,19 +125,7 @@ class SettingsScreen extends StatelessWidget {
                           title: "Quyền riêng tư",
                           subtitle:
                               "Quản lý dữ liệu tài khoản và quyền riêng tư",
-                          onTap: () {},
-                        ),
-                        _buildSettingItem(
-                          context,
-                          icon: isDark ? Iconsax.sun_1 : Iconsax.moon,
-                          iconColor: isDark ? Colors.amber : Colors.blueGrey,
-                          title: "Chế độ tối",
-                          hasSwitch: true,
-                          switchValue: isDark,
-                          onToggle: (value) {
-                            Get.changeThemeMode(
-                                value ? ThemeMode.dark : ThemeMode.light);
-                          },
+                          onTap: () => Get.toNamed(PRoutes.privacy),
                         ),
                       ]),
 

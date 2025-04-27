@@ -8,6 +8,7 @@ import 'package:pine/utils/popups/loaders.dart';
 import '../../../data/repositories/brand_repository.dart';
 
 class BrandController extends GetxController {
+  /// Lấy instance của controller theo brandId, tạo mới nếu chưa tồn tại
   static BrandController getInstance(String brandId) {
     if (Get.isRegistered<BrandController>(tag: brandId)) {
       return Get.find<BrandController>(tag: brandId);
@@ -16,21 +17,28 @@ class BrandController extends GetxController {
     }
   }
 
-  // Thêm biến để lưu trữ sản phẩm của thương hiệu
+  // Danh sách sản phẩm của thương hiệu
   final RxList<ProductModel> brandProducts = <ProductModel>[].obs;
+
   // Biến quản lý trạng thái loading
   final RxBool isLoading = true.obs;
   final RxBool isLoadingMore = false.obs;
-  // Biến để quản lý phân trang
+
+  // Biến quản lý phân trang
   DocumentSnapshot? lastDocument;
   final RxBool isLastPage = false.obs;
-  final int productsPerPage = 10; // Số sản phẩm tải mỗi lần
-  // Biến để quản lý sắp xếp - Thay đổi từ 'Tên' thành 'A-Z'
+  final int productsPerPage = 10;
+
+  // Biến quản lý sắp xếp
   final RxString selectedSortOption = 'A-Z'.obs;
   final RxInt actualProductCount = 0.obs;
+  final Map<String, double> _ratingsCache = <String, double>{}.obs;
 
+  // Danh sách thương hiệu
   final RxList<BrandModel> allBrands = <BrandModel>[].obs;
   final RxList<BrandModel> featuredBrands = <BrandModel>[].obs;
+
+  // Repositories
   final brandRepository = Get.put(BrandRepository());
   final productRepository = ProductRepository.instance;
 
@@ -40,15 +48,12 @@ class BrandController extends GetxController {
     super.onInit();
   }
 
-  /// Load Brands
+  /// Lấy danh sách thương hiệu nổi bật (isFeatured = true)
   Future<void> getFeaturedBrands() async {
     try {
       isLoading.value = true;
-
       final brands = await brandRepository.getAllBrands();
-
       allBrands.assignAll(brands);
-
       featuredBrands.assignAll(
           allBrands.where((brand) => brand.isFeatured ?? false).take(4));
     } catch (e) {
@@ -58,7 +63,7 @@ class BrandController extends GetxController {
     }
   }
 
-  /// Get Brands For Category
+  /// Lấy danh sách thương hiệu thuộc danh mục
   Future<List<BrandModel>> getBrandsForCategory(String categoryId) async {
     try {
       final brands = await brandRepository.getBrandsForCategory(categoryId);
@@ -69,16 +74,14 @@ class BrandController extends GetxController {
     }
   }
 
-  // Phương thức cũ, giữ lại để tương thích
+  /// Lấy sản phẩm của thương hiệu với số lượng giới hạn
+  /// Mặc định lấy 3 sản phẩm bán chạy nhất
   Future<List<ProductModel>> getBrandProducts(
-      {required String brandId, int limit = -1}) async {
+      {required String brandId, int limit = 3}) async {
     try {
       isLoading.value = true;
-      final products = await productRepository.getProductsForBrand(
-          brandId: brandId, limit: limit);
-
-      // Lưu sản phẩm vào danh sách có thể quan sát
-      brandProducts.assignAll(products);
+      final products = await productRepository
+          .getTopSellingProductsForBrand(brandId, limit: limit);
       return products;
     } catch (e) {
       PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
@@ -88,15 +91,14 @@ class BrandController extends GetxController {
     }
   }
 
+  /// Lấy số lượng sản phẩm thực tế của thương hiệu
   Future<void> fetchActualProductCount(String brandId) async {
     try {
-      // Tạo truy vấn để đếm số sản phẩm thực tế
       final query = FirebaseFirestore.instance
           .collection('Products')
           .where('Brand.Id', isEqualTo: brandId)
           .where('IsFeatured', isEqualTo: true);
 
-      // Lấy kết quả và cập nhật biến đếm
       final querySnapshot = await query.get();
       actualProductCount.value = querySnapshot.docs.length;
     } catch (e) {
@@ -104,19 +106,17 @@ class BrandController extends GetxController {
     }
   }
 
-  // Phương thức mới hỗ trợ lazy loading
+  /// Tải sản phẩm của thương hiệu với phân trang
+  /// Nếu isInitial = true, sẽ tải lại từ đầu và xóa danh sách hiện tại
   Future<void> fetchBrandProductsPaginated({
     required String brandId,
     bool isInitial = false,
   }) async {
     try {
-      // Nếu đang tải hoặc đã tải hết sản phẩm (trừ khi là tải lại ban đầu)
       if ((isLoadingMore.value || isLastPage.value) && !isInitial) return;
 
-      // Hiển thị loader tùy theo loại tải
       if (isInitial) {
         isLoading.value = true;
-        // Reset lại trạng thái phân trang nếu là tải ban đầu
         lastDocument = null;
         brandProducts.clear();
         isLastPage.value = false;
@@ -124,7 +124,6 @@ class BrandController extends GetxController {
         isLoadingMore.value = true;
       }
 
-      // Gọi repository để lấy dữ liệu phân trang
       final result = await productRepository.getPaginatedProducts(
         sortOption: selectedSortOption.value,
         limit: productsPerPage,
@@ -132,11 +131,8 @@ class BrandController extends GetxController {
         brandId: brandId,
       );
 
-      // Lưu document cuối cùng để phân trang tiếp theo
       lastDocument = result['lastDocument'];
       isLastPage.value = result['isLastPage'];
-
-      // Thêm sản phẩm mới vào danh sách
       final List<ProductModel> newProducts = result['products'];
 
       if (isInitial) {
@@ -147,7 +143,6 @@ class BrandController extends GetxController {
     } catch (e) {
       PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
     } finally {
-      // Cập nhật trạng thái loading
       if (isInitial) {
         isLoading.value = false;
       } else {
@@ -156,70 +151,160 @@ class BrandController extends GetxController {
     }
   }
 
-  // Phương thức đổi tiêu chí sắp xếp và tải lại dữ liệu
+  /// Thay đổi tiêu chí sắp xếp và tải lại dữ liệu
   void changeSortOption(String brandId, String sortOption) {
     if (selectedSortOption.value == sortOption) return;
     selectedSortOption.value = sortOption;
-    // Tải lại từ đầu với tiêu chí sắp xếp mới
     fetchBrandProductsPaginated(brandId: brandId, isInitial: true);
   }
 
-  // Thêm phương thức mới để sắp xếp sản phẩm đã được tải về
-  void sortProducts(String sortOption) {
+  /// Sắp xếp danh sách sản phẩm hiện tại theo tiêu chí
+  /// Không tải lại dữ liệu từ server
+  Future<void> sortProducts(String sortOption) async {
     selectedSortOption.value = sortOption;
     List<ProductModel> products = [...brandProducts];
 
-    switch (sortOption) {
-      case 'A-Z':
-        products.sort((a, b) => a.title.compareTo(b.title)); // Sắp xếp từ A-Z
-        break;
-      case 'Z-A':
-        products.sort((a, b) => b.title.compareTo(a.title)); // Sắp xếp từ Z-A
-        break;
-      case 'Giá cao':
-        products.sort((a, b) {
-          // Lấy giá hiển thị (sau giảm giá nếu có)
-          double displayPriceA =
-              a.salePrice > 0 && a.salePrice < a.price ? a.salePrice : a.price;
-          double displayPriceB =
-              b.salePrice > 0 && b.salePrice < b.price ? b.salePrice : b.price;
-          return displayPriceB
-              .compareTo(displayPriceA); // Sắp xếp cao xuống thấp
-        });
-        break;
-      case 'Giá thấp':
-        products.sort((a, b) {
-          // Lấy giá hiển thị (sau giảm giá nếu có)
-          double displayPriceA =
-              a.salePrice > 0 && a.salePrice < a.price ? a.salePrice : a.price;
-          double displayPriceB =
-              b.salePrice > 0 && b.salePrice < b.price ? b.salePrice : b.price;
-          return displayPriceA.compareTo(displayPriceB); // Sắp xếp thấp lên cao
-        });
-        break;
-      case 'Giảm giá':
-        products.sort((a, b) {
-          // Tính phần trăm giảm giá cho cả hai sản phẩm
-          double discountPercentA = 0;
-          double discountPercentB = 0;
+    try {
+      switch (sortOption) {
+        case 'A-Z':
+          products.sort((a, b) => a.title.compareTo(b.title));
+          break;
+        case 'Z-A':
+          products.sort((a, b) => b.title.compareTo(a.title));
+          break;
+        case 'Giá cao':
+          products.sort((a, b) {
+            double displayPriceA = a.salePrice > 0 && a.salePrice < a.price
+                ? a.salePrice
+                : a.price;
+            double displayPriceB = b.salePrice > 0 && b.salePrice < b.price
+                ? b.salePrice
+                : b.price;
+            return displayPriceB.compareTo(displayPriceA);
+          });
+          break;
+        case 'Giá thấp':
+          products.sort((a, b) {
+            double displayPriceA = a.salePrice > 0 && a.salePrice < a.price
+                ? a.salePrice
+                : a.price;
+            double displayPriceB = b.salePrice > 0 && b.salePrice < b.price
+                ? b.salePrice
+                : b.price;
+            return displayPriceA.compareTo(displayPriceB);
+          });
+          break;
+        case 'Bán chạy':
+          products.sort((a, b) => b.soldQuantity.compareTo(a.soldQuantity));
+          break;
+        case 'Giảm giá':
+          products.sort((a, b) {
+            double discountPercentA = 0;
+            double discountPercentB = 0;
 
-          // Chỉ tính khi có giá sale và giá gốc hợp lệ
-          if (a.price > 0 && a.salePrice > 0 && a.salePrice < a.price) {
-            discountPercentA = ((a.price - a.salePrice) / a.price) * 100;
-          }
-          if (b.price > 0 && b.salePrice > 0 && b.salePrice < b.price) {
-            discountPercentB = ((b.price - b.salePrice) / b.price) * 100;
-          }
+            if (a.price > 0 && a.salePrice > 0 && a.salePrice < a.price) {
+              discountPercentA = ((a.price - a.salePrice) / a.price) * 100;
+            }
+            if (b.price > 0 && b.salePrice > 0 && b.salePrice < b.price) {
+              discountPercentB = ((b.price - b.salePrice) / b.price) * 100;
+            }
 
-          // So sánh phần trăm giảm giá
-          return discountPercentB.compareTo(discountPercentA);
-        });
-        break;
-      default:
-        products.sort((a, b) => a.title.compareTo(b.title));
+            return discountPercentB.compareTo(discountPercentA);
+          });
+          break;
+        case 'Đánh giá':
+          await _sortByRating(products);
+          break;
+        default:
+          products.sort((a, b) => a.title.compareTo(b.title));
+      }
+
+      brandProducts.assignAll(products);
+    } catch (e) {
+      PLoaders.errorSnackBar(
+          title: 'Lỗi sắp xếp', message: 'Có lỗi xảy ra khi sắp xếp sản phẩm');
+    } finally {
+      isLoading.value = false;
     }
+  }
 
-    // Cập nhật lại danh sách sản phẩm đã sắp xếp
-    brandProducts.assignAll(products);
+  /// Sắp xếp sản phẩm theo đánh giá trung bình
+  /// Phương thức private được gọi từ sortProducts khi lựa chọn 'Đánh giá'
+  Future<void> _sortByRating(List<ProductModel> products) async {
+    try {
+      if (products.isEmpty) return;
+
+      final productIds = products.map((p) => p.id).toList();
+      final List<String> idsToFetch = [];
+      final Map<String, double> ratingsFromCache = {};
+
+      // Tối ưu bằng cách chỉ lấy dữ liệu cho những sản phẩm chưa có trong cache
+      for (var id in productIds) {
+        if (_ratingsCache.containsKey(id)) {
+          ratingsFromCache[id] = _ratingsCache[id]!;
+        } else {
+          idsToFetch.add(id);
+        }
+      }
+
+      // Lấy đánh giá cho các sản phẩm chưa có trong cache
+      final Map<String, double> newRatings = idsToFetch.isEmpty
+          ? {}
+          : await productRepository.getProductsAverageRatings(idsToFetch);
+
+      final Map<String, double> allRatings = {
+        ...ratingsFromCache,
+        ...newRatings
+      };
+
+      _ratingsCache.addAll(newRatings);
+
+      products.sort((a, b) {
+        final ratingA = allRatings[a.id] ?? 0.0;
+        final ratingB = allRatings[b.id] ?? 0.0;
+
+        // Ưu tiên sản phẩm có đánh giá
+        if (ratingA > 0 && ratingB == 0) return -1;
+        if (ratingA == 0 && ratingB > 0) return 1;
+
+        return ratingB.compareTo(ratingA);
+      });
+    } catch (e) {
+      print('Lỗi khi sắp xếp theo đánh giá: $e');
+    }
+  }
+
+  /// Lấy 2 thương hiệu bán chạy nhất thuộc danh mục (cả danh mục con)
+  /// Thương hiệu được sắp xếp theo tổng số lượng bán ra cao nhất
+  Future<List<BrandModel>> getTopSellingBrandsForCategory(String categoryId,
+      {int limit = 2}) async {
+    try {
+      isLoading.value = true;
+      final brands = await brandRepository
+          .getTopSellingBrandsForCategory(categoryId, limit: limit);
+      return brands;
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
+      return [];
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Lấy tất cả thương hiệu thuộc danh mục, được sắp xếp theo tổng số lượng bán ra
+  /// Sử dụng trong trang danh mục con để hiển thị danh sách thương hiệu
+  Future<List<BrandModel>> getAllBrandsForCategoryWithSales(
+      String categoryId) async {
+    try {
+      isLoading.value = true;
+      final brands =
+          await brandRepository.getAllBrandsForCategoryWithSales(categoryId);
+      return brands;
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Có lỗi xảy ra!', message: e.toString());
+      return [];
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
