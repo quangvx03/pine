@@ -82,7 +82,6 @@ class CreateCategoryForm extends StatelessWidget {
                 child: ElevatedButton(onPressed: () => createController.createCategory(), child: const Text('Tạo')),
               ),
 
-
               const SizedBox(height: PSizes.spaceBtwInputFields * 2),
             ],
           )

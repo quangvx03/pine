@@ -47,18 +47,19 @@ class ImageModel {
   String get updatedAtFormatted => PFormatter.formatDate(updatedAt);
 
   /// Convert to Json to Store in DB
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({bool isNew = false}) {
     return {
       'url': url,
       'folder': folder,
       'sizeBytes': sizeBytes,
       'filename': filename,
       'fullPath': fullPath,
-      'createdAt': createdAt?.toUtc(),
+      'createdAt': isNew ? FieldValue.serverTimestamp() : createdAt,
       'contentType': contentType,
       'mediaCategory': mediaCategory,
     };
   }
+
 
   /// Convert Firestore Json and Map on Model
   factory ImageModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
@@ -73,8 +74,8 @@ class ImageModel {
         sizeBytes: data['sizeBytes'] ?? 0,
         filename: data['filename'] ?? '',
         fullPath: data['fullPath'] ?? '',
-        createdAt: data.containsKey('createdAt') ? data['createdAt']?.toDate() : null,
-        updatedAt: data.containsKey('updatedAt') ? data['updatedAt']?.toDate() : null,
+        createdAt: data['createdAt'] is Timestamp ? (data['createdAt'] as Timestamp).toDate() : null,
+        updatedAt: data['updatedAt'] is Timestamp ? (data['updatedAt'] as Timestamp).toDate() : null,
         contentType: data['contentType'] ?? '',
         mediaCategory: data['mediaCategory'] ?? '',
       );

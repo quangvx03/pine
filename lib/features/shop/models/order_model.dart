@@ -5,7 +5,7 @@ import 'package:pine_admin_panel/utils/helpers/helper_functions.dart';
 import '../../../utils/constants/enums.dart';
 import '../../../utils/formatters/formatter.dart';
 import '../../personalization/models/address_model.dart';
-import 'cart_item_model.dart';
+import 'cart_model.dart';
 
 class OrderModel {
   final String id;
@@ -18,7 +18,10 @@ class OrderModel {
   final String paymentMethod;
   final AddressModel? address;
   final DateTime? deliveryDate;
-  final List<CartItemModel> items;
+  final List<CartModel> items;
+  final String? couponId;
+  final String? couponCode;
+  final double discountAmount;
 
   OrderModel({
     required this.id,
@@ -32,6 +35,9 @@ class OrderModel {
     this.paymentMethod = 'Thanh toán khi nhận hàng',
     this.address,
     this.deliveryDate,
+    this.couponId,
+    this.couponCode,
+    this.discountAmount = 0,
   });
 
   String get formattedOrderDate => PHelperFunctions.getFormattedDate(orderDate);
@@ -70,6 +76,9 @@ class OrderModel {
       'address': address?.toJson(),
       'deliveryDate': deliveryDate,
       'items': items.map((item) => item.toJson()).toList(),
+      'couponId': couponId,
+      'couponCode': couponCode,
+      'discountAmount': discountAmount,
     };
   }
 
@@ -103,12 +112,17 @@ class OrderModel {
           : (data['deliveryDate'] as Timestamp).toDate(),
       items: data.containsKey('items')
           ? (data['items'] as List<dynamic>)
-          .map((itemData) => CartItemModel.fromJson(itemData as Map<String, dynamic>))
+          .map((itemData) => CartModel.fromJson(itemData as Map<String, dynamic>))
           .toList()
           : [],
       shippingCost: data.containsKey('shippingCost')
           ? (data['shippingCost'] as num).toDouble()
           : 15000,
+      couponId: data['couponId'] as String?,
+      couponCode: data['couponCode'] as String?,
+      discountAmount: (data['discountAmount'] is double)
+          ? data['discountAmount'] as double
+          : (data['discountAmount'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

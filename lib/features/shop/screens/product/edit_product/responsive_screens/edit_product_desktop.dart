@@ -106,7 +106,7 @@ class EditProductDesktopScreen extends StatelessWidget {
                                 ProductAdditionalImages(
                                   additionalProductImagesURLs: ProductImagesController.instance.additionalProductImagesUrls,
                                   onTapToAddImages: () {
-                                    editController.pickAdditionalImages();
+                                    editController.selectMultipleProductImages();
                                   },
                                   onTapToRemoveImage: (index) {
                                     editController.removeAdditionalImage(index);

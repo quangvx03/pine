@@ -48,10 +48,22 @@ class CouponRows extends DataTableSource {
         ),
 
         DataCell(
-          coupon.status
-              ? const Icon(Iconsax.star1, color: PColors.primary)
-              : const Icon(Iconsax.star),
+          Builder(
+            builder: (_) {
+              final isExpired = coupon.endDate != null && coupon.endDate!.isBefore(DateTime.now());
+
+              if (isExpired) {
+                return const Icon(Icons.star_border_rounded, color: Colors.redAccent);
+              }
+
+              return coupon.status
+                  ? const Icon(Icons.star_rounded, color: PColors.primary)
+                  : const Icon(Icons.star_border_rounded);
+            },
+          ),
         ),
+
+        DataCell(Text('${coupon.usedCount}')),
         DataCell(Text(coupon.endDate == null ? '' : coupon.formattedEndDate)),
         DataCell(
           PTableActionButtons(

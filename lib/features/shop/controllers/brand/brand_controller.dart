@@ -11,13 +11,20 @@ class BrandController extends PBaseController<BrandModel> {
   final _brandRepository = Get.put(BrandRepository());
   final categoryController = Get.put(CategoryController());
 
+  RxList<BrandModel> filteredItems = <BrandModel>[].obs;
+  void updateFilteredItems(List<BrandModel> updatedItems) {
+    filteredItems.value = updatedItems;
+    update();
+  }
+
+
   @override
   Future<List<BrandModel>> fetchItems() async {
     final fetchedBrands = await _brandRepository.getAllBrands();
 
     final fetchedBrandCategories = await _brandRepository.getAllBrandCategories();
 
-    if(categoryController.allItems.isNotEmpty) await categoryController.fetchItems();
+    if(categoryController.allItems.isEmpty) await categoryController.fetchItems();
 
     for (var brand in fetchedBrands) {
       List<String> categoryIds = fetchedBrandCategories
@@ -48,6 +55,18 @@ class BrandController extends PBaseController<BrandModel> {
   void sortByName(int sortColumnIndex, bool ascending) {
     sortByProperty(sortColumnIndex, ascending, (BrandModel brand) {
       return removeDiacritics(brand.name.toLowerCase());
+    });
+  }
+
+  void sortByProductCount(int sortColumnIndex, bool ascending) {
+    sortByProperty(sortColumnIndex, ascending, (BrandModel brand) {
+      return brand.productsCount ?? 0;
+    });
+  }
+
+  void sortByDate(int sortColumnIndex, bool ascending) {
+    sortByProperty(sortColumnIndex, ascending, (BrandModel brand) {
+      return brand.createdAt?.millisecondsSinceEpoch ?? 0;
     });
   }
 

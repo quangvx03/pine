@@ -11,7 +11,7 @@ class SupplierController extends PBaseController<SupplierModel> {
   @override
   void onInit() {
     super.onInit();
-    fetchData(); // ← Gọi cái này mới trigger việc gọi fetchItems và cập nhật danh sách
+    fetchData();
   }
 
 
@@ -28,10 +28,17 @@ class SupplierController extends PBaseController<SupplierModel> {
   @override
   Future<List<SupplierModel>> fetchItems() async {
     sortAscending.value = false;
-    return await _repository.getAllSuppliers(); // 🔄 Lấy danh sách từ Firestore
+    return await _repository.getAllSuppliers();
   }
 
   void sortByDate(int sortColumnIndex, bool ascending) {
     sortByProperty(sortColumnIndex, ascending, (SupplierModel o) => o.createdAt.toString().toLowerCase());
   }
+
+  void sortByName(int sortColumnIndex, bool ascending) {
+    sortByProperty(sortColumnIndex, ascending, (SupplierModel supplier) {
+      return supplier.name.toLowerCase();
+    });
+  }
+
 }

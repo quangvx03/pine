@@ -96,7 +96,10 @@ class BrandRepository extends GetxController {
 
   Future<void> updateBrand(BrandModel brand) async {
     try{
-      await _db.collection("Brands").doc(brand.id).update(brand.toJson());
+      await _db.collection("Brands").doc(brand.id).set(
+        brand.toJson(),
+        SetOptions(merge: true),
+      );
     } on FirebaseException catch (e) {
       throw PFirebaseException(e.code).message;
     } on FormatException catch (_) {

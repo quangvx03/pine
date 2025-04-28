@@ -34,7 +34,6 @@ class SupplierProducts extends StatelessWidget {
           );
         }
 
-        // Tính tổng giá trị nhập hàng
         final totalValue = controller.filteredSupplierProducts.fold(
           0.0,
               (sum, p) => sum + (p.price * p.quantity),
@@ -69,7 +68,6 @@ class SupplierProducts extends StatelessWidget {
 
             const SizedBox(height: PSizes.spaceBtwItems),
 
-            // Search
             TextFormField(
               controller: controller.searchTextController,
               onChanged: (query) => controller.searchProductQuery(query),

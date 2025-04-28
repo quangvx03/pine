@@ -39,9 +39,9 @@ class BrandModel {
       'Name': name,
       'Image': image,
       'IsFeatured': isFeatured,
-      'ProductsCount': productsCount = 0,
+      'ProductsCount': productsCount,
       'CreatedAt': createdAt,
-      'UpdatedAt': updatedAt = DateTime.now(),
+      'UpdatedAt': updatedAt,
     };
   }
 

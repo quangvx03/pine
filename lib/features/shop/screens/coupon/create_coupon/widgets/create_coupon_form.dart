@@ -20,7 +20,7 @@ class CreateCouponForm extends StatelessWidget {
     final couponController = Get.put(CouponController());
 
     return PRoundedContainer(
-      width: 800, // Adjust width for two-column layout
+      width: 800,
       padding: const EdgeInsets.all(PSizes.defaultSpace),
       child: Form(
         key: createController.formKey,
@@ -32,15 +32,12 @@ class CreateCouponForm extends StatelessWidget {
             Text('Tạo mã giảm giá', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: PSizes.spaceBtwSections),
 
-            // Create a 2-column layout
             Row(
               children: [
-                // First column
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Coupon Code Text Field
                       TextFormField(
                         controller: createController.couponCode,
                         validator: (value) => PValidator.validateEmptyText('Mã giảm giá', value),
@@ -52,7 +49,6 @@ class CreateCouponForm extends StatelessWidget {
                       ),
                       const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                      // Discount Type Dropdown
                       Obx(
                             () => couponController.isLoading.value
                             ? const PShimmerEffect(width: double.infinity, height: 55)
@@ -71,7 +67,6 @@ class CreateCouponForm extends StatelessWidget {
                       ),
                       const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                      // Discount Amount Text Field
                       TextFormField(
                         controller: createController.discountAmount,
                         validator: (value) => PValidator.validateEmptyText('Số tiền giảm', value),
@@ -84,7 +79,6 @@ class CreateCouponForm extends StatelessWidget {
                       ),
                       const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                      // 🆕 Description Text Field
                       TextFormField(
                         controller: createController.description,
                         validator: (value) => PValidator.validateEmptyText('Mô tả', value),
@@ -100,10 +94,7 @@ class CreateCouponForm extends StatelessWidget {
                   ),
                 ),
 
-                // Spacer between columns
                 const SizedBox(width: PSizes.spaceBtwSections),
-
-                // Second column
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +112,6 @@ class CreateCouponForm extends StatelessWidget {
                       ),
                       const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                      // End Date Picker
                       TextFormField(
                         controller: createController.endDate,
                         validator: (value) => PValidator.validateEmptyText('Ngày hết hạn', value),
@@ -135,7 +125,6 @@ class CreateCouponForm extends StatelessWidget {
                       ),
                       const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                      // Status Checkbox
                       Obx(
                             () => CheckboxListTile(
                           value: createController.status.value,

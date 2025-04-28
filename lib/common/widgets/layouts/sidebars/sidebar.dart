@@ -46,7 +46,6 @@ class PSidebar extends StatelessWidget {
                     children: [
                       Text('Menu', style: Theme.of(context).textTheme.bodySmall!.apply(letterSpacingDelta: 1.2)),
 
-                      /// Menu shared by all
                       PMenuItem(
                         route: userRole == 'staff' ? PRoutes.staffDashboard : PRoutes.dashboard,
                         icon: Iconsax.status,
@@ -57,7 +56,6 @@ class PSidebar extends StatelessWidget {
                       const PMenuItem(route: PRoutes.brands, icon: Iconsax.dcube, itemName: 'Thương hiệu'),
                       const PMenuItem(route: PRoutes.products, icon: Iconsax.shopping_bag, itemName: 'Sản phẩm'),
 
-                      /// Admin-only menu
                       if (userRole == 'admin') ...[
                         const PMenuItem(route: PRoutes.banners, icon: Iconsax.picture_frame, itemName: 'Banner'),
                         const PMenuItem(route: PRoutes.coupons, icon: Iconsax.ticket_discount, itemName: 'Mã giảm giá'),

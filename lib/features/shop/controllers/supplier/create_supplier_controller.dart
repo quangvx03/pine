@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pine_admin_panel/features/shop/controllers/supplier/supplier_controller.dart';
@@ -6,6 +7,8 @@ import 'package:pine_admin_panel/features/shop/models/product_model.dart';
 import 'package:pine_admin_panel/utils/helpers/network_manager.dart';
 import 'package:pine_admin_panel/utils/popups/full_screen_loader.dart';
 import 'package:pine_admin_panel/utils/popups/loaders.dart';
+import 'package:pine_admin_panel/utils/helpers/pdf_invoice_generator.dart';
+import 'package:printing/printing.dart';
 
 import '../../../../data/repositories/supplier_repository.dart';
 import '../../models/supplier_model.dart';
@@ -25,19 +28,16 @@ class CreateSupplierController extends GetxController {
   final totalAmount = 0.0.obs;
   final totalQuantity = 0.obs;
 
-  /// Thêm 1 sản phẩm
   void addProduct(ProductModel product, int quantity, double price) {
     productList.add(SupplierProductModel(product: product, quantity: quantity, price: price));
     _calculateTotal();
   }
 
-  /// Xoá sản phẩm
   void removeProduct(int index) {
     productList.removeAt(index);
     _calculateTotal();
   }
 
-  /// Tính tổng tiền và tổng số lượng
   void _calculateTotal() {
     double total = 0;
     int qty = 0;
@@ -51,7 +51,19 @@ class CreateSupplierController extends GetxController {
     totalQuantity.value = qty;
   }
 
-  /// Tạo đơn nhập hàng
+  SupplierModel getSupplierModel() {
+    return SupplierModel(
+      id: '',
+      name: name.text.trim(),
+      phone: phone.text.trim(),
+      address: address.text.trim(),
+      products: productList,
+      quantity: totalQuantity.value,
+      totalAmount: totalAmount.value,
+      createdAt: DateTime.now(),
+    );
+  }
+
   Future<void> createPurchaseOrder() async {
     try {
       PFullScreenLoader.popUpCircular();
@@ -67,34 +79,25 @@ class CreateSupplierController extends GetxController {
         return;
       }
 
-      // Kiểm tra có sản phẩm chưa
       if (productList.isEmpty) {
         PFullScreenLoader.stopLoading();
         PLoaders.errorSnackBar(title: 'Thiếu sản phẩm', message: 'Vui lòng thêm ít nhất 1 sản phẩm.');
         return;
       }
 
-      final newRecord = SupplierModel(
-        id: '',
-        name: name.text.trim(),
-        phone: phone.text.trim(),
-        address: address.text.trim(),
-        products: productList,
-        quantity: totalQuantity.value,
-        totalAmount: totalAmount.value,
-        createdAt: DateTime.now(),
-      );
+      final newRecord = getSupplierModel();
 
       newRecord.id = await SupplierRepository.instance.createPurchaseOrder(newRecord);
-      // Cập nhật controller danh sách
       SupplierController.instance.addItemToLists(newRecord);
+
+      await exportInvoice();
 
       resetFields();
       PFullScreenLoader.stopLoading();
 
       PLoaders.successSnackBar(
         title: 'Thành công',
-        message: 'Đơn nhập hàng đã được tạo.',
+        message: 'Đơn nhập hàng đã được tạo và hóa đơn PDF đã được xuất.',
       );
     } catch (e) {
       PFullScreenLoader.stopLoading();
@@ -102,7 +105,16 @@ class CreateSupplierController extends GetxController {
     }
   }
 
-  /// Reset toàn bộ fields
+  Future<void> exportInvoice() async {
+    try {
+      final supplier = getSupplierModel();
+      final pdfData = await PDFInvoiceGenerator.generateSupplierInvoice(supplier);
+      await Printing.sharePdf(bytes: pdfData, filename: 'invoice_${DateTime.now().millisecondsSinceEpoch}.pdf');
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Lỗi xuất PDF', message: e.toString());
+    }
+  }
+
   void resetFields() {
     name.clear();
     phone.clear();

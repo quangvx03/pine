@@ -4,12 +4,13 @@ import 'package:iconsax/iconsax.dart';
 
 import 'package:pine_admin_panel/common/widgets/containers/rounded_container.dart';
 import 'package:pine_admin_panel/features/shop/controllers/dashboard/dashboard_controller.dart';
+import 'package:pine_admin_panel/features/shop/screens/staff_dashboard/table/best_seller_table.dart';
 import 'package:pine_admin_panel/utils/constants/sizes.dart';
 
+import '../../../../../common/widgets/icons/p_circular_icon.dart';
 import '../../dashboard/table/dashboard_table.dart';
 import '../../dashboard/widgets/dashboard_card.dart';
 import '../../dashboard/widgets/order_status_graph.dart';
-import '../../dashboard/widgets/weekly_sales.dart';
 
 class StaffDashboardDesktopScreen extends StatelessWidget {
   const StaffDashboardDesktopScreen({super.key});
@@ -81,31 +82,65 @@ class StaffDashboardDesktopScreen extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Cột bên trái chứa "Đơn hàng gần đây" và "Sản phẩm bán chạy"
                   Expanded(
                     flex: 2,
                     child: Column(
                       children: [
-                        /// Bar Graph
-                        const PWeeklySalesGraph(),
-                        const SizedBox(height: PSizes.spaceBtwSections),
-
-                        /// Orders
+                        /// Đơn hàng gần đây
                         PRoundedContainer(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Đơn hàng gần đây', style: Theme.of(context).textTheme.headlineSmall),
+                              Row(
+                                children: [
+                                  PCircularIcon(
+                                    icon: Iconsax.box_search,
+                                    backgroundColor: Colors.pinkAccent.withOpacity(0.1),
+                                    color: Colors.pinkAccent,
+                                    size: PSizes.md,
+                                  ),
+                                  const SizedBox(width: PSizes.spaceBtwItems),
+                                  Text('Đơn hàng gần đây', style: Theme.of(context).textTheme.headlineSmall),
+                                ],
+                              ),
                               const SizedBox(height: PSizes.spaceBtwSections),
                               const DashboardOrderTable(),
+                            ],
+                          ),
+                        ),
+
+                        // Thêm khoảng cách sau đơn hàng gần đây
+                        const SizedBox(height: PSizes.spaceBtwSections),
+
+                        /// Sản phẩm bán chạy
+                        PRoundedContainer(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  PCircularIcon(
+                                    icon: Iconsax.chart_square,
+                                    backgroundColor: Colors.green.withOpacity(0.1),
+                                    color: Colors.green,
+                                    size: PSizes.md,
+                                  ),
+                                  const SizedBox(width: PSizes.spaceBtwItems),
+                                  Text('Sản phẩm bán chạy', style: Theme.of(context).textTheme.headlineSmall),
+                                ],
+                              ),
+                              const SizedBox(height: PSizes.spaceBtwSections),
+                              const BestSellerTable(),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
+
                   const SizedBox(width: PSizes.spaceBtwSections),
 
-                  /// Pie Chart
                   const Expanded(child: OrderStatusPieChart()),
                 ],
               ),

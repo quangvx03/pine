@@ -1,14 +1,12 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:pine_admin_panel/common/widgets/icons/table_action_icon_buttons.dart';
 import 'package:pine_admin_panel/common/widgets/images/p_rounded_image.dart';
 import 'package:pine_admin_panel/features/shop/controllers/brand/brand_controller.dart';
 import 'package:pine_admin_panel/routes/routes.dart';
 import 'package:pine_admin_panel/utils/constants/colors.dart';
 import 'package:pine_admin_panel/utils/constants/enums.dart';
-import 'package:pine_admin_panel/utils/constants/image_strings.dart';
 import 'package:pine_admin_panel/utils/constants/sizes.dart';
 import 'package:pine_admin_panel/utils/device/device_utility.dart';
 
@@ -68,7 +66,8 @@ class BrandRows extends DataTableSource {
             ),
           ),
 
-        DataCell(brand.isFeatured ? const Icon(Iconsax.star1, color: PColors.primary) : const Icon(Iconsax.star)),
+        DataCell(brand.isFeatured ? const Icon(Icons.star_rounded, color: PColors.primary) : const Icon(Icons.star_border_rounded)),
+        DataCell(Text('${brand.productsCount ?? 0}')),
         DataCell(Text(brand.createdAt != null ? brand.formattedDate : '')),
         DataCell(
           PTableActionButtons(

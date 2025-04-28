@@ -22,7 +22,6 @@ class SupplierRows extends DataTableSource {
 
     return DataRow2(
       cells: [
-        // ID
         DataCell(
           Text(
             supplier.id,
@@ -34,20 +33,10 @@ class SupplierRows extends DataTableSource {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-
-        // Tên nhà cung cấp
         DataCell(Text(supplier.name)),
-
-        // Số điện thoại
         DataCell(Text(supplier.phone)),
-
-        // Tổng tiền
         DataCell(Text(currencyFormat.format(supplier.totalAmount))),
-
-        // Ngày tạo đơn
         DataCell(Text(dateFormat.format(supplier.createdAt))),
-
-        // Actions
         DataCell(
           PTableActionButtons(
             view: true,

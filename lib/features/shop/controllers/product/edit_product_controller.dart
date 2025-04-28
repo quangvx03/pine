@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pine_admin_panel/data/repositories/product_repository.dart';
 import 'package:pine_admin_panel/features/shop/controllers/category/category_controller.dart';
 import 'package:pine_admin_panel/features/shop/controllers/product/product_attributes_controller.dart';
@@ -19,6 +21,8 @@ import 'package:pine_admin_panel/utils/popups/full_screen_loader.dart';
 import 'package:pine_admin_panel/utils/popups/loaders.dart';
 
 import '../../../../utils/constants/sizes.dart';
+import '../../../media/controllers/media_controller.dart';
+import '../../../media/models/image_model.dart';
 
 class EditProductController extends GetxController {
   static EditProductController get instance => Get.find();
@@ -63,6 +67,15 @@ class EditProductController extends GetxController {
         stock.text = product.stock.toString();
         price.text = product.price.toString();
         salePrice.text = product.salePrice.toString();
+      } else {
+        double minPrice = product.productVariations?.map((e) => e.price).reduce((a, b) => a < b ? a : b) ?? 0.0;
+        double maxPrice = product.productVariations?.map((e) => e.price).reduce((a, b) => a > b ? a : b) ?? 0.0;
+
+        price.text = "${minPrice.toInt()} - ${maxPrice.toInt()}";
+        salePrice.text = product.salePrice > 0 ? product.salePrice.toString() : '';
+
+        int totalStock = product.productVariations?.map((e) => e.stock).reduce((a, b) => a + b) ?? 0;
+        stock.text = totalStock.toString();
       }
 
       selectedBrand.value = product.brand;
@@ -85,14 +98,15 @@ class EditProductController extends GetxController {
     }
   }
 
-  // Chọn nhiều ảnh bổ sung
-  void selectAdditionalImages(List<String> images) {
-    final imagesController = ProductImagesController.instance;
-    imagesController.additionalProductImagesUrls.addAll(images);
-    update();
+  void selectMultipleProductImages() async {
+    final controller = Get.put(MediaController());
+    List<ImageModel>? selectedImages = await controller.selectImagesFromMedia(multipleSelection: true, selectedUrls: ProductImagesController.instance.additionalProductImagesUrls);
+
+    if (selectedImages != null && selectedImages.isNotEmpty) {
+      ProductImagesController.instance.additionalProductImagesUrls.assignAll(selectedImages.map((e) => e.url));
+    }
   }
 
-// Xoá ảnh bổ sung theo index
   void removeAdditionalImage(int index) {
     final imagesController = ProductImagesController.instance;
     if (index >= 0 && index < imagesController.additionalProductImagesUrls.length) {
@@ -101,18 +115,7 @@ class EditProductController extends GetxController {
     }
   }
 
-  Future<void> pickAdditionalImages() async {
-    final imagesController = ProductImagesController.instance;
-    // 👉 Giả sử bạn đã có logic chọn ảnh (ví dụ FilePicker hoặc imageUploader riêng)
-    // Dưới đây là mô phỏng thêm ảnh URL (giả lập)
-    List<String> newImages = [
-      'https://via.placeholder.com/150', // Thay bằng ảnh thực tế khi chọn
-      'https://via.placeholder.com/200'
-    ];
 
-    imagesController.additionalProductImagesUrls.addAll(newImages);
-    update(); // để UI cập nhật
-  }
 
   Future<List<CategoryModel>> loadSelectedCategories(String productId) async {
     selectedCategoriesLoader.value = true;
@@ -143,9 +146,17 @@ class EditProductController extends GetxController {
         return;
       }
 
-      if (productType.value == ProductType.single && !stockPriceFormKey.currentState!.validate()) {
-        PFullScreenLoader.stopLoading();
-        return;
+      if (productType.value == ProductType.single) {
+        if (!stockPriceFormKey.currentState!.validate()) {
+          PFullScreenLoader.stopLoading();
+          return;
+        }
+
+        if (int.tryParse(stock.text.trim()) == null || double.tryParse(price.text.trim()) == null) {
+          PFullScreenLoader.stopLoading();
+          PLoaders.errorSnackBar(title: 'Lỗi', message: 'Giá và số lượng không hợp lệ.');
+          return;
+        }
       }
 
       if (selectedBrand.value == null) throw 'Chọn thương hiệu cho sản phẩm';
@@ -153,14 +164,12 @@ class EditProductController extends GetxController {
       if (productType.value == ProductType.variable && ProductVariationController.instance.productVariations.isEmpty) {
         throw 'Không có thể loại nào cho Thể Loại Sản phẩm. Tạo một số thể loại hoặc thay đổi Loại Sản phẩm.';
       }
+
       if (productType.value == ProductType.variable) {
         final variationCheckFailed = ProductVariationController.instance.productVariations.any((element) =>
-        element.price.isNaN ||
-            element.price < 0 ||
-            element.salePrice.isNaN ||
-            element.salePrice < 0 ||
-            element.stock.isNaN ||
-            element.stock < 0,
+        element.price.isNaN || element.price < 0 ||
+            element.salePrice.isNaN || element.salePrice < 0 ||
+            element.stock.isNaN || element.stock < 0
         );
         if (variationCheckFailed) throw 'Dữ liệu thể loại không chính xác. Vui lòng kiểm tra lại các thể loại';
       }
@@ -170,61 +179,71 @@ class EditProductController extends GetxController {
         throw 'Chọn ảnh đại diện sản phẩm';
       }
 
-        var variations = ProductVariationController.instance.productVariations;
-        if (productType.value == ProductType.single && variations.isNotEmpty) {
-          ProductVariationController.instance.resetAllValues();
-          variations.value = [];
+      var variations = ProductVariationController.instance.productVariations;
+      if (productType.value == ProductType.single && variations.isNotEmpty) {
+        ProductVariationController.instance.resetAllValues();
+        variations.value = [];
+      }
+
+      product.sku = '';
+      product.isFeatured = isFeatured.value;
+      product.title = title.text.trim();
+      product.brand = selectedBrand.value;
+      product.productVariations = variations;
+      product.description = description.text.trim();
+      product.productType = productType.value.toString();
+      if (productType.value == ProductType.single) {
+        product.stock = int.tryParse(stock.text.trim()) ?? 0;
+      } else {
+        int totalStock = ProductVariationController.instance.productVariations.map((e) => e.stock).reduce((a, b) => a + b);
+        product.stock = totalStock;
+      }
+
+      if (productType.value == ProductType.single) {
+        product.price = double.tryParse(price.text.trim()) ?? 0;
+      } else {
+        List<double> prices = ProductVariationController.instance.productVariations.map((e) => e.price).toList();
+        product.price = prices.isNotEmpty ? prices.reduce((a, b) => a < b ? a : b) : 0;
+      }
+
+      product.images = imagesController.additionalProductImagesUrls;
+      product.salePrice = double.tryParse(salePrice.text.trim()) ?? 0;
+      product.thumbnail = imagesController.selectedThumbnailImageUrl.value ?? '';
+      product.productAttributes = ProductAttributesController.instance.productAttributes;
+
+      productDataUploader.value = true;
+      await ProductRepository.instance.updateProduct(product);
+
+      if (selectedCategories.isNotEmpty) {
+        categoriesRelationshipUploader.value = true;
+
+        List<String> existingCategoryIdsCopy = List.from(alreadyAddedCategories.map((category) => category.id));
+        List<String> selectedCategoryIdsCopy = List.from(selectedCategories.map((category) => category.id));
+
+        for (var selectedCategoryId in selectedCategoryIdsCopy) {
+          if (!existingCategoryIdsCopy.contains(selectedCategoryId)) {
+            final productCategory = ProductCategoryModel(productId: product.id, categoryId: selectedCategoryId);
+            await ProductRepository.instance.createProductCategory(productCategory);
+          }
         }
 
-          product.sku = '';
-          product.isFeatured = isFeatured.value;
-          product.title = title.text.trim();
-          product.brand = selectedBrand.value;
-          product.productVariations = variations;
-          product.description = description.text.trim();
-          product.productType = productType.value.toString();
-          product.stock = int.tryParse(stock.text.trim()) ?? 0;
-          product.price = double.tryParse(price.text.trim()) ?? 0;
-          product.images = imagesController.additionalProductImagesUrls;
-          product.salePrice = double.tryParse(salePrice.text.trim()) ?? 0;
-          product.thumbnail = imagesController.selectedThumbnailImageUrl.value ?? '';
-          product.productAttributes = ProductAttributesController.instance.productAttributes;
-
-          productDataUploader.value = true;
-          await ProductRepository.instance.updateProduct(product);
-
-          if (selectedCategories.isNotEmpty) {
-            categoriesRelationshipUploader.value = true;
-            List<String> existingCategoryIds = alreadyAddedCategories.map((
-                category) => category.id).toList();
-
-            for (var category in selectedCategories) {
-              if (!existingCategoryIds.contains(category.id)) {
-                final productCategory = ProductCategoryModel(
-                    productId: product.id, categoryId: category.id);
-                await ProductRepository.instance.createProductCategory(productCategory);
-              }
-            }
-
-            for (var existingCategoryId in existingCategoryIds) {
-              if (!selectedCategories.any((category) =>
-              category.id == existingCategoryId)) {
-                await ProductRepository.instance.removeProductCategory(
-                    product.id, existingCategoryId);
-              }
-            }
+        for (var existingCategoryId in existingCategoryIdsCopy) {
+          if (!selectedCategoryIdsCopy.contains(existingCategoryId)) {
+            await ProductRepository.instance.removeProductCategory(product.id, existingCategoryId);
           }
-        ProductController.instance.updateItemFromLists(product);
+        }
+      }
 
-        PFullScreenLoader.stopLoading();
-
-        showCompletionDialog();
+      ProductController.instance.updateItemFromLists(product);
+      PFullScreenLoader.stopLoading();
+      showCompletionDialog();
 
     } catch (e) {
       PFullScreenLoader.stopLoading();
       PLoaders.errorSnackBar(title: 'Ôi không', message: e.toString());
     }
   }
+
 
   void resetValues() {
     isLoading.value = false;

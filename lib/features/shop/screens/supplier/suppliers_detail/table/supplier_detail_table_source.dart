@@ -16,6 +16,7 @@ class SupplierProductsRows extends DataTableSource {
 
     return DataRow2(
       cells: [
+        DataCell(Text((index + 1).toString())),
         DataCell(Text(productData.product.title)),
         DataCell(Text(productData.quantity.toString())),
         DataCell(Text('${currencyFormatter.format(productData.price)}đ')),

@@ -29,7 +29,7 @@ class PWeeklySalesGraph extends StatelessWidget {
                 children: [
                   PCircularIcon(
                     icon: Iconsax.graph,
-                    backgroundColor: Colors.brown.withOpacity(0.1),
+                    backgroundColor: Colors.brown.withValues(alpha: 0.1),
                     color: Colors.brown,
                     size: PSizes.md,
                   ),
@@ -43,28 +43,17 @@ class PWeeklySalesGraph extends StatelessWidget {
 
           const SizedBox(height: PSizes.spaceBtwSections),
 
-          /// Biểu đồ
           Obx(() {
-            if (controller.isLoading.value) {
-              return const SizedBox(
-                height: 400,
-                child: Center(child: PLoaderAnimation()),
-              );
-            }
-
             final sales = controller.weeklySales;
-            if (sales.isEmpty) {
-              return const SizedBox(
-                height: 400,
-                child: Center(child: Text('Không có dữ liệu')),
-              );
-            }
+            final fallbackSales = sales.isNotEmpty ? sales : List.filled(7, 0.0);
 
             return SizedBox(
               height: 400,
-              child: BarChart(
+              child: controller.isLoading.value
+                  ? const Center(child: PLoaderAnimation())
+                  : BarChart(
                 BarChartData(
-                  titlesData: buildFlTitlesData(sales, controller),
+                  titlesData: buildFlTitlesData(fallbackSales, controller),
                   borderData: FlBorderData(
                     show: true,
                     border: const Border(
@@ -79,20 +68,21 @@ class PWeeklySalesGraph extends StatelessWidget {
                     horizontalInterval: 50000,
                   ),
                   groupsSpace: 30,
-                  barGroups: sales.asMap().entries.map((entry) {
+                  barGroups: fallbackSales.asMap().entries.map((entry) {
                     return BarChartGroupData(
                       x: entry.key,
                       barRods: [
                         BarChartRodData(
                           width: 25,
                           toY: entry.value,
-                          color: PColors.primary,
+                          color: sales.isEmpty ? Colors.grey.shade300 : PColors.primary,
                           borderRadius: BorderRadius.circular(PSizes.sm),
                         ),
                       ],
                     );
                   }).toList(),
                   barTouchData: BarTouchData(
+                    enabled: sales.isNotEmpty,
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipColor: (_) => PColors.secondary,
                       tooltipPadding: const EdgeInsets.all(8),
@@ -112,12 +102,14 @@ class PWeeklySalesGraph extends StatelessWidget {
   }
 }
 
-
 FlTitlesData buildFlTitlesData(List<double> sales, DashboardController controller) {
   final type = controller.salesViewType.value;
   final labels = _generateLabels(type, sales.length, controller);
+
   final maxY = sales.isNotEmpty ? sales.reduce((a, b) => a > b ? a : b) : 1;
-  final interval = ((maxY / 5).ceil()).toDouble();
+  double interval = ((maxY / 5).ceil()).toDouble();
+
+  if (interval <= 0) interval = 1;
 
   return FlTitlesData(
     show: true,
@@ -146,6 +138,7 @@ FlTitlesData buildFlTitlesData(List<double> sales, DashboardController controlle
     topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
   );
 }
+
 
 List<String> _generateLabels(String type, int length, DashboardController controller) {
   switch (type) {
@@ -231,4 +224,3 @@ class _SalesViewSwitcher extends StatelessWidget {
     );
   }
 }
-

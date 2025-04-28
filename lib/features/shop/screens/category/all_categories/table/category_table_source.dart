@@ -45,7 +45,7 @@ class CategoryRows extends DataTableSource {
         ),
 
         DataCell(Text(parentCategory != null ? parentCategory.name : '')),
-        DataCell(category.isFeatured ? const Icon(Iconsax.star1, color: PColors.primary) : const Icon(Iconsax.star)),
+        DataCell(category.isFeatured ? const Icon(Icons.star_rounded, color: PColors.primary) : const Icon(Icons.star_border_rounded)),
         DataCell(Text(category.createdAt == null ? '' : category.formattedDate)),
         DataCell(
           PTableActionButtons(

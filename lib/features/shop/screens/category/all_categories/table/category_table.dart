@@ -27,7 +27,8 @@ class CategoryTable extends StatelessWidget {
                 onSort: (columnIndex, ascending) =>
                     controller.sortByName(columnIndex, ascending)),
             const DataColumn2(label: Text('Nổi bật')),
-            const DataColumn2(label: Text('Ngày')),
+            DataColumn2(label: Text('Ngày'), onSort: (columnIndex, ascending) =>
+                controller.sortByDate(columnIndex, ascending)),
             const DataColumn2(label: Text('Hành động'), fixedWidth: 100),
           ],
           source: CategoryRows(),

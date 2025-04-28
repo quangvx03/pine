@@ -12,6 +12,7 @@ class CouponModel {
   DateTime? createdAt;
   DateTime? updatedAt;
   String description;
+  int usedCount;
 
   CouponModel({
     required this.id,
@@ -24,6 +25,7 @@ class CouponModel {
     this.createdAt,
     this.updatedAt,
     this.description = '',
+    this.usedCount = 0,
   });
 
   String get formattedDate => PFormatter.formatDate(createdAt);
@@ -72,9 +74,39 @@ class CouponModel {
         createdAt: data.containsKey('CreatedAt') ? data['CreatedAt']?.toDate() : null,
         updatedAt: data.containsKey('UpdatedAt') ? data['UpdatedAt']?.toDate() : null,
         description: data['Description'] ?? '',
+        usedCount: 0, // mặc định nếu không có
       );
     } else {
       return CouponModel.empty();
     }
   }
+
+  CouponModel copyWith({
+    String? id,
+    String? couponCode,
+    String? type,
+    double? discountAmount,
+    double? minimumPurchaseAmount,
+    DateTime? endDate,
+    bool? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? description,
+    int? usedCount,
+  }) {
+    return CouponModel(
+      id: id ?? this.id,
+      couponCode: couponCode ?? this.couponCode,
+      type: type ?? this.type,
+      discountAmount: discountAmount ?? this.discountAmount,
+      minimumPurchaseAmount: minimumPurchaseAmount ?? this.minimumPurchaseAmount,
+      endDate: endDate ?? this.endDate,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      description: description ?? this.description,
+      usedCount: usedCount ?? this.usedCount,
+    );
+  }
+
 }

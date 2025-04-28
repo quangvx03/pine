@@ -27,7 +27,10 @@ class CouponTable extends StatelessWidget {
             DataColumn2(label: const Text('Loại')),
             const DataColumn2(label: Text('Giảm')),
             const DataColumn2(label: Text('Trạng thái')),
-            const DataColumn2(label: Text('Ngày hết hạn')),
+            DataColumn2(label: const Text('Đã sử dụng'), onSort: (columnIndex, ascending) =>
+                controller.sortByUsedCount(columnIndex, ascending)),
+            DataColumn2(label: Text('Ngày hết hạn'), onSort: (columnIndex, ascending) =>
+                controller.sortByEndDate(columnIndex, ascending)),
             const DataColumn2(label: Text('Hành động'), fixedWidth: 100),
           ],
           source: CouponRows(),

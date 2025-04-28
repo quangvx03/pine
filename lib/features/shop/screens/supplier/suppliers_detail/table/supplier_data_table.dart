@@ -22,6 +22,7 @@ class SupplierProductTable extends StatelessWidget {
         sortAscending: controller.sortAscending.value,
         sortColumnIndex: controller.sortColumnIndex.value,
         columns: [
+          DataColumn2(label: Text('STT')),
           DataColumn2(
               label: const Text('Tên sản phẩm'),
               onSort: (columnIndex, ascending) =>

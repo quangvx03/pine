@@ -34,4 +34,11 @@ class CategoryController extends PBaseController<CategoryModel> {
       return removeDiacritics(category.name.toLowerCase());
     });
   }
+
+  void sortByDate(int sortColumnIndex, bool ascending) {
+    sortByProperty(sortColumnIndex, ascending, (CategoryModel category) {
+      return category.createdAt?.millisecondsSinceEpoch ?? 0;
+    });
+  }
+
 }

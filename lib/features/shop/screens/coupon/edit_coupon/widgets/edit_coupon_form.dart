@@ -85,7 +85,6 @@ class EditCouponForm extends StatelessWidget {
                       ),
                       const SizedBox(height: PSizes.spaceBtwInputFields),
 
-                      // 🆕 Description Text Field
                       TextFormField(
                         controller: editController.description,
                         validator: (value) => PValidator.validateEmptyText('Mô tả', value),

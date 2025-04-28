@@ -6,6 +6,7 @@ import 'package:pine_admin_panel/utils/popups/loaders.dart';
 import '../../../../data/repositories/supplier_repository.dart';
 import '../../models/supplier_product_model.dart';
 import '../../models/supplier_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SupplierDetailController extends GetxController {
   static SupplierDetailController get instance => Get.find();
@@ -28,7 +29,6 @@ class SupplierDetailController extends GetxController {
     }
   }
 
-  /// Đặt supplier hiện tại
   void setSupplier(SupplierModel newSupplier) {
     supplier.value = newSupplier;
     allSupplierProducts.assignAll(newSupplier.products);
@@ -36,17 +36,32 @@ class SupplierDetailController extends GetxController {
     update();
   }
 
-  /// Tìm kiếm sản phẩm theo tên hoặc ID
+  Future<void> reloadSupplierFromFirestore(String supplierId) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Suppliers')
+          .doc(supplierId)
+          .get();
+
+      if (snapshot.exists) {
+        final updatedSupplier = SupplierModel.fromSnapshot(snapshot);
+        setSupplier(updatedSupplier);
+      }
+    } catch (e) {
+      PLoaders.errorSnackBar(title: 'Lỗi khi load lại', message: e.toString());
+    }
+  }
+
   void searchProductQuery(String query) {
     if (supplier.value == null) return;
 
-    final matched = allSupplierProducts.where((e) => e.product.title.toLowerCase().contains(query.toLowerCase())).toList();
+    final matched = allSupplierProducts.where((e) =>
+        e.product.title.toLowerCase().contains(query.toLowerCase())).toList();
 
     filteredSupplierProducts.assignAll(matched);
     update();
   }
 
-  /// Sắp xếp theo tên sản phẩm
   void sortByName(int columnIndex, bool ascending) {
     sortAscending.value = ascending;
     filteredSupplierProducts.sort((a, b) {
@@ -59,7 +74,6 @@ class SupplierDetailController extends GetxController {
     update();
   }
 
-  /// Sắp xếp theo số lượng
   void sortByQuantity(int columnIndex, bool ascending) {
     sortAscending.value = ascending;
     filteredSupplierProducts.sort((a, b) =>
@@ -69,13 +83,11 @@ class SupplierDetailController extends GetxController {
     update();
   }
 
-  /// Định dạng ngày tạo
   String get formattedDate {
     if (supplier.value == null) return '';
     return PFormatter.formatDate(supplier.value!.createdAt);
   }
 
-  /// Tổng giá trị hàng nhập (giá nhập * số lượng)
   String get formattedTotalAmount {
     if (supplier.value == null) return '';
 
@@ -87,7 +99,6 @@ class SupplierDetailController extends GetxController {
     return PFormatter.formatCurrencyRange(totalAmount.toStringAsFixed(0));
   }
 
-  /// Nếu muốn load lại danh sách sản phẩm từ API
   Future<void> getSupplierProducts(String supplierId) async {
     try {
       productsLoading.value = true;

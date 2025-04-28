@@ -5,15 +5,13 @@ import '../../models/notification_model.dart';
 class NotificationController extends GetxController {
   static NotificationController get instance => Get.find();
 
-  // List to hold notifications
   var notifications = <NotificationModel>[].obs;
   var unreadCount = 0.obs;
 
-  // Fetch notifications from Firestore (example)
   Future<void> fetchNotifications() async {
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('notifications')  // Assuming you store notifications in this collection
+          .collection('Notifications')
           .orderBy('timestamp', descending: true)
           .get();
 
@@ -26,21 +24,19 @@ class NotificationController extends GetxController {
     }
   }
 
-  // Add a new notification (can be triggered by an external action)
   void addNotification(String title, String message) {
     final newNotification = NotificationModel(
-      id: DateTime.now().toString(), // You can use a unique ID or Firestore document ID
+      id: DateTime.now().toString(),
       title: title,
       message: message,
       isRead: false,
       timestamp: Timestamp.now(),
     );
 
-    notifications.insert(0, newNotification);  // Add to the front
+    notifications.insert(0, newNotification);
     updateUnreadCount();
   }
 
-  // Mark all notifications as read
   void markAllAsRead() {
     for (var notification in notifications) {
       notification.isRead = true;
@@ -48,7 +44,6 @@ class NotificationController extends GetxController {
     updateUnreadCount();
   }
 
-  // Update the unread count
   void updateUnreadCount() {
     unreadCount.value = notifications.where((n) => !n.isRead).length;
   }

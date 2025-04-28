@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:pine_admin_panel/features/shop/models/brand_model.dart';
 import 'package:pine_admin_panel/features/shop/models/category_model.dart';
 import 'package:pine_admin_panel/features/shop/models/product_category_model.dart';
 import 'package:pine_admin_panel/features/shop/models/product_model.dart';
+import 'package:pine_admin_panel/features/shop/models/product_variation_model.dart';
 import 'package:pine_admin_panel/utils/constants/enums.dart';
 import 'package:pine_admin_panel/utils/constants/image_strings.dart';
 import 'package:pine_admin_panel/utils/helpers/network_manager.dart';
@@ -27,8 +29,9 @@ class CreateProductController extends GetxController {
   final isFeatured = false.obs;
 
   final stockPriceFormKey = GlobalKey<FormState>();
-  final productRepository = Get.put(ProductRepository());
   final titleDescriptionFormKey = GlobalKey<FormState>();
+
+  final productRepository = Get.put(ProductRepository());
 
   TextEditingController title = TextEditingController();
   TextEditingController stock = TextEditingController();
@@ -46,6 +49,8 @@ class CreateProductController extends GetxController {
   RxBool categoriesRelationshipUploader = false.obs;
 
   Future<void> createProduct() async {
+    if (isLoading.value) return;
+    isLoading.value = true;
     try {
       showProgressDialog();
 
@@ -67,32 +72,54 @@ class CreateProductController extends GetxController {
 
       if (selectedBrand.value == null) throw 'Chọn thương hiệu cho sản phẩm';
 
-      if (productType.value == ProductType.variable && ProductVariationController.instance.productVariations.isEmpty) {
-        throw 'Không có thể loại nào cho Thể Loại Sản phẩm. Tạo một số thể loại hoặc thay đổi Loại Sản phẩm.';
+      final imagesController = ProductImagesController.instance;
+
+      thumbnailUploader.value = true;
+      if (imagesController.selectedThumbnailImageUrl.value == null) {
+        throw 'Chọn ảnh đại diện sản phẩm';
       }
+
+      additionalImagesUploader.value = true;
+
+      double parsedPrice = double.tryParse(price.text.trim()) ?? 0;
+      double parsedSalePrice = double.tryParse(salePrice.text.trim()) ?? 0;
+      int parsedStock = int.tryParse(stock.text.trim()) ?? 0;
+
+      List<ProductVariationModel> variations = [];
+
       if (productType.value == ProductType.variable) {
-        final variationCheckFailed = ProductVariationController.instance.productVariations.any((element) =>
+        variations = ProductVariationController.instance.productVariations;
+
+        if (variations.isEmpty) {
+          throw 'Không có thể loại nào cho Thể Loại Sản phẩm. Tạo một số thể loại hoặc thay đổi Loại Sản phẩm.';
+        }
+
+        final variationCheckFailed = variations.any((element) =>
         element.price.isNaN ||
             element.price < 0 ||
             element.salePrice.isNaN ||
             element.salePrice < 0 ||
             element.stock.isNaN ||
             element.stock < 0 ||
-            element.image.value.isEmpty
-        );
-        if (variationCheckFailed) throw 'Dữ liệu thể loại không chính xác. Vui lòng kiểm tra lại các thể loại';
-      }
+            element.image.value.isEmpty);
 
-      thumbnailUploader.value = true;
-      final imagesController = ProductImagesController.instance;
-      if (imagesController.selectedThumbnailImageUrl.value == null) throw 'Chọn ảnh đại diện sản phẩm';
+        if (variationCheckFailed) {
+          throw 'Dữ liệu thể loại không chính xác. Vui lòng kiểm tra lại các thể loại';
+        }
 
-      additionalImagesUploader.value = true;
+        int totalStock = 0;
+        double minPrice = double.infinity;
+        double maxPrice = -double.infinity;
 
-      final variations = ProductVariationController.instance.productVariations;
-      if (productType.value == ProductType.single && variations.isNotEmpty) {
-        ProductVariationController.instance.resetAllValues();
-        variations.value = [];
+        for (var variation in variations) {
+          totalStock += variation.stock;
+          if (variation.price < minPrice) minPrice = variation.price;
+          if (variation.price > maxPrice) maxPrice = variation.price;
+        }
+
+        parsedStock = totalStock;
+        price.text = "${minPrice.toStringAsFixed(2)} - ${maxPrice.toStringAsFixed(2)}";
+        parsedPrice = 0;
       }
 
       final newRecord = ProductModel(
@@ -104,17 +131,17 @@ class CreateProductController extends GetxController {
         productVariations: variations,
         description: description.text.trim(),
         productType: productType.value.toString(),
-        stock: int.tryParse(stock.text.trim()) ?? 0,
-        price: double.tryParse(price.text.trim()) ?? 0,
+        stock: parsedStock,
+        price: parsedPrice,
         images: imagesController.additionalProductImagesUrls,
-        salePrice: double.tryParse(salePrice.text.trim()) ?? 0,
+        salePrice: parsedSalePrice,
         thumbnail: imagesController.selectedThumbnailImageUrl.value ?? '',
         productAttributes: ProductAttributesController.instance.productAttributes,
         date: DateTime.now(),
       );
 
       productDataUploader.value = true;
-      newRecord.id = await ProductRepository.instance.createProduct(newRecord);
+      newRecord.id = await productRepository.createProduct(newRecord);
 
       if (selectedCategories.isNotEmpty) {
         if (newRecord.id.isEmpty) throw 'Lỗi lưu dữ liệu. Vui lòng thử lại';
@@ -122,14 +149,13 @@ class CreateProductController extends GetxController {
         categoriesRelationshipUploader.value = true;
         for (var category in selectedCategories) {
           final productCategory = ProductCategoryModel(productId: newRecord.id, categoryId: category.id);
-          await ProductRepository.instance.createProductCategory(productCategory);
+          await productRepository.createProductCategory(productCategory);
         }
       }
 
       ProductController.instance.addItemToLists(newRecord);
 
       PFullScreenLoader.stopLoading();
-
       showCompletionDialog();
     } catch (e) {
       PFullScreenLoader.stopLoading();
@@ -153,7 +179,6 @@ class CreateProductController extends GetxController {
     selectedCategories.clear();
     ProductVariationController.instance.resetAllValues();
     ProductAttributesController.instance.resetProductAttributes();
-
     thumbnailUploader.value = false;
     additionalImagesUploader.value = false;
     productDataUploader.value = false;
@@ -162,29 +187,29 @@ class CreateProductController extends GetxController {
 
   void showProgressDialog() {
     showDialog(
-        context: Get.context!,
-        barrierDismissible: false,
-        builder: (context) => PopScope(
-          canPop: false,
-          child: AlertDialog(
-            title: const Text('Đang thêm sản phẩm'),
-            content: Obx(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: const Text('Đang thêm sản phẩm'),
+          content: Obx(
                 () => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(PImages.creatingProductIllustration, height: 200, width: 200),
-                    const SizedBox(height: PSizes.spaceBtwItems),
-                    buildCheckbox('Ảnh đại diện', thumbnailUploader),
-                    buildCheckbox('Ảnh sản phẩm', additionalImagesUploader),
-                    buildCheckbox('Thông tin sản phẩm', productDataUploader),
-                    buildCheckbox('Danh mục sản phẩm', categoriesRelationshipUploader),
-                    const SizedBox(height: PSizes.spaceBtwItems),
-                    const Text('Đang thêm sản phẩm...'),
-                  ],
-                )
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(PImages.creatingProductIllustration, height: 200, width: 200),
+                const SizedBox(height: PSizes.spaceBtwItems),
+                buildCheckbox('Ảnh đại diện', thumbnailUploader),
+                buildCheckbox('Ảnh sản phẩm', additionalImagesUploader),
+                buildCheckbox('Thông tin sản phẩm', productDataUploader),
+                buildCheckbox('Danh mục sản phẩm', categoriesRelationshipUploader),
+                const SizedBox(height: PSizes.spaceBtwItems),
+                const Text('Đang thêm sản phẩm...'),
+              ],
             ),
           ),
-        )
+        ),
+      ),
     );
   }
 
@@ -192,10 +217,10 @@ class CreateProductController extends GetxController {
     return Row(
       children: [
         AnimatedSwitcher(
-            duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           child: value.value
-            ? const Icon(CupertinoIcons.checkmark_alt_circle_fill, color: Colors.green)
-            : const Icon(CupertinoIcons.checkmark_alt_circle),
+              ? const Icon(CupertinoIcons.checkmark_alt_circle_fill, color: Colors.green)
+              : const Icon(CupertinoIcons.checkmark_alt_circle),
         ),
         const SizedBox(width: PSizes.spaceBtwItems),
         Text(label),
@@ -209,12 +234,12 @@ class CreateProductController extends GetxController {
         title: const Text('Thành công'),
         actions: [
           TextButton(
-              onPressed: () {
-                Get.back();
-                Get.back();
-              },
-              child: const Text('Tới danh sách sản phẩm')
-          )
+            onPressed: () {
+              Get.back();
+              Get.back();
+            },
+            child: const Text('Tới danh sách sản phẩm'),
+          ),
         ],
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -226,8 +251,7 @@ class CreateProductController extends GetxController {
             const Text('Đã thêm sản phẩm'),
           ],
         ),
-      )
+      ),
     );
   }
-
 }

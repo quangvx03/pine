@@ -22,7 +22,6 @@ class ReviewController extends PBaseController<ReviewModel> {
       for (final doc in snapshot.docs) {
         final review = ReviewModel.fromSnapshot(doc);
 
-        // 🧠 Lấy product title từ bảng Products
         String? productTitle;
         try {
           final productDoc = await _db.collection("Products").doc(review.productId).get();
@@ -43,7 +42,6 @@ class ReviewController extends PBaseController<ReviewModel> {
     }
   }
 
-  /// Tìm kiếm theo tên khách hàng hoặc nội dung đánh giá
   @override
   bool containsSearchQuery(ReviewModel item, String query) {
     final lowerQuery = query.toLowerCase();
@@ -51,7 +49,6 @@ class ReviewController extends PBaseController<ReviewModel> {
         item.comment.toLowerCase().contains(lowerQuery);
   }
 
-  /// Lọc theo số sao
   void filterByStar() {
     final query = searchTextController.text.toLowerCase();
     final results = allItems.where((review) {
@@ -65,13 +62,11 @@ class ReviewController extends PBaseController<ReviewModel> {
     filteredItems.assignAll(results);
   }
 
-  /// Tìm kiếm theo tên hoặc nội dung + kết hợp filter
   @override
   void searchQuery(String query) {
-    filterByStar(); // dùng lại filter luôn
+    filterByStar();
   }
 
-  /// Xóa đánh giá
   @override
   Future<void> deleteItem(ReviewModel item) async {
     try {
@@ -85,4 +80,11 @@ class ReviewController extends PBaseController<ReviewModel> {
   void sortByDate(int sortColumnIndex, bool ascending) {
     sortByProperty(sortColumnIndex, ascending, (ReviewModel o) => o.datetime.toString().toLowerCase());
   }
+
+  void sortByUsername(int sortColumnIndex, bool ascending) {
+    sortByProperty(sortColumnIndex, ascending, (ReviewModel review) {
+      return review.username.toLowerCase();
+    });
+  }
+
 }

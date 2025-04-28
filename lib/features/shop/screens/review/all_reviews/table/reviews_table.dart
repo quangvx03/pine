@@ -20,7 +20,8 @@ class ReviewTable extends StatelessWidget {
         sortAscending: controller.sortAscending.value,
         sortColumnIndex: controller.sortColumnIndex.value,
         columns: [
-          const DataColumn2(label: Text('Khách hàng'), fixedWidth: 200),
+          DataColumn2(label: Text('Khách hàng'), fixedWidth: 200, onSort: (columnIndex, ascending) =>
+              controller.sortByUsername(columnIndex, ascending)),
           const DataColumn2(label: Text('Đơn hàng'), fixedWidth: 150),
           const DataColumn2(label: Text('Sản phẩm')),
           const DataColumn2(label: Text('Số sao'), fixedWidth: 150),

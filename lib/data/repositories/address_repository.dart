@@ -17,7 +17,6 @@ class AddressRepository extends GetxController {
     }
   }
 
-  /// Clear the "selected" field for all addresses
   Future<void> updateSelectedField(String userId, String addressId, bool selected) async {
     try {
       await _db
@@ -31,7 +30,6 @@ class AddressRepository extends GetxController {
     }
   }
 
-  /// Store a new address for a user
   Future<void> addAddress(String userId, AddressModel address) async {
     try {
       await _db

@@ -23,7 +23,7 @@ class CreateCouponController extends GetxController {
   final discountAmount = TextEditingController();
   final minimumPurchaseAmount = TextEditingController();
   final endDate = TextEditingController();
-  final description = TextEditingController(); // 👈 Thêm field mô tả
+  final description = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
   final Rxn<DateTime> selectedEndDate = Rxn<DateTime>();
@@ -65,7 +65,7 @@ class CreateCouponController extends GetxController {
         endDate: selectedEndDate.value,
         status: status.value,
         createdAt: DateTime.now(),
-        description: description.text.trim(), // 👈 Gán mô tả
+        description: description.text.trim(),
       );
 
       newRecord.id = await CouponRepository.instance.createCoupon(newRecord);
@@ -90,7 +90,6 @@ class CreateCouponController extends GetxController {
     }
   }
 
-  /// 🧹 Reset dữ liệu sau khi tạo mã giảm giá
   void resetFields() {
     loading(false);
     status(false);
@@ -99,7 +98,7 @@ class CreateCouponController extends GetxController {
     discountAmount.clear();
     minimumPurchaseAmount.clear();
     endDate.clear();
-    description.clear(); // 👈 Reset description luôn
+    description.clear();
   }
 }
 

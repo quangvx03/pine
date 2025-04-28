@@ -64,7 +64,6 @@ class CustomerDetailController extends GetxController {
     update();
   }
 
-  // Sắp xếp theo id đơn hàng
   void sortById(int sortColumnIndex, bool ascending) {
     sortAscending.value = ascending;
     filteredCustomerOrders.sort((a, b) {

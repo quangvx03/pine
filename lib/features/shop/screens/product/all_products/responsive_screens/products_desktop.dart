@@ -16,40 +16,69 @@ class ProductsDesktopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ProductController());
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-            padding: const EdgeInsets.all(PSizes.defaultSpace),
+          padding: const EdgeInsets.all(PSizes.defaultSpace),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Breadcrumbs
-              const PBreadcrumbsWithHeading(heading: 'Sản phẩm', breadcrumbItems: ['Sản phẩm']),
+              const PBreadcrumbsWithHeading(
+                heading: 'Sản phẩm',
+                breadcrumbItems: ['Sản phẩm'],
+              ),
               const SizedBox(height: PSizes.spaceBtwSections),
-        
-              // Table Body
-              Obx(
-                () {
-                  if (controller.isLoading.value) return const PLoaderAnimation();
 
-                    return PRoundedContainer(
-                      child: Column(
+              // Table Body
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const PLoaderAnimation();
+                }
+
+                return PRoundedContainer(
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          // Table Header
-                          PTableHeader(
+                          // Dropdown filter
+                          Obx(() => DropdownButton<String>(
+                            value: controller.selectedStockFilter.value,
+                            onChanged: (value) {
+                              if (value != null) {
+                                controller.selectedStockFilter.value = value;
+                                controller.filterByStock(value);
+                              }
+                            },
+                            items: controller.stockFilterOptions.map((type) {
+                              return DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                          )),
+                          const SizedBox(width: PSizes.spaceBtwItems),
+
+                          // Table Header with search
+                          Expanded(
+                            child: PTableHeader(
                               buttonText: 'Thêm sản phẩm',
                               onPressed: () => Get.toNamed(PRoutes.createProduct),
-                            searchOnChanged: (query) => controller.searchQuery(query),
+                              searchOnChanged: (query) =>
+                                  controller.searchQuery(query),
+                            ),
                           ),
-                          const SizedBox(height: PSizes.spaceBtwItems),
-
-                          // Table
-                          const ProductsTable(),
                         ],
                       ),
-                    );
-                  }
-              ),
+                      const SizedBox(height: PSizes.spaceBtwItems),
+
+                      // Table
+                      const ProductsTable(),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:pine_admin_panel/features/shop/controllers/customer/customer_con
 import 'package:pine_admin_panel/utils/helpers/helper_functions.dart';
 import '../../../../utils/constants/enums.dart';
 import '../../models/order_model.dart';
+import '../../models/product_model.dart';
 import '../order/order_controller.dart';
 import '../product/product_controller.dart';
 
@@ -21,6 +22,7 @@ class DashboardController extends PBaseController<OrderModel> {
   final RxString salesViewType = 'week'.obs;
   final Rx<DateTime?> startDate = Rx<DateTime?>(null);
   final Rx<DateTime?> endDate = Rx<DateTime?>(null);
+  final RxList<ProductModel> bestSellers = <ProductModel>[].obs;
 
   int get totalProductInStock => productController.allItems.fold(0, (sum, p) => sum + (p.stock ?? 0));
   int get totalProductSold => productController.allItems.fold(0, (sum, p) => sum + (p.soldQuantity ?? 0));
@@ -29,6 +31,7 @@ class DashboardController extends PBaseController<OrderModel> {
   @override
   void onInit() {
     fetchData();
+    fetchBestSellers();
     super.onInit();
   }
 
@@ -51,6 +54,21 @@ class DashboardController extends PBaseController<OrderModel> {
 
     return orderController.allItems;
   }
+
+  Future<void> fetchBestSellers() async {
+    if (productController.allItems.isEmpty) {
+      await productController.fetchItems();
+    }
+
+    final sortedProducts = productController.allItems
+        .where((product) => product.soldQuantity > 0)
+        .toList();
+
+    sortedProducts.sort((a, b) => b.soldQuantity.compareTo(a.soldQuantity));
+
+    bestSellers.assignAll(sortedProducts.take(10).toList());
+  }
+
 
   void changeSalesViewType(String type) {
     if (salesViewType.value == type) return;

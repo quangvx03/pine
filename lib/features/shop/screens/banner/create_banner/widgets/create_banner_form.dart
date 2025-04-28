@@ -29,7 +29,6 @@ class CreateBannerForm extends StatelessWidget {
               Text('Thêm banner', style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: PSizes.spaceBtwSections),
 
-              // Image Uploader & Featured Checkbox
               Column(
                 children: [
                   Obx(
@@ -58,7 +57,6 @@ class CreateBannerForm extends StatelessWidget {
                           child: const Text('Hoạt động'))),
               const SizedBox(height: PSizes.spaceBtwInputFields),
 
-              // Dropdown Menu Screens
               Obx(
                 () {
                   return DropdownButton<String>(
@@ -76,7 +74,6 @@ class CreateBannerForm extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(onPressed: () => controller.createBanner(), child: const Text('Thêm')),
               ),
-
 
               const SizedBox(height: PSizes.spaceBtwInputFields * 2),
             ],

@@ -8,6 +8,6 @@ class ReviewsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PSiteTemplate(desktop: ReviewsDesktopScreen());
+    return PSiteTemplate(desktop: ReviewsDesktopScreen());
   }
 }

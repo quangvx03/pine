@@ -28,7 +28,6 @@ class SupplierInfo extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: PSizes.spaceBtwSections),
 
-          // Info Card
           Row(
             children: [
               const SizedBox(width: 120, child: Text('Tên nhà cung cấp')),
@@ -68,7 +67,6 @@ class SupplierInfo extends StatelessWidget {
           const Divider(),
           const SizedBox(height: PSizes.spaceBtwItems),
 
-          // Stats
           Row(
             children: [
               Expanded(

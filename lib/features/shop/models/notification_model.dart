@@ -15,7 +15,6 @@ class NotificationModel {
     required this.timestamp,
   });
 
-  // Tạo từ Firestore document snapshot
   factory NotificationModel.fromSnapshot(DocumentSnapshot doc) {
     return NotificationModel(
       id: doc.id,
@@ -26,7 +25,6 @@ class NotificationModel {
     );
   }
 
-  // Chuyển thành Map để lưu vào Firestore
   Map<String, dynamic> toMap() {
     return {
       'title': title,

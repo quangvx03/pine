@@ -12,68 +12,83 @@ import '../../../media/models/image_model.dart';
 import '../../models/category_model.dart';
 import 'brand_controller.dart';
 
-
 class EditBrandController extends GetxController {
   static EditBrandController get instance => Get.find();
 
   final loading = false.obs;
-  RxString imageURL = ''.obs;
   final isFeatured = false.obs;
+  final imageURL = ''.obs;
   final name = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  final repository = Get.put(BrandRepository());
-  final List<CategoryModel> selectedCategories = <CategoryModel>[].obs;
+  final selectedCategories = <CategoryModel>[].obs;
 
-  void init (BrandModel brand) {
+  final repository = Get.put(BrandRepository());
+
+  void init(BrandModel brand) {
+    resetFields();
+
     name.text = brand.name;
     isFeatured.value = brand.isFeatured;
     imageURL.value = brand.image;
-    if(brand.brandCategories != null) {
-      selectedCategories.addAll(brand.brandCategories ?? []);
+
+    if (brand.brandCategories != null) {
+      selectedCategories.addAll(brand.brandCategories!);
     }
   }
 
   void toggleSelection(CategoryModel category) {
-    if (selectedCategories.contains(category)) {
-      selectedCategories.remove(category);
-    } else {
-      selectedCategories.add(category);
+    selectedCategories.contains(category)
+        ? selectedCategories.remove(category)
+        : selectedCategories.add(category);
+  }
+
+  void pickImage() async {
+    final mediaController = Get.put(MediaController());
+    final selectedImages = await mediaController.selectImagesFromMedia();
+
+    if (selectedImages != null && selectedImages.isNotEmpty) {
+      imageURL.value = selectedImages.first.url;
     }
   }
 
   Future<void> updateBrand(BrandModel brand) async {
     try {
       PFullScreenLoader.popUpCircular();
+
       final isConnected = await NetworkManager.instance.isConnected();
-      if (!isConnected) {
-        PFullScreenLoader.stopLoading();
-        return;
-      }
-      if (!formKey.currentState!.validate()) {
+      if (!isConnected || !formKey.currentState!.validate()) {
         PFullScreenLoader.stopLoading();
         return;
       }
 
-      bool isBrandUpdated = false;
+      bool isUpdated = false;
 
-      if (brand.image != imageURL.value || brand.name != name.text.trim() || brand.isFeatured != isFeatured.value) {
-        isBrandUpdated = true;
-        brand.image = imageURL.value;
-        brand.name = name.text.trim();
-        brand.isFeatured = isFeatured.value;
-        brand.updatedAt = DateTime.now();
+      if (brand.image != imageURL.value ||
+          brand.name != name.text.trim() ||
+          brand.isFeatured != isFeatured.value) {
+        brand
+          ..image = imageURL.value
+          ..name = name.text.trim()
+          ..isFeatured = isFeatured.value
+          ..updatedAt = DateTime.now();
+
         await repository.updateBrand(brand);
+
+        isUpdated = true;
       }
 
-      await updateBrandCategories(brand);
+      await _updateBrandCategories(brand);
 
-      if (isBrandUpdated) await updateBrandInProducts(brand);
+      final index = BrandController.instance.allItems.indexWhere((item) => item.id == brand.id);
+      if (index != -1) {
+      BrandController.instance.allItems[index] = brand;
+      BrandController.instance.update();
+    }
+      final updatedBrands = await BrandController.instance.fetchItems();
+      BrandController.instance.updateFilteredItems(updatedBrands);
 
-      BrandController.instance.updateItemFromLists(brand);
-
-      PFullScreenLoader.stopLoading();
+    PFullScreenLoader.stopLoading();
       PLoaders.successSnackBar(title: 'Thành công', message: 'Đã cập nhật thương hiệu thành công');
-
       update();
     } catch (e) {
       PFullScreenLoader.stopLoading();
@@ -82,49 +97,32 @@ class EditBrandController extends GetxController {
   }
 
 
-  void pickImage() async {
-    final controller = Get.put(MediaController());
-    List<ImageModel>? selectedImages = await controller.selectImagesFromMedia();
+  Future<void> _updateBrandCategories(BrandModel brand) async {
+    final existing = await repository.getCategoriesOfSpecificBrand(brand.id);
+    final selectedIds = selectedCategories.map((e) => e.id).toSet();
 
-    if(selectedImages != null && selectedImages.isNotEmpty) {
-      ImageModel selectedImage = selectedImages.first;
-      imageURL.value = selectedImage.url;
+    if (existing.isNotEmpty) {
+      for (var c in existing.where((e) => !selectedIds.contains(e.categoryId))) {
+        await repository.deleteBrandCategory(c.id ?? '');
+      }
     }
+
+    if (selectedCategories.isNotEmpty) {
+      for (var newCat in selectedCategories.where((e) => !existing.any((ex) => ex.categoryId == e.id))) {
+        final newEntry = BrandCategoryModel(brandId: brand.id, categoryId: newCat.id);
+        newEntry.id = await repository.createBrandCategory(newEntry);
+      }
+    }
+
+    brand.brandCategories = [...selectedCategories];
   }
+
 
   void resetFields() {
-    loading(false);
-    isFeatured(false);
-    name.clear();
+    loading.value = false;
+    isFeatured.value = false;
     imageURL.value = '';
+    name.clear();
     selectedCategories.clear();
-  }
-
-  updateBrandCategories(BrandModel brand) async {
-    final brandCategories = await repository.getCategoriesOfSpecificBrand(brand.id);
-
-    final selectedCategoryIds = selectedCategories.map((e) => e.id);
-
-    final categoriesToRemove = brandCategories.where((existingCategory) => !selectedCategoryIds.contains(existingCategory.categoryId)).toList();
-
-    for (var categoryToRemove in categoriesToRemove) {
-      await BrandRepository.instance.deleteBrandCategory(categoryToRemove.id ?? '');
-    }
-
-    final newCategoriesToAdd = selectedCategories
-    .where((newCategory) => !brandCategories.any((existingCategory) => existingCategory.categoryId == newCategory.id))
-    .toList();
-
-    for (var newCategory in newCategoriesToAdd) {
-      var brandCategory = BrandCategoryModel(brandId: brand.id, categoryId: newCategory.id);
-      brandCategory.id = await BrandRepository.instance.createBrandCategory(brandCategory);
-    }
-
-    brand.brandCategories!.assignAll(selectedCategories);
-    BrandController.instance.updateItemFromLists(brand);
-  }
-
-  updateBrandInProducts(BrandModel brand) async {
-
   }
 }

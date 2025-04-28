@@ -28,9 +28,7 @@ class SuppliersDesktopScreen extends StatelessWidget {
               // Breadcrumbs
               const PBreadcrumbsWithHeading(heading: 'Nhập hàng', breadcrumbItems: ['Nhập hàng']),
               const SizedBox(height: PSizes.spaceBtwSections),
-        
-              // Table Body
-              // Show Loader
+
               PRoundedContainer(
                   child: Column(
                     children: [

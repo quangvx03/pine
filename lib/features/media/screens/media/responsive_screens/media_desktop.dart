@@ -34,7 +34,7 @@ class MediaDesktopScreen extends StatelessWidget {
                     width: PSizes.buttonWidth * 1.5,
                     child: ElevatedButton.icon(
                       onPressed: () => controller.showImagesUploaderSection.value = !controller.showImagesUploaderSection.value,
-                      icon: const Icon(Iconsax.cloud_add),
+                      icon: const Icon(Iconsax.cloud_add, color: Colors.white),
                       label: const Text('Tải hình ảnh'),
                     ),
                   )

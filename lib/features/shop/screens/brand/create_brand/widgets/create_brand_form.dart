@@ -27,20 +27,17 @@ class CreateBrandForm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Heading
               const SizedBox(height: PSizes.sm),
               Text('Thêm thương hiệu', style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: PSizes.spaceBtwSections),
 
-              // Name Text Field
               TextFormField(
                 controller: controller.name,
                 validator: (value) => PValidator.validateEmptyText('Tên', value),
                 decoration: const InputDecoration(labelText: 'Tên thương hiệu', prefixIcon: Icon(Iconsax.box)),
               ),
               const SizedBox(height: PSizes.spaceBtwInputFields),
-              
-              // Categories
+
               Text('Chọn danh mục', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: PSizes.spaceBtwInputFields / 2),
               Obx(

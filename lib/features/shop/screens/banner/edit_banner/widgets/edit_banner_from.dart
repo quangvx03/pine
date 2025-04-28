@@ -29,12 +29,10 @@ class EditBannerForm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Heading
               const SizedBox(height: PSizes.sm),
               Text('Cập nhật banner', style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: PSizes.spaceBtwSections),
 
-              // Image Uploader & Featured Checkbox
               Column(
                 children: [
                   Obx(
@@ -60,7 +58,6 @@ class EditBannerForm extends StatelessWidget {
                           child: const Text('Hoạt động'))),
               const SizedBox(height: PSizes.spaceBtwInputFields),
 
-              // Dropdown Menu Screens
               Obx(
                       () {
                     return DropdownButton<String>(
@@ -78,7 +75,6 @@ class EditBannerForm extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(onPressed: () => controller.updateBanner(banner), child: const Text('Cập nhật')),
               ),
-
 
               const SizedBox(height: PSizes.spaceBtwInputFields * 2),
             ],

@@ -26,9 +26,7 @@ class CategoriesDesktopScreen extends StatelessWidget {
               // Breadcrumbs
               const PBreadcrumbsWithHeading(heading: 'Danh mục', breadcrumbItems: ['Danh mục']),
               const SizedBox(height: PSizes.spaceBtwSections),
-        
-              // Table Body
-              // Show Loader
+
               PRoundedContainer(
                   child: Column(
                     children: [

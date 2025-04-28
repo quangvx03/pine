@@ -47,11 +47,23 @@ class ProductModel {
 
   String get formattedDate => PFormatter.formatDate(date);
   String get formattedCurrency {
+    if (productVariations != null && productVariations!.isNotEmpty) {
+      double minPrice = productVariations!.map((variation) => variation.price).reduce((a, b) => a < b ? a : b);
+      double maxPrice = productVariations!.map((variation) => variation.price).reduce((a, b) => a > b ? a : b);
+
+      if (salePrice > 0 && salePrice < minPrice) {
+        minPrice = salePrice;
+      }
+      return PFormatter.formatCurrencyRange("${minPrice.toInt()} - ${maxPrice.toInt()}");
+    }
+
     if (salePrice > 0 && salePrice < price) {
       return PFormatter.formatCurrencyRange("${salePrice.toInt()} - ${price.toInt()}");
     }
+
     return PFormatter.formatCurrencyRange(price.toInt().toString());
   }
+
 
   /// Create Empty func for clean code
   static ProductModel empty() => ProductModel(

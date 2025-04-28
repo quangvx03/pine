@@ -17,11 +17,9 @@ class CreateBannerDesktopScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Breadcrumbs
               PBreadcrumbsWithHeading(returnToPreviousScreen: true, heading: 'Thêm banner', breadcrumbItems: [{ 'label': 'Banner', 'path': PRoutes.banners }, 'Thêm banner']),
               SizedBox(height: PSizes.spaceBtwSections),
 
-              // Form
               CreateBannerForm(),
             ],
           ),

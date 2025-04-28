@@ -35,6 +35,9 @@ dependencies:
   data_table_2: ^2.5.18
   url_strategy: ^0.3.0
   universal_html: ^2.2.4
+  pdf: ^3.10.6
+  printing: ^5.11.0
+  open_file: ^3.0.1
 
   #State Management
   get: ^4.7.2

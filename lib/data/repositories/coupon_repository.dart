@@ -12,10 +12,22 @@ class CouponRepository extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Future<List<CouponModel>> getAllCoupons() async {
-    try{
+    try {
       final snapshot = await _db.collection("Coupons").get();
-      final result = snapshot.docs.map((doc) => CouponModel.fromSnapshot(doc)).toList();
-      return result;
+      final now = DateTime.now();
+
+      final coupons = await Future.wait(snapshot.docs.map((doc) async {
+        var coupon = CouponModel.fromSnapshot(doc);
+
+        if (coupon.endDate != null && coupon.endDate!.isBefore(now) && coupon.status) {
+          coupon = coupon.copyWith(status: false);
+          await updateCoupon(coupon);
+        }
+
+        return coupon;
+      }).toList());
+
+      return coupons;
     } on FirebaseException catch (e) {
       throw PFirebaseException(e.code).message;
     } on PlatformException catch (e) {
@@ -23,6 +35,24 @@ class CouponRepository extends GetxController {
     } catch (e) {
       throw 'Có lỗi xảy ra. Vui lòng thử lại';
     }
+  }
+
+  Future<int> getUsedCount(String couponId) async {
+    final usersSnapshot = await _db.collection('Users').get();
+    int totalUsed = 0;
+
+    for (var userDoc in usersSnapshot.docs) {
+      final usedCouponsSnapshot = await _db
+          .collection('Users')
+          .doc(userDoc.id)
+          .collection('UsedCoupons')
+          .where('CouponId', isEqualTo: couponId)
+          .get();
+
+      totalUsed += usedCouponsSnapshot.size;
+    }
+
+    return totalUsed;
   }
 
   Future<String> createCoupon(CouponModel coupon) async {

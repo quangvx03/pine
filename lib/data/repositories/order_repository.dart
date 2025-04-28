@@ -36,13 +36,11 @@ class OrderRepository extends GetxController {
     List<OrderModel> allOrders = [];
 
     try {
-      // Lấy tất cả user
       final users = await _db.collection("Users").get();
 
       for (var user in users.docs) {
         final userId = user.id;
 
-        // Lấy tất cả orders của user đó
         final orders = await _db
             .collection("Users")
             .doc(userId)
@@ -65,7 +63,6 @@ class OrderRepository extends GetxController {
     try {
       await _db.collection("Users").doc(order.userId).collection("Orders").add(order.toJson());
 
-
       await _db.collection("Notifications").add({
         'title': 'Đơn hàng mới',
         'message': 'Khách hàng ${order.userId} đã đặt một đơn hàng mới!',
@@ -73,7 +70,6 @@ class OrderRepository extends GetxController {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Cập nhật thông báo mới trong ứng dụng
       _notificationController.addNotification(
         'Đơn hàng mới',
         'Khách hàng ${order.userId} đã đặt một đơn hàng mới!',
@@ -92,7 +88,7 @@ class OrderRepository extends GetxController {
   Future<void> updateOrderSpecificValue(String userId, String orderId, Map<String, dynamic> data) async {
     try {
       if (userId.isEmpty || orderId.isEmpty) {
-        throw '⚠️ User ID hoặc Order ID không hợp lệ!';
+        throw 'User ID hoặc Order ID không hợp lệ!';
       }
       await _db.collection("Users").doc(userId).collection("Orders").doc(orderId).update(data);
     } on FirebaseException catch (e) {

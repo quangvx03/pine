@@ -4,11 +4,9 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pine_admin_panel/common/widgets/containers/rounded_container.dart';
 import 'package:pine_admin_panel/utils/constants/sizes.dart';
 import 'package:pine_admin_panel/utils/formatters/formatter.dart';
-import 'package:pine_admin_panel/utils/helpers/helper_functions.dart';
 import 'package:pine_admin_panel/utils/validators/validation.dart';
 
 import '../../../../controllers/supplier/create_supplier_controller.dart';
-import '../../../../controllers/supplier/supplier_controller.dart';
 import '../../../../models/product_model.dart';
 
 class CreateSupplierForm extends StatelessWidget {
@@ -17,9 +15,6 @@ class CreateSupplierForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final createController = Get.put(CreateSupplierController());
-   // final supplierController = Get.put(SupplierController());
-
-
     final productNameController = TextEditingController();
     final productQtyController = TextEditingController();
     final productPriceController = TextEditingController();
@@ -35,7 +30,6 @@ class CreateSupplierForm extends StatelessWidget {
             Text('Tạo đơn nhập hàng', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: PSizes.spaceBtwSections),
 
-            /// THÔNG TIN NHÀ CUNG CẤP
             TextFormField(
               controller: createController.name,
               validator: (value) => PValidator.validateEmptyText('Tên nhà cung cấp', value),
@@ -67,11 +61,9 @@ class CreateSupplierForm extends StatelessWidget {
             ),
             const SizedBox(height: PSizes.spaceBtwSections),
 
-            /// DANH SÁCH SẢN PHẨM
             Text('Sản phẩm', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: PSizes.sm),
 
-            /// DÒNG NHẬP THÊM SẢN PHẨM
             Padding(
               padding: const EdgeInsets.only(bottom: PSizes.sm),
               child: Row(
@@ -116,7 +108,7 @@ class CreateSupplierForm extends StatelessWidget {
                         thumbnail: '',
                         price: price,
                         stock: qty,
-                        productType: 'manual',
+                        productType: 'single',
                         isFeatured: false,
                       );
 
@@ -132,7 +124,6 @@ class CreateSupplierForm extends StatelessWidget {
               ),
             ),
 
-            /// DANH SÁCH SP ĐÃ THÊM
             Obx(() => Column(
               children: List.generate(createController.productList.length, (index) {
                 final item = createController.productList[index];
@@ -167,7 +158,6 @@ class CreateSupplierForm extends StatelessWidget {
 
             const SizedBox(height: PSizes.spaceBtwSections),
 
-            /// TỔNG TIỀN
             Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -179,17 +169,28 @@ class CreateSupplierForm extends StatelessWidget {
               ],
             )),
 
-
             const SizedBox(height: PSizes.spaceBtwSections),
 
-            /// BUTTON SUBMIT
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => createController.createPurchaseOrder(),
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)),
-                child: const Text('Tạo đơn nhập hàng'),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => createController.createPurchaseOrder(),
+                    icon: const Icon(Iconsax.document), // optional icon
+                    label: const Text('Tạo đơn'),
+                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)),
+                  ),
+                ),
+                const SizedBox(width: PSizes.spaceBtwInputFields),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => createController.exportInvoice(),
+                    icon: const Icon(Iconsax.export),
+                    label: const Text('Xuất hóa đơn'),
+                    style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -20,19 +20,18 @@ class EditCouponController extends GetxController {
   final discountAmount = TextEditingController();
   final minimumPurchaseAmount = TextEditingController();
   final endDate = TextEditingController();
-  final description = TextEditingController(); // 🔹 THÊM MỚI
+  final description = TextEditingController();
   final Rxn<DateTime> selectedEndDate = Rxn<DateTime>();
 
   final formKey = GlobalKey<FormState>();
 
-  /// 🛠 Khởi tạo dữ liệu khi chỉnh sửa mã giảm giá
   void init(CouponModel coupon) {
     couponCode.text = coupon.couponCode;
     type.value = coupon.type;
     discountAmount.text = coupon.discountAmount.toString();
     minimumPurchaseAmount.text = coupon.minimumPurchaseAmount.toString();
     status.value = coupon.status;
-    description.text = coupon.description ?? ''; // 🔹 THÊM MỚI
+    description.text = coupon.description ?? '';
 
     if (coupon.endDate != null) {
       selectedEndDate.value = coupon.endDate;
@@ -40,7 +39,6 @@ class EditCouponController extends GetxController {
     }
   }
 
-  /// 📅 Chọn ngày hết hạn
   Future<void> pickEndDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -55,7 +53,6 @@ class EditCouponController extends GetxController {
     }
   }
 
-  /// 📝 Cập nhật mã giảm giá
   Future<void> updateCoupon(CouponModel coupon) async {
     try {
       PFullScreenLoader.popUpCircular();
@@ -69,20 +66,17 @@ class EditCouponController extends GetxController {
         return;
       }
 
-      // Cập nhật thông tin mã giảm giá
       coupon.couponCode = couponCode.text.trim();
       coupon.type = type.value;
       coupon.discountAmount = double.tryParse(discountAmount.text.trim()) ?? 0;
       coupon.minimumPurchaseAmount = double.tryParse(minimumPurchaseAmount.text.trim()) ?? 0;
       coupon.endDate = selectedEndDate.value;
       coupon.status = status.value;
-      coupon.description = description.text.trim(); // 🔹 THÊM MỚI
+      coupon.description = description.text.trim();
       coupon.updatedAt = DateTime.now();
 
-      // Gửi dữ liệu cập nhật lên server
       await CouponRepository.instance.updateCoupon(coupon);
 
-      // Cập nhật danh sách trong CouponController
       CouponController.instance.updateItemFromLists(coupon);
 
       resetFields();
@@ -95,7 +89,6 @@ class EditCouponController extends GetxController {
     }
   }
 
-  /// 🔄 Reset các trường nhập sau khi cập nhật
   void resetFields() {
     loading(false);
     status(false);
@@ -104,7 +97,7 @@ class EditCouponController extends GetxController {
     discountAmount.clear();
     minimumPurchaseAmount.clear();
     endDate.clear();
-    description.clear(); // 🔹 THÊM MỚI
+    description.clear();
   }
 }
 

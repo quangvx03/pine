@@ -113,7 +113,7 @@ class OrderItems extends StatelessWidget {
               children: [
                 _buildSummaryRow(context, 'Tạm tính', currencyFormatter.format(subTotal)),
                 const SizedBox(height: PSizes.spaceBtwItems),
-                _buildSummaryRow(context, 'Giảm giá', currencyFormatter.format(0)),
+                _buildSummaryRow(context, 'Giảm giá', '- ${currencyFormatter.format(order.discountAmount)}'),
                 const SizedBox(height: PSizes.spaceBtwItems),
                 _buildSummaryRow(context, 'Phí vận chuyển', currencyFormatter.format(order.shippingCost)),
                 const SizedBox(height: PSizes.spaceBtwItems),

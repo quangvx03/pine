@@ -24,7 +24,7 @@ class CustomerOrderTable extends StatelessWidget {
           sortColumnIndex: controller.sortColumnIndex.value,
           columns: [
             DataColumn2(label: const Text('ID Đơn hàng'), onSort: (columnIndex, ascending) => controller.sortById(columnIndex, ascending)),
-            const DataColumn2(label: Text('Ngày')),
+            DataColumn2(label: Text('Ngày'), onSort: (columnIndex, ascending) => controller.sortById(columnIndex, ascending)),
             const DataColumn2(label: Text('Sản phẩm')),
             DataColumn2(label: const Text('Trạng thái'),
                 fixedWidth: PDeviceUtils.isMobileScreen(context) ? 100 : null),

@@ -21,9 +21,8 @@ class EditStaffController extends GetxController {
   final emailController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final profilePicture = ''.obs;
-  final role = Rx<AppRole>(AppRole.staff); // Chỉnh sửa role với Rx<AppRole>
+  final role = Rx<AppRole>(AppRole.staff);
 
-  // Các controller cho địa chỉ
   final nameController = TextEditingController();
   final phoneNumberAddressController = TextEditingController();
   final streetController = TextEditingController();
@@ -33,7 +32,6 @@ class EditStaffController extends GetxController {
 
   final formKey = GlobalKey<FormState>();
 
-  /// 🛠 Khởi tạo dữ liệu khi chỉnh sửa thông tin nhân viên
   void init(UserModel user) {
     firstNameController.text = user.firstName;
     lastNameController.text = user.lastName;

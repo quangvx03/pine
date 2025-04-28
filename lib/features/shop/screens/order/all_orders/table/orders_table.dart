@@ -27,7 +27,7 @@ class OrderTable extends StatelessWidget {
             const DataColumn2(label: Text('ID Đơn hàng')),
             DataColumn2(label: const Text('Ngày đặt'), onSort: (columnIndex, ascending) => controller.sortByDate(columnIndex, ascending)),
             DataColumn2(label: const Text('Ngày giao'), onSort: (columnIndex, ascending) => controller.sortByDate(columnIndex, ascending)),
-            const DataColumn2(label: Text('Sản phẩm')),
+            DataColumn2(label: Text('Sản phẩm'), onSort: (columnIndex, ascending) => controller.sortByItemCount(columnIndex, ascending)),
             DataColumn2(label: Text('Trạng thái'),
                 fixedWidth: PDeviceUtils.isMobileScreen(context) ? 120 : null),
             const DataColumn2(label: Text('Tổng')),

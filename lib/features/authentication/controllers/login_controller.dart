@@ -61,13 +61,11 @@ class LoginController extends GetxController {
       PFullScreenLoader.stopLoading();
 
       if (user.role == AppRole.admin) {
-        print("Admin login");
-        localStorage.write('Role', 'admin'); // 👈 Lưu role vào storage
+        localStorage.write('Role', 'admin');
         localStorage.write('activeItem', '/dashboard');
         Get.offAll(() => DashboardScreen());
       } else if (user.role == AppRole.staff) {
-        print("Staff login");
-        localStorage.write('Role', 'staff'); // 👈 Lưu role vào storage
+        localStorage.write('Role', 'staff');
         localStorage.write('activeItem', '/staff-dashboard');
         Get.offAll(() => StaffDashboardScreen());
       }
@@ -90,9 +88,7 @@ class LoginController extends GetxController {
         return;
       }
 
-      // Register user using Email & Password Authentication
       await AuthenticationRepository.instance.registerWithEmailAndPassword(PTexts.adminEmail, PTexts.adminPassword);
-
 
       final userRepository = Get.put(UserRepository());
       await userRepository.createUser(
@@ -106,10 +102,7 @@ class LoginController extends GetxController {
         ),
       );
 
-      // Remove Loader
       PFullScreenLoader.stopLoading();
-
-      // Redirect
       AuthenticationRepository.instance.screenRedirect();
     } catch (e) {
       PFullScreenLoader.stopLoading();

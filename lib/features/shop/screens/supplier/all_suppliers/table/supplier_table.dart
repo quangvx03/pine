@@ -24,7 +24,8 @@ class SupplierTable extends StatelessWidget {
           minWidth: 700,
           columns: [
             DataColumn2(label: const Text('ID')),
-            DataColumn2(label: const Text('Nhà cung cấp')),
+            DataColumn2(label: const Text('Nhà cung cấp'), onSort: (columnIndex, ascending) =>
+                controller.sortByName(columnIndex, ascending)),
             const DataColumn2(label: Text('Số điện thoại')),
             const DataColumn2(label: Text('Tổng tiền')),
             DataColumn2(label: Text('Ngày nhập'), onSort: (columnIndex, ascending) =>

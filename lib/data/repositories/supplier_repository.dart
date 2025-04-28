@@ -13,7 +13,6 @@ class SupplierRepository extends GetxController {
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  /// 📥 Lấy tất cả đơn nhập hàng
   Future<List<SupplierModel>> getAllSuppliers() async {
     try {
       final snapshot = await _db.collection("Suppliers").orderBy("createdAt", descending: true).get();
@@ -42,8 +41,6 @@ class SupplierRepository extends GetxController {
       throw 'Có lỗi xảy ra. Vui lòng thử lại';
     }
   }
-
-
 
   Future<void> updatePurchaseOrder(SupplierModel supplier) async {
     try {

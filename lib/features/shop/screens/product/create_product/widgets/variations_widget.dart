@@ -63,77 +63,100 @@ class ProductVariations extends StatelessWidget {
 
   // Helper method to build a variation tile
   Widget _buildVariationTile(
-      BuildContext context, int index, ProductVariationModel variation, ProductVariationController variationController) {
+      BuildContext context,
+      int index,
+      ProductVariationModel variation,
+      ProductVariationController variationController) {
     return ExpansionTile(
       backgroundColor: PColors.lightGrey,
-        collapsedBackgroundColor: PColors.lightGrey,
-        childrenPadding: const EdgeInsets.all(PSizes.md),
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PSizes.borderRadiusLg)),
-        title: Text(variation.attributeValues.entries.map((entry) => '${entry.key}: ${entry.value}').join(', ')),
+      collapsedBackgroundColor: PColors.lightGrey,
+      childrenPadding: const EdgeInsets.all(PSizes.md),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(PSizes.borderRadiusLg),
+      ),
+      title: Text(variation.attributeValues.entries
+          .map((entry) => '${entry.key}: ${entry.value}')
+          .join(', ')),
       children: [
         // Upload Variation Image
-        Obx(
-            () => PImageUploader(
-              right: 0,
-                left: null,
-                imageType: variation.image.value.isNotEmpty ? ImageType.network : ImageType.asset,
-              image: variation.image.value.isNotEmpty ? variation.image.value : PImages.defaultImage,
-              onIconButtonPressed: () => ProductImagesController.instance.selectVariationImage(variation),
-            )
-        ),
+        Obx(() => PImageUploader(
+          right: 0,
+          left: null,
+          imageType: variation.image.value.isNotEmpty ? ImageType.network : ImageType.asset,
+          image: variation.image.value.isNotEmpty
+              ? variation.image.value
+              : PImages.defaultImage,
+          onIconButtonPressed: () =>
+              ProductImagesController.instance.selectVariationImage(variation),
+        )),
         const SizedBox(height: PSizes.spaceBtwInputFields),
 
-        // Variation Stock, and Pricing
+        // Stock, Price, Sale Price
         Row(
           children: [
             Expanded(
-                child: TextFormField(
-                  onChanged: (value) => variation.stock = int.parse(value),
-                  controller: variationController.stockControllersList[index][variation],
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(labelText: 'Kho', hintText: 'Thêm Kho, chỉ được phép "số"'),
-                )
-            ),
-            const SizedBox(width: PSizes.spaceBtwInputFields),
-            Expanded(
-                child: TextFormField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly, // Chỉ cho phép nhập số
-                  ],
-                  onChanged: (value) => variation.price = double.parse(value),
-                  controller: variationController.priceControllersList[index][variation],
-                  decoration: const InputDecoration(labelText: 'Giá', hintText: 'Thêm Giá, chỉ được phép "số"'),
-                )
+              child: TextFormField(
+                onChanged: (value) {
+                  final parsed = int.tryParse(value);
+                  if (parsed != null) variation.stock = parsed;
+                },
+                controller: variationController.stockControllers[variation.id],
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: 'Kho',
+                  hintText: 'Thêm Kho, chỉ được phép "số"',
+                ),
+              ),
             ),
             const SizedBox(width: PSizes.spaceBtwInputFields),
             Expanded(
               child: TextFormField(
-                onChanged: (value) => variation.salePrice = double.parse(value),
-                controller: variationController.salePriceControllersList[index][variation],
+                onChanged: (value) =>
+                variation.price = double.tryParse(value) ?? 0.0,
+                controller: variationController.priceControllers[variation.id],
                 keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly, // Chỉ cho phép nhập số
-                ],
-                decoration: const InputDecoration(labelText: 'Giảm giá', hintText: 'Thêm Giá, chỉ được phép "số"'),
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: 'Giá',
+                  hintText: 'Thêm Giá, chỉ được phép "số"',
+                ),
+              ),
+            ),
+            const SizedBox(width: PSizes.spaceBtwInputFields),
+            Expanded(
+              child: TextFormField(
+                onChanged: (value) =>
+                variation.salePrice = double.tryParse(value) ?? 0.0,
+                controller:
+                variationController.salePriceControllers[variation.id],
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: 'Giảm giá',
+                  hintText: 'Thêm Giá, chỉ được phép "số"',
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: PSizes.spaceBtwInputFields),
 
-        // Variation Description
+        // Description
         TextFormField(
           onChanged: (value) => variation.description = value,
-          controller: variationController.descriptionControllersList[index][variation],
-          decoration: const InputDecoration(labelText: 'Mô tả', hintText: 'Thêm mô tả cho phân loại...'),
+          controller: variationController.descriptionControllers[variation.id],
+          decoration: const InputDecoration(
+            labelText: 'Mô tả',
+            hintText: 'Thêm mô tả cho phân loại...',
+          ),
         ),
         const SizedBox(height: PSizes.spaceBtwSections),
       ],
     );
   }
+
 
   // Helper method to build message when there are no variations
   Widget _buildNoVariationsMessage() {

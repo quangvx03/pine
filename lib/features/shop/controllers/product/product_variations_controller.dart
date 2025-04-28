@@ -10,91 +10,77 @@ class ProductVariationController extends GetxController {
   final isLoading = false.obs;
   final RxList<ProductVariationModel> productVariations = <ProductVariationModel>[].obs;
 
-  List<Map<ProductVariationModel, TextEditingController>> stockControllersList = [];
-  List<Map<ProductVariationModel, TextEditingController>> priceControllersList = [];
-  List<Map<ProductVariationModel, TextEditingController>> salePriceControllersList = [];
-  List<Map<ProductVariationModel, TextEditingController>> descriptionControllersList = [];
+  // ✅ Use variation.id as key for easy access
+  final stockControllers = <String, TextEditingController>{};
+  final priceControllers = <String, TextEditingController>{};
+  final salePriceControllers = <String, TextEditingController>{};
+  final descriptionControllers = <String, TextEditingController>{};
 
   final attributesController = Get.put(ProductAttributesController());
 
   void initializeVariationControllers(List<ProductVariationModel> variations) {
-    stockControllersList.clear();
-    priceControllersList.clear();
-    salePriceControllersList.clear();
-    descriptionControllersList.clear();
+    stockControllers.clear();
+    priceControllers.clear();
+    salePriceControllers.clear();
+    descriptionControllers.clear();
 
     for (var variation in variations) {
-      Map<ProductVariationModel, TextEditingController> stockControllers = {};
-      stockControllers[variation] = TextEditingController(text: variation.stock.toString());
-      stockControllersList.add(stockControllers);
-
-      Map<ProductVariationModel, TextEditingController> priceControllers = {};
-      priceControllers[variation] = TextEditingController(text: variation.price.toString());
-      priceControllersList.add(priceControllers);
-
-      Map<ProductVariationModel, TextEditingController> salePriceControllers = {};
-      salePriceControllers[variation] = TextEditingController(text: variation.salePrice.toString());
-      salePriceControllersList.add(salePriceControllers);
-
-      Map<ProductVariationModel, TextEditingController> descriptionControllers = {};
-      descriptionControllers[variation] = TextEditingController(text: variation.description.toString());
-      descriptionControllersList.add(descriptionControllers);
+      stockControllers[variation.id] = TextEditingController(text: variation.stock.toString());
+      priceControllers[variation.id] = TextEditingController(text: variation.price.toString());
+      salePriceControllers[variation.id] = TextEditingController(text: variation.salePrice.toString());
+      descriptionControllers[variation.id] = TextEditingController(text: variation.description.toString());
     }
-
   }
 
   void removeVariations(BuildContext context) {
     PDialogs.defaultDialog(
-        context: context,
+      context: context,
       title: 'Xóa thuộc tính',
       onConfirm: () {
-          productVariations.value = [];
-          resetAllValues();
-          Navigator.of(context).pop();
-      }
+        productVariations.clear();
+        resetAllValues();
+        Navigator.of(context).pop();
+      },
     );
   }
 
   void generateVariationsConfirmation(BuildContext context) {
     PDialogs.defaultDialog(
-        context: context,
+      context: context,
       confirmText: 'Tạo',
       title: 'Tạo thể loại',
-      content: 'Một khi các thể loại được tạo ra, bạn không thể thêm nhiều thuộc tính hơn. Để thêm nhiều thể loại hơn, bạn phải xóa bất kỳ thuộc tính nào.',
-      onConfirm: () => generateVariationsFromAttributes(),
+      content:
+      'Một khi các thể loại được tạo ra, bạn không thể thêm nhiều thuộc tính hơn. Để thêm nhiều thể loại hơn, bạn phải xóa bất kỳ thuộc tính nào.',
+      onConfirm: generateVariationsFromAttributes,
     );
   }
 
   void generateVariationsFromAttributes() {
-
-    final List<ProductVariationModel> variations = [];
+    resetAllValues();
+    final variations = <ProductVariationModel>[];
 
     if (attributesController.productAttributes.isNotEmpty) {
-      final List<List<String>> attributeCombinations =
-          getCombinations(attributesController.productAttributes.map((attr) => attr.values ?? <String>[]).toList());
+      final attributeCombinations = getCombinations(
+        attributesController.productAttributes.map((attr) => attr.values ?? <String>[]).toList(),
+      );
 
       for (final combination in attributeCombinations) {
-        final Map<String, String> attributeValues =
-            Map.fromIterables(attributesController.productAttributes.map((attr) => attr.name ?? ''), combination);
+        final attributeValues = Map.fromIterables(
+          attributesController.productAttributes.map((attr) => attr.name ?? ''),
+          combination,
+        );
 
-        final ProductVariationModel variation = ProductVariationModel(id: UniqueKey().toString(), attributeValues: attributeValues);
+        final variation = ProductVariationModel(
+          id: UniqueKey().toString(),
+          attributeValues: attributeValues,
+        );
 
         variations.add(variation);
 
-        final Map<ProductVariationModel, TextEditingController> stockControllers = {};
-        final Map<ProductVariationModel, TextEditingController> priceControllers = {};
-        final Map<ProductVariationModel, TextEditingController> salePriceControllers = {};
-        final Map<ProductVariationModel, TextEditingController> descriptionControllers = {};
-
-        stockControllers[variation] = TextEditingController();
-        priceControllers[variation] = TextEditingController();
-        salePriceControllers[variation] = TextEditingController();
-        descriptionControllers[variation] = TextEditingController();
-
-        stockControllersList.add(stockControllers);
-        priceControllersList.add(priceControllers);
-        salePriceControllersList.add(salePriceControllers);
-        descriptionControllersList.add(descriptionControllers);
+        stockControllers[variation.id] = TextEditingController();
+        priceControllers[variation.id] = TextEditingController();
+        salePriceControllers[variation.id] = TextEditingController();
+        descriptionControllers[variation.id] = TextEditingController();
       }
     }
 
@@ -102,7 +88,7 @@ class ProductVariationController extends GetxController {
   }
 
   List<List<String>> getCombinations(List<List<String>> lists) {
-    final List<List<String>> result = [];
+    final result = <List<String>>[];
     combine(lists, 0, <String>[], result);
     return result;
   }
@@ -114,16 +100,16 @@ class ProductVariationController extends GetxController {
     }
 
     for (final item in lists[index]) {
-      final List<String> updated = List.from(current)..add(item);
+      final updated = List<String>.from(current)..add(item);
       combine(lists, index + 1, updated, result);
     }
   }
 
   void resetAllValues() {
     productVariations.clear();
-    stockControllersList.clear();
-    priceControllersList.clear();
-    salePriceControllersList.clear();
-    descriptionControllersList.clear();
+    stockControllers.clear();
+    priceControllers.clear();
+    salePriceControllers.clear();
+    descriptionControllers.clear();
   }
 }

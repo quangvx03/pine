@@ -124,7 +124,7 @@ class ProductAttributes extends StatelessWidget {
             child: SizedBox(
               width: 200,
               child: ElevatedButton.icon(
-                icon: const Icon(Iconsax.activity),
+                icon: const Icon(Iconsax.activity, color: Colors.white),
                 label: const Text('Tạo'),
                 onPressed: () => variationController.generateVariationsConfirmation(context),
               ),

@@ -23,23 +23,18 @@ class BrandsDesktopScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Breadcrumbs
               const PBreadcrumbsWithHeading(heading: 'Thương hiệu', breadcrumbItems: ['Thương hiệu']),
               const SizedBox(height: PSizes.spaceBtwSections),
 
-              // Table Body
-              // Show Loader
               PRoundedContainer(
                 child: Column(
                   children: [
-                    // Table Header
                     PTableHeader(buttonText: 'Thêm thương hiệu',
                         onPressed: () => Get.toNamed(PRoutes.createBrand),
                         searchController: controller.searchTextController,
                         searchOnChanged: (query) => controller.searchQuery(query)),
                     const SizedBox(height: PSizes.spaceBtwItems),
 
-                    // Table
                     Obx(() {
                       if (controller.isLoading.value) return const PLoaderAnimation();
                       return const BrandTable();

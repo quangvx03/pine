@@ -23,28 +23,22 @@ class BannersDesktopScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Breadcrumbs
               const PBreadcrumbsWithHeading(heading: 'Banner', breadcrumbItems: ['Banner']),
               const SizedBox(height: PSizes.spaceBtwSections),
 
-              // Table Body
-              // Show Loader
               Obx(() {
                   if(controller.isLoading.value) return const PLoaderAnimation();
 
                    return PRoundedContainer(
                     child: Column(
                       children: [
-                        // Table Header
                         PTableHeader(buttonText: 'Thêm banner', onPressed: () => Get.toNamed(PRoutes.createBanner)),
                         SizedBox(height: PSizes.spaceBtwItems),
 
-                        // Table
                         BannersTable(),
                       ],
                     ),
                   );
-
                 }
               ),
             ],
